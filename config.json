@@ -1,0 +1,4 @@
+{
+    "interval_minutes": 25,
+    "db_path": "moodtrace.db"
+}
