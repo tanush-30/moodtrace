@@ -76,6 +76,40 @@ if not os.path.isabs(db_path):
 
 interval_minutes = config["interval_minutes"]
 
+def add_to_startup():
+    try:
+        # Check if we are on Windows
+        if sys.platform != "win32":
+            return
+        
+        startup_dir = os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup")
+        lnk_path = os.path.join(startup_dir, "MoodTrace.lnk")
+        if os.path.exists(lnk_path):
+            return # Already in startup
+            
+        vbs_path = os.path.normpath(os.path.join(SCRIPT_DIR, "run_invisible.vbs"))
+        if not os.path.exists(vbs_path):
+            return
+            
+        # Run powershell command to create shortcut
+        lnk_escaped = lnk_path.replace("\\", "/")
+        vbs_escaped = vbs_path.replace("\\", "/")
+        dir_escaped = SCRIPT_DIR.replace("\\", "/")
+        
+        ps_cmd = (
+            f'$WshShell = New-Object -ComObject WScript.Shell; '
+            f'$Shortcut = $WshShell.CreateShortcut("{lnk_escaped}"); '
+            f'$Shortcut.TargetPath = "wscript.exe"; '
+            f'$Shortcut.Arguments = "`"{vbs_escaped}`""; '
+            f'$Shortcut.WorkingDirectory = "{dir_escaped}"; '
+            f'$Shortcut.Save()'
+        )
+        import subprocess
+        subprocess.run(["powershell", "-Command", ps_cmd], capture_output=True)
+        print("MoodTrace added to Windows Startup successfully.")
+    except Exception as e:
+        print(f"Warning: Could not add to Windows Startup: {e}")
+
 # -----------------------------------------------------------------------------
 # Database Setup and Buffering Thread
 # -----------------------------------------------------------------------------
@@ -225,6 +259,7 @@ def setup_tray():
     global tray_icon
     menu = pystray.Menu(
         pystray.MenuItem("Log Mood Now", lambda: trigger_popup_queue.put("manual")),
+        pystray.MenuItem("Configure Interval", lambda: trigger_popup_queue.put("config")),
         pystray.MenuItem("Exit", lambda: trigger_popup_queue.put("QUIT"))
     )
     tray_icon = pystray.Icon("moodtrace", generate_tray_icon(), "MoodTrace Collector", menu)
@@ -465,10 +500,78 @@ def cleanup():
 atexit.register(cleanup)
 
 # -----------------------------------------------------------------------------
+# Configuration Popup GUI
+# -----------------------------------------------------------------------------
+def run_config_popup():
+    global interval_minutes
+    root = tk.Tk()
+    root.title("MoodTrace — Configure")
+    root.configure(bg="#1e1e2e")
+    root.resizable(False, False)
+    
+    w, h = 320, 185
+    ws = root.winfo_screenwidth()
+    hs = root.winfo_screenheight()
+    x = (ws // 2) - (w // 2)
+    y = (hs // 2) - (h // 2)
+    root.geometry(f"{w}x{h}+{x}+{y}")
+    
+    root.attributes("-topmost", True)
+    root.focus_force()
+    
+    tk.Label(root, text="Configure Interval", font=("Segoe UI", 12, "bold"), bg="#1e1e2e", fg="#cdd6f4").pack(pady=(15, 10))
+    tk.Label(root, text="Popup interval (minutes):", font=("Segoe UI", 10), bg="#1e1e2e", fg="#a6adc8").pack(pady=2)
+    
+    entry_var = tk.StringVar(value=str(interval_minutes))
+    entry = tk.Entry(root, textvariable=entry_var, font=("Segoe UI", 10), bg="#313244", fg="#cdd6f4", insertbackground="#cdd6f4", bd=0, justify="center", width=10)
+    entry.pack(pady=5)
+    entry.focus()
+    
+    status_lbl = tk.Label(root, text="", font=("Segoe UI", 8), bg="#1e1e2e", fg="#f38ba8")
+    status_lbl.pack()
+    
+    def on_save():
+        global interval_minutes
+        val_str = entry_var.get().strip()
+        try:
+            val = int(val_str)
+            if val < 1:
+                raise ValueError("Interval must be at least 1 minute.")
+            
+            config_data = load_config()
+            config_data["interval_minutes"] = val
+            with open(CONFIG_PATH, "w") as f:
+                json.dump(config_data, f, indent=4)
+                
+            interval_minutes = val
+            print(f"Interval updated to {val} minutes.")
+            root.destroy()
+        except ValueError as err:
+            status_lbl.config(text=str(err) or "Invalid number")
+            
+    btn_frame = tk.Frame(root, bg="#1e1e2e")
+    btn_frame.pack(pady=(10, 15))
+    
+    save_btn = tk.Button(btn_frame, text="Save", width=8, font=("Segoe UI", 9, "bold"), bg="#89b4fa", fg="#1e1e2e", activebackground="#b4befe", relief="flat", bd=0, command=on_save)
+    save_btn.pack(side="left", padx=10)
+    
+    cancel_btn = tk.Button(btn_frame, text="Cancel", width=8, font=("Segoe UI", 9), bg="#313244", fg="#cdd6f4", activebackground="#45475a", activeforeground="#cdd6f4", relief="flat", bd=0, command=root.destroy)
+    cancel_btn.pack(side="left", padx=10)
+    
+    root.bind("<Return>", lambda e: on_save())
+    root.bind("<Escape>", lambda e: root.destroy())
+    
+    root.mainloop()
+
+# -----------------------------------------------------------------------------
 # Main Scheduler Loop
 # -----------------------------------------------------------------------------
 def main():
     global last_log_time, is_popup_open
+    
+    # Register with Windows Startup shortcut
+    add_to_startup()
+    
     print("MoodTrace Data Collector is active.")
     print("Press Ctrl+Alt+M to manually report your state.")
     print(f"Using SQLite Database: {db_path}")
@@ -499,6 +602,11 @@ def main():
                     is_popup_open = False
                     # Reset interval timer after a selection was answered or closed
                     last_log_time = time.time()
+            elif cmd == "config":
+                if not is_popup_open:
+                    is_popup_open = True
+                    run_config_popup()
+                    is_popup_open = False
         except queue.Empty:
             continue
         except KeyboardInterrupt:
