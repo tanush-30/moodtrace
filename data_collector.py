@@ -76,6 +76,13 @@ if not os.path.isabs(db_path):
 
 interval_minutes = config["interval_minutes"]
 
+# Popup configuration:
+# - AUTO_SCHEDULED_POPUP_ENABLED: False prevents intrusive popups from interrupting your workflow.
+# - MANUAL_POPUP_ENABLED: True allows on-demand logging via Ctrl+Alt+M or tray menu.
+AUTO_SCHEDULED_POPUP_ENABLED = False
+MANUAL_POPUP_ENABLED = True
+
+
 def add_to_startup():
     try:
         # Check if we are on Windows
@@ -228,7 +235,8 @@ is_popup_open = False
 last_log_time = time.time()
 
 def trigger_manual():
-    trigger_popup_queue.put("manual")
+    if MANUAL_POPUP_ENABLED:
+        trigger_popup_queue.put("manual")
 
 hotkey_listener = keyboard.GlobalHotKeys({
     '<ctrl>+<alt>+m': trigger_manual
@@ -258,7 +266,10 @@ tray_icon = None
 def setup_tray():
     global tray_icon
     menu = pystray.Menu(
-        pystray.MenuItem("Log Mood Now", lambda: trigger_popup_queue.put("manual")),
+        pystray.MenuItem(
+            "Log Mood Now",
+            lambda: trigger_popup_queue.put("manual") if MANUAL_POPUP_ENABLED else None
+        ),
         pystray.MenuItem("Configure Interval", lambda: trigger_popup_queue.put("config")),
         pystray.MenuItem("Exit", lambda: trigger_popup_queue.put("QUIT"))
     )
@@ -580,11 +591,18 @@ def main():
     # Start timer monitoring thread
     def check_timer():
         global last_log_time
+
         while True:
             time.sleep(5)
+
+            # Do not schedule automatic popups if disabled
+            if not AUTO_SCHEDULED_POPUP_ENABLED:
+                continue
+
             elapsed = time.time() - last_log_time
             if elapsed >= interval_minutes * 60:
                 trigger_popup_queue.put("scheduled")
+                last_log_time = time.time()
                 
     timer_thread = threading.Thread(target=check_timer, daemon=True)
     timer_thread.start()
@@ -595,12 +613,17 @@ def main():
             cmd = trigger_popup_queue.get(timeout=1.0)
             if cmd == "QUIT":
                 break
-            elif cmd in ("manual", "scheduled"):
+            elif cmd == "manual" and MANUAL_POPUP_ENABLED:
                 if not is_popup_open:
                     is_popup_open = True
                     run_tkinter_popup(cmd)
                     is_popup_open = False
-                    # Reset interval timer after a selection was answered or closed
+                    last_log_time = time.time()
+            elif cmd == "scheduled" and AUTO_SCHEDULED_POPUP_ENABLED:
+                if not is_popup_open:
+                    is_popup_open = True
+                    run_tkinter_popup(cmd)
+                    is_popup_open = False
                     last_log_time = time.time()
             elif cmd == "config":
                 if not is_popup_open:

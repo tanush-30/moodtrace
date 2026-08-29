@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Affect Self-Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="/popup.js" defer></script>
+    <style>
+      body {
+        background-color: #0c0818;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        user-select: none;
+      }
+
+      /* Custom Popup Titlebar to allow closing */
+      .popup-titlebar {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .popup-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0 4px;
+        transition: color 0.2s ease;
+      }
+
+      .close-btn:hover {
+        color: var(--accent-pink);
+      }
+
+      .popup-instruction {
+        margin: 15px 0 10px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #fff;
+        text-align: center;
+      }
+
+      /* Interactive Affect Grid Canvas */
+      .affect-grid-wrapper {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 2px solid rgba(154, 77, 255, 0.15);
+        border-radius: 12px;
+        cursor: crosshair;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+
+      .affect-grid-wrapper:hover {
+        border-color: rgba(154, 77, 255, 0.35);
+      }
+
+      .grid-crosshair-h {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .grid-crosshair-v {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 1px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      /* Interactive Quadrant Highlights */
+      .quadrant-bg {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        transition: opacity 0.25s ease;
+        opacity: 0.02;
+        pointer-events: none;
+      }
+
+      .quad-tl { top: 0; left: 0; background: var(--accent-pink); }
+      .quad-tr { top: 0; right: 0; background: #ffd700; }
+      .quad-bl { bottom: 0; left: 0; background: #0000ff; }
+      .quad-br { bottom: 0; right: 0; background: #00ff7f; }
+
+      .affect-grid-wrapper:hover .quadrant-bg {
+        opacity: 0.05;
+      }
+
+      .grid-labels {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .grid-label {
+        position: absolute;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+      }
+
+      .gl-excited { top: 8px; left: 50%; transform: translateX(-50%); }
+      .gl-calm { bottom: 8px; left: 50%; transform: translateX(-50%); }
+      .gl-negative { left: 8px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+      .gl-positive { right: 8px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+    </style>
+  </head>
+
+  <body>
+    <div class="popup-titlebar">
+      <span class="popup-title">Self-Report</span>
+      <button class="close-btn" id="btn-close-popup">&times;</button>
+    </div>
+
+    <p class="popup-instruction">How is your mood right now?</p>
+
+    <!-- Interactive Grid -->
+    <div class="affect-grid-wrapper" id="affect-grid">
+      <!-- Quadrants background -->
+      <div class="quadrant-bg quad-tl"></div>
+      <div class="quadrant-bg quad-tr"></div>
+      <div class="quadrant-bg quad-bl"></div>
+      <div class="quadrant-bg quad-br"></div>
+
+      <!-- Axes Crosshairs -->
+      <div class="grid-crosshair-h"></div>
+      <div class="grid-crosshair-v"></div>
+
+      <!-- Labels -->
+      <div class="grid-labels">
+        <span class="grid-label gl-excited">Excited</span>
+        <span class="grid-label gl-calm">Calm</span>
+        <span class="grid-label gl-negative">Negative</span>
+        <span class="grid-label gl-positive">Positive</span>
+      </div>
+    </div>
+  </body>
+</html>

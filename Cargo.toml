@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "input_capture",
+    "music_providers",
+    "tauri_app/src-tauri"
+]
+resolver = "2"

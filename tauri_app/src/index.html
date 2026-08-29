@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moodtrace Dashboard</title>
+    <!-- Import Premium Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="/main.js" defer></script>
+  </head>
+
+  <body>
+    <div class="background-radial-glow"></div>
+    
+    <main class="dashboard-container">
+      <!-- Title Header -->
+      <header class="app-header">
+        <div class="logo-area">
+          <span class="pulse-dot"></span>
+          <h1>MOODTRACE</h1>
+        </div>
+        <p class="tagline">Windows Human-Computer Affect Analysis Pipeline</p>
+      </header>
+
+      <!-- Grid Layout -->
+      <div class="dashboard-grid">
+        
+        <!-- Panel 1: Emotion Coordinates -->
+        <section class="glass-panel main-mood-card">
+          <h2 class="section-title">Inferred Emotion State</h2>
+          
+          <div class="mood-plot-container">
+            <!-- 2D Emotion Plane Visualizer -->
+            <div class="emotion-plane" id="emotion-plane-visualizer">
+              <span class="axis-label top">Excited</span>
+              <span class="axis-label bottom">Calm</span>
+              <span class="axis-label left">Negative</span>
+              <span class="axis-label right">Positive</span>
+              
+              <div class="plane-crosshair-h"></div>
+              <div class="plane-crosshair-v"></div>
+              
+              <!-- Inferred dot -->
+              <div class="inferred-dot" id="inferred-dot"></div>
+            </div>
+          </div>
+
+          <div class="mood-readout">
+            <span class="mood-label" id="mood-label">Calm & Happy</span>
+            <span class="mood-coordinates" id="mood-coordinates">Valence: 0.50, Arousal: -0.80</span>
+          </div>
+        </section>
+
+        <!-- Panel 2: Music Recommendation -->
+        <section class="glass-panel music-recommendation-card">
+          <h2 class="section-title">Acoustic Therapeutic Tracking</h2>
+          
+          <div class="track-info-wrapper">
+            <div class="track-art-glow" id="track-art-glow">
+              <div class="track-art-inner">
+                <!-- SVG Music Note or Wave Icon -->
+                <svg viewBox="0 0 24 24" class="music-icon" id="music-art-icon">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="track-metadata">
+              <h3 class="track-title" id="track-title">No Track Active</h3>
+              <p class="track-artist" id="track-artist">Select a provider and interact</p>
+              <p class="click-play-hint" style="font-size: 0.65rem; color: var(--text-secondary); opacity: 0.6; margin-top: 4px;">Click disc to play/unmute</p>
+            </div>
+          </div>
+
+          <!-- Provider Switch Selector -->
+          <div class="provider-selector">
+            <span class="selector-label">Platform Link</span>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="btn-yt" data-provider="youtube">YouTube</button>
+              <button class="toggle-btn" id="btn-spot" data-provider="spotify">Spotify</button>
+            </div>
+          </div>
+
+          <!-- YouTube Player — iframe injected here by main.js when track changes -->
+          <div class="yt-embed-container" id="yt-player-container"></div>
+        </section>
+
+        <!-- Panel 3: Action Center -->
+        <section class="glass-panel actions-card">
+          <h2 class="section-title">Command Center</h2>
+          <p class="description">Manual override for self-label training and database collection.</p>
+          
+          <div class="button-container">
+            <button class="action-btn glow-btn" id="btn-open-grid">
+              <svg viewBox="0 0 24 24" class="btn-icon">
+                <path d="M4 3h16c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm0 4v12h16V7H4zm12 10H8v-2h8v2zm2-4H6V9h12v4z" />
+              </svg>
+              Summon Affect Grid
+            </button>
+          </div>
+
+          <div class="stats-footer">
+            <div class="stat-item">
+              <span class="stat-value" id="events-count">0</span>
+              <span class="stat-label">Events (45s)</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="status-label">Active</span>
+              <span class="stat-label">Pipeline Status</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </body>
+</html>

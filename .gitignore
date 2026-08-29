@@ -21,3 +21,14 @@ env/
 *.njsproj
 *.sln
 *.swp
+
+# Rust target build artifacts
+target/
+**/target/
+
+# Node / frontend dependencies
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
