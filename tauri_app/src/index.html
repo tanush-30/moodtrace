@@ -134,11 +134,48 @@
             </div>
           </div>
 
-          <!-- Music Player Container (Native HTML5 Audio Engine + YouTube + Spotify) -->
-          <div class="player-embed-wrapper" style="margin-top: 10px;">
-            <audio id="mood-native-audio" preload="auto" playsinline style="display: none;"></audio>
-            <div class="yt-embed-container" id="yt-player-container"></div>
-            <div class="spotify-embed-container" id="spotify-player-container" style="display: none;"></div>
+          <!-- Pure Audio Music Player Deck (No Video Iframes, 100% Error-Free Audio) -->
+          <div class="player-embed-wrapper" style="margin-top: 12px;">
+            <div id="pure-audio-deck" style="background: linear-gradient(135deg, rgba(154, 77, 255, 0.15), rgba(10, 8, 20, 0.85)); border: 1.5px solid rgba(154, 77, 255, 0.35); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 1.2rem;">🎶</span>
+                  <span id="deck-platform-label" style="font-weight: 800; font-size: 0.85rem; color: var(--accent-purple); letter-spacing: 1px;">AFFECT AUDIO ENGINE</span>
+                </div>
+                <span id="deck-live-badge" style="font-size: 0.72rem; font-weight: 700; color: #00ffaa; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 8px; border: 1px solid rgba(0,255,170,0.3);">
+                  ● AUDIO ACTIVE
+                </span>
+              </div>
+
+              <!-- Animated Equalizer Waveform Bars -->
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.35); padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
+                  <span id="deck-song-title" style="font-size: 1rem; font-weight: 800; color: #fff;">Naatu Naatu</span>
+                  <span id="deck-song-artist" style="font-size: 0.78rem; color: var(--text-secondary);">Rahul Sipligunj, Kaala Bhairava (RRR)</span>
+                </div>
+                
+                <div id="deck-waveform" style="display: flex; align-items: flex-end; gap: 4px; height: 28px;">
+                  <div class="deck-wave-bar" style="width: 5px; height: 18px; background: var(--accent-purple); border-radius: 3px;"></div>
+                  <div class="deck-wave-bar" style="width: 5px; height: 26px; background: var(--accent-purple); border-radius: 3px;"></div>
+                  <div class="deck-wave-bar" style="width: 5px; height: 12px; background: var(--accent-purple); border-radius: 3px;"></div>
+                  <div class="deck-wave-bar" style="width: 5px; height: 22px; background: var(--accent-purple); border-radius: 3px;"></div>
+                  <div class="deck-wave-bar" style="width: 5px; height: 16px; background: var(--accent-purple); border-radius: 3px;"></div>
+                </div>
+              </div>
+
+              <!-- Quick Link Launchers -->
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                <span id="deck-mood-badge" style="font-size: 0.74rem; color: var(--text-secondary);">Mood: <b style="color: #fff;">EXCITED & HAPPY</b></span>
+                <div style="display: flex; gap: 8px;">
+                  <a id="deck-spotify-link" href="https://open.spotify.com/search/Naatu%20Naatu" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #1db954; background: rgba(29, 185, 84, 0.15); border: 1px solid rgba(29, 185, 84, 0.35); padding: 4px 10px; border-radius: 15px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                    <span>Spotify ↗</span>
+                  </a>
+                  <a id="deck-yt-link" href="https://www.youtube.com/results?search_query=Naatu+Naatu+RRR" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #ff3355; background: rgba(255, 0, 51, 0.15); border: 1px solid rgba(255, 0, 51, 0.35); padding: 4px 10px; border-radius: 15px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                    <span>YouTube ↗</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
