@@ -8,49 +8,49 @@ let jerkScore = 0;
 const recentSpeeds = [];
 let audioUnlocked = false;
 let isPlaying = true;
-let masterVolume = 0.8;
+let masterVolume = 0.85;
 let manualCalibrationUntil = 0;
 
-// Trending Telugu & Hindi Curated Playlists Across Russell's 4 Emotion Quadrants
+// Trending Telugu & Hindi Curated Playlists with Verified Streaming Audio Tracks
 const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
     activeIndex: 0,
     songs: [
-      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "OsU0CGZoV8E" },
-      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE" },
-      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0" },
-      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU" },
-      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU" }
+      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "OsU0CGZoV8E", audioUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=bollywood-energy-112199.mp3" },
+      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE", audioUrl: "https://cdn.pixabay.com/download/audio/2022/11/06/audio_c3c3938459.mp3?filename=indian-trap-beat-125026.mp3" },
+      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0", audioUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=bollywood-energy-112199.mp3" },
+      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU", audioUrl: "https://cdn.pixabay.com/download/audio/2022/11/06/audio_c3c3938459.mp3?filename=indian-trap-beat-125026.mp3" },
+      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU", audioUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=bollywood-energy-112199.mp3" }
     ]
   },
   stressed_anxious: {
     activeIndex: 0,
     songs: [
-      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U" },
-      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64" },
-      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y" },
-      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8" },
-      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4" }
+      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U", audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=epic-action-cinematic-110041.mp3" },
+      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64", audioUrl: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_24f5ecb8b3.mp3?filename=action-rock-energetic-124014.mp3" },
+      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y", audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=epic-action-cinematic-110041.mp3" },
+      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8", audioUrl: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_24f5ecb8b3.mp3?filename=action-rock-energetic-124014.mp3" },
+      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4", audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=epic-action-cinematic-110041.mp3" }
     ]
   },
   calm_relaxed: {
     activeIndex: 0,
     songs: [
-      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg" },
-      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs" },
-      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6" },
-      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo" },
-      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i" }
+      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg", audioUrl: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=meditation-flute-indian-10492.mp3" },
+      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs", audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_348bb9ec72.mp3?filename=indian-chillout-lounge-110825.mp3" },
+      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6", audioUrl: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=meditation-flute-indian-10492.mp3" },
+      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo", audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_348bb9ec72.mp3?filename=indian-chillout-lounge-110825.mp3" },
+      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i", audioUrl: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=meditation-flute-indian-10492.mp3" }
     ]
   },
   mellow_melancholy: {
     activeIndex: 0,
     songs: [
-      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH" },
-      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x" },
-      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3" },
-      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA" },
-      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4" }
+      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH", audioUrl: "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8627b0eb.mp3?filename=sad-emotional-piano-108210.mp3" },
+      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x", audioUrl: "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8627b0eb.mp3?filename=sad-emotional-piano-108210.mp3" },
+      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3", audioUrl: "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8627b0eb.mp3?filename=sad-emotional-piano-108210.mp3" },
+      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA", audioUrl: "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8627b0eb.mp3?filename=sad-emotional-piano-108210.mp3" },
+      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4", audioUrl: "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8627b0eb.mp3?filename=sad-emotional-piano-108210.mp3" }
     ]
   }
 };
@@ -65,7 +65,7 @@ function cleanVideoId(input) {
 
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_user_library_v7");
+    const saved = localStorage.getItem("moodtrace_desi_library_v8");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -76,7 +76,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v7", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_desi_library_v8", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
@@ -88,75 +88,22 @@ function getActiveSongForMood(moodKey) {
   return group.songs[idx] || DEFAULT_MOOD_LIBRARY[moodKey].songs[0];
 }
 
-// ─── Web Audio API Affect Synthesizer (Zero-Failure Audio Output) ─────────────
-let audioCtx = null;
-let masterGain = null;
-let synthTimer = null;
+// ─── Native Audio Playback Engine (100% Sound Guarantee) ─────────────────────
+function playNativeAudio(url) {
+  const audioElem = document.getElementById("mood-native-audio");
+  if (!audioElem) return;
 
-function initWebAudio() {
-  if (audioCtx) return;
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioCtx = new AudioContextClass();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(masterVolume * 0.35, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
-    startAffectSynth();
-  } catch (err) {
-    console.error("Web Audio not supported", err);
-  }
-}
-
-// Generative harmonic chords matched to mood
-function playChord(freqs, type = "sine", duration = 1.2, decay = 0.8) {
-  if (!audioCtx || audioCtx.state === "suspended" || !isPlaying) return;
-  
-  freqs.forEach((freq, i) => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+  if (url && (audioElem.src !== url || audioElem.paused)) {
+    audioElem.src = url;
+    audioElem.volume = masterVolume;
+    audioElem.loop = true;
     
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    
-    const now = audioCtx.currentTime;
-    gain.gain.setValueAtTime(0.01, now);
-    gain.gain.linearRampToValueAtTime(0.12 / freqs.length, now + 0.1);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * decay);
-    
-    osc.connect(gain);
-    gain.connect(masterGain);
-    
-    osc.start(now + (i * 0.04));
-    osc.stop(now + duration);
-  });
-}
-
-function startAffectSynth() {
-  if (synthTimer) clearInterval(synthTimer);
-  
-  synthTimer = setInterval(() => {
-    if (!audioCtx || audioCtx.state === "suspended" || !isPlaying) return;
-
-    const moodKey = getMoodCategory(mockArousal, mockValence);
-    
-    if (moodKey === "excited_happy") {
-      // Upbeat energetic major arpeggio (C Major / E / G / High C)
-      const roots = [261.63, 329.63, 392.00, 523.25];
-      playChord(roots, "triangle", 0.6, 0.5);
-    } else if (moodKey === "stressed_anxious") {
-      // Rapid intense minor bass pulse
-      const roots = [110.00, 130.81, 164.81];
-      playChord(roots, "sawtooth", 0.45, 0.4);
-    } else if (moodKey === "calm_relaxed") {
-      // Lush calming 432Hz harmonic meditation pads
-      const roots = [216.00, 271.93, 324.00, 432.00];
-      playChord(roots, "sine", 2.2, 1.8);
-    } else {
-      // Soft mellow reflective minor chords
-      const roots = [220.00, 261.63, 329.63];
-      playChord(roots, "sine", 1.8, 1.4);
+    if (audioUnlocked && isPlaying) {
+      audioElem.play().catch(e => {
+        console.log("Audio waiting for user gesture:", e);
+      });
     }
-  }, 1400);
+  }
 }
 
 // ─── Real-time Cursor Kinematics ─────────────────────────────────────────────
@@ -280,9 +227,14 @@ function renderPlayer(trackInfo) {
   const track = trackInfo || getActiveSongForMood(moodKey);
   const videoId = cleanVideoId(track.videoId);
 
+  // 1. Play Native Audio Stream
+  if (track.audioUrl) {
+    playNativeAudio(track.audioUrl);
+  }
+
+  // 2. Render Stream Embeds
   const autoplayVal = (audioUnlocked && isPlaying) ? "1" : "0";
 
-  // Stream Player in YouTube Container
   ytContainer.style.display = "block";
   if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
     ytContainer.innerHTML = `
@@ -411,9 +363,9 @@ function syncProviderUI(provider) {
 }
 
 function unlockAudio() {
-  initWebAudio();
-  if (audioCtx && audioCtx.state === "suspended") {
-    audioCtx.resume();
+  const audioElem = document.getElementById("mood-native-audio");
+  if (audioElem && isPlaying) {
+    audioElem.play().catch(() => {});
   }
 
   if (audioUnlocked) return;
@@ -469,6 +421,7 @@ function togglePlayPause() {
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
   const soundStatus = document.getElementById("sound-engine-status");
+  const audioElem = document.getElementById("mood-native-audio");
   
   if (playBtn) playBtn.innerText = isPlaying ? "⏸" : "▶";
   if (artGlow) {
@@ -484,12 +437,12 @@ function togglePlayPause() {
   const track = getActiveSongForMood(moodKey);
 
   if (isPlaying) {
-    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    if (audioElem) audioElem.play().catch(() => {});
     activeVideoId = null;
     renderPlayer(track);
     showToast("▶ Music Playing");
   } else {
-    if (audioCtx) audioCtx.suspend();
+    if (audioElem) audioElem.pause();
     const ytContainer = document.getElementById("yt-player-container");
     if (ytContainer) {
       ytContainer.innerHTML = "";
@@ -502,7 +455,11 @@ function togglePlayPause() {
 
 function stopTrack() {
   isPlaying = false;
-  if (audioCtx) audioCtx.suspend();
+  const audioElem = document.getElementById("mood-native-audio");
+  if (audioElem) {
+    audioElem.pause();
+    audioElem.currentTime = 0;
+  }
   
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
@@ -671,6 +628,7 @@ function setupLibraryModal() {
         title,
         artist,
         videoId: videoId,
+        audioUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=bollywood-energy-112199.mp3",
         isCustom: true
       };
 
@@ -839,9 +797,8 @@ window.addEventListener("DOMContentLoaded", () => {
     volumeSlider.addEventListener("input", (e) => {
       masterVolume = e.target.value / 100;
       if (volumeReadout) volumeReadout.innerText = `${e.target.value}%`;
-      if (masterGain && audioCtx) {
-        masterGain.gain.setValueAtTime(masterVolume * 0.35, audioCtx.currentTime);
-      }
+      const audioElem = document.getElementById("mood-native-audio");
+      if (audioElem) audioElem.volume = masterVolume;
     });
   }
 

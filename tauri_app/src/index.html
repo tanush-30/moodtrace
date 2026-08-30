@@ -134,8 +134,9 @@
             </div>
           </div>
 
-          <!-- Music Player Container (Supports both YouTube and Spotify) -->
+          <!-- Music Player Container (Native HTML5 Audio Engine + YouTube + Spotify) -->
           <div class="player-embed-wrapper" style="margin-top: 10px;">
+            <audio id="mood-native-audio" preload="auto" playsinline style="display: none;"></audio>
             <div class="yt-embed-container" id="yt-player-container"></div>
             <div class="spotify-embed-container" id="spotify-player-container" style="display: none;"></div>
           </div>
