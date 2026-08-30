@@ -14,13 +14,22 @@
     <div class="background-radial-glow"></div>
     
     <main class="dashboard-container">
+      <!-- Live Audio Activation Banner -->
+      <div id="audio-activation-banner" class="audio-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(154, 77, 255, 0.25), rgba(0, 191, 255, 0.25)); border: 1px solid rgba(154, 77, 255, 0.4); border-radius: 12px; padding: 10px 16px; cursor: pointer; transition: all 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.2rem;">🎵</span>
+          <span id="audio-banner-text" style="font-size: 0.85rem; font-weight: 600; color: #fff;">Click here to enable live audio playback & mouse mood-tracking</span>
+        </div>
+        <button id="btn-enable-audio" style="background: var(--accent-purple); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">Enable Audio</button>
+      </div>
+
       <!-- Title Header -->
       <header class="app-header">
         <div class="logo-area">
           <span class="pulse-dot"></span>
           <h1>MOODTRACE</h1>
         </div>
-        <p class="tagline">Windows Human-Computer Affect Analysis Pipeline</p>
+        <p class="tagline">Real-time Human Affect & Music Generation Pipeline</p>
       </header>
 
       <!-- Grid Layout -->
@@ -48,18 +57,27 @@
 
           <div class="mood-readout">
             <span class="mood-label" id="mood-label">Calm & Happy</span>
-            <span class="mood-coordinates" id="mood-coordinates">Valence: 0.50, Arousal: -0.80</span>
+            <span class="mood-coordinates" id="mood-coordinates">Valence: 0.50  Arousal: -0.80</span>
+          </div>
+
+          <div class="dynamics-bar-wrapper" style="margin-top: 10px; width: 100%; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-secondary);">
+              <span>Mouse Speed Dynamics</span>
+              <span id="speed-indicator">0 px/s</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+              <div id="speed-meter-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-pink)); transition: width 0.15s ease;"></div>
+            </div>
           </div>
         </section>
 
         <!-- Panel 2: Music Recommendation -->
         <section class="glass-panel music-recommendation-card">
-          <h2 class="section-title">Acoustic Therapeutic Tracking</h2>
+          <h2 class="section-title">Acoustic Affect Generation</h2>
           
           <div class="track-info-wrapper">
-            <div class="track-art-glow" id="track-art-glow">
+            <div class="track-art-glow" id="track-art-glow" style="cursor: pointer;">
               <div class="track-art-inner">
-                <!-- SVG Music Note or Wave Icon -->
                 <svg viewBox="0 0 24 24" class="music-icon" id="music-art-icon">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                 </svg>
@@ -67,9 +85,9 @@
             </div>
 
             <div class="track-metadata">
-              <h3 class="track-title" id="track-title">No Track Active</h3>
-              <p class="track-artist" id="track-artist">Select a provider and interact</p>
-              <p class="click-play-hint" style="font-size: 0.65rem; color: var(--text-secondary); opacity: 0.6; margin-top: 4px;">Click disc to play/unmute</p>
+              <h3 class="track-title" id="track-title">Loading Track...</h3>
+              <p class="track-artist" id="track-artist">Move mouse fast or slow to shift mood</p>
+              <p class="click-play-hint" id="player-status-hint" style="font-size: 0.7rem; color: var(--accent-blue); opacity: 0.9; margin-top: 4px;">▶ Move cursor to shift mood & music</p>
             </div>
           </div>
 
@@ -82,14 +100,14 @@
             </div>
           </div>
 
-          <!-- YouTube Player — iframe injected here by main.js when track changes -->
+          <!-- YouTube Player Container -->
           <div class="yt-embed-container" id="yt-player-container"></div>
         </section>
 
         <!-- Panel 3: Action Center -->
         <section class="glass-panel actions-card">
           <h2 class="section-title">Command Center</h2>
-          <p class="description">Manual override for self-label training and database collection.</p>
+          <p class="description">Interactive mouse kinematics affect inference & self-report logger.</p>
           
           <div class="button-container">
             <button class="action-btn glow-btn" id="btn-open-grid">
@@ -103,10 +121,10 @@
           <div class="stats-footer">
             <div class="stat-item">
               <span class="stat-value" id="events-count">0</span>
-              <span class="stat-label">Events (45s)</span>
+              <span class="stat-label">Velocity Samples</span>
             </div>
             <div class="stat-item">
-              <span class="stat-value" id="status-label">Active</span>
+              <span class="stat-value" id="status-label" style="color: #00ffaa;">Live Inferred</span>
               <span class="stat-label">Pipeline Status</span>
             </div>
           </div>
