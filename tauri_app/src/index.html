@@ -100,8 +100,11 @@
             </div>
           </div>
 
-          <!-- YouTube Player Container -->
-          <div class="yt-embed-container" id="yt-player-container"></div>
+          <!-- Music Player Container (Supports both YouTube and Spotify) -->
+          <div class="player-embed-wrapper" style="margin-top: 10px;">
+            <div class="yt-embed-container" id="yt-player-container"></div>
+            <div class="spotify-embed-container" id="spotify-player-container" style="display: none;"></div>
+          </div>
         </section>
 
         <!-- Panel 3: Action Center -->
@@ -132,5 +135,44 @@
 
       </div>
     </main>
+
+    <!-- Modal: Affect Self-Report Grid -->
+    <div id="affect-grid-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-badge">Manual Affect Override</span>
+            <h3 class="modal-title">Summon Affect Grid</h3>
+          </div>
+          <button id="btn-close-modal" class="modal-close-btn">&times;</button>
+        </div>
+        <p class="modal-subtitle">Click anywhere inside the 2D plane to calibrate your emotional state and auto-switch music.</p>
+        
+        <div class="modal-grid-wrapper" id="modal-affect-grid">
+          <!-- Quadrant Highlights -->
+          <div class="quad-bg quad-tl"></div>
+          <div class="quad-bg quad-tr"></div>
+          <div class="quad-bg quad-bl"></div>
+          <div class="quad-bg quad-br"></div>
+          
+          <!-- Crosshairs -->
+          <div class="grid-crosshair-h"></div>
+          <div class="grid-crosshair-v"></div>
+          
+          <!-- Labels -->
+          <span class="grid-label gl-top">Excited (High Arousal)</span>
+          <span class="grid-label gl-bottom">Calm (Low Arousal)</span>
+          <span class="grid-label gl-left">Negative</span>
+          <span class="grid-label gl-right">Positive</span>
+          
+          <!-- Cursor dot -->
+          <div class="grid-marker" id="modal-grid-marker"></div>
+        </div>
+
+        <div class="modal-footer">
+          <span id="modal-coords-readout">Hover over the grid to choose coordinates</span>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
