@@ -8,6 +8,7 @@ let jerkScore = 0;
 const recentSpeeds = [];
 let audioUnlocked = false;
 let isPlaying = true;
+let masterVolume = 0.8;
 let manualCalibrationUntil = 0;
 
 // Trending Telugu & Hindi Curated Playlists Across Russell's 4 Emotion Quadrants
@@ -54,7 +55,6 @@ const DEFAULT_MOOD_LIBRARY = {
   }
 };
 
-// Clean YouTube video ID from URL or plain ID
 function cleanVideoId(input) {
   if (!input) return "OsU0CGZoV8E";
   input = String(input).trim();
@@ -63,28 +63,20 @@ function cleanVideoId(input) {
   return input.split("?")[0].split("&")[0];
 }
 
-// Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    localStorage.removeItem("moodtrace_user_library");
-    localStorage.removeItem("moodtrace_user_library_v2");
-    localStorage.removeItem("moodtrace_user_library_v3");
-    localStorage.removeItem("moodtrace_user_library_v4_desi");
-
-    const saved = localStorage.getItem("moodtrace_user_library_v6_desi");
+    const saved = localStorage.getItem("moodtrace_user_library_v7");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
     }
-  } catch (e) {
-    console.error("Could not load library", e);
-  }
+  } catch (e) {}
   return JSON.parse(JSON.stringify(DEFAULT_MOOD_LIBRARY));
 }
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v6_desi", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v7", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
@@ -94,6 +86,77 @@ function getActiveSongForMood(moodKey) {
   const group = moodLibrary[moodKey] || moodLibrary["excited_happy"];
   const idx = Math.max(0, Math.min(group.activeIndex, group.songs.length - 1));
   return group.songs[idx] || DEFAULT_MOOD_LIBRARY[moodKey].songs[0];
+}
+
+// ─── Web Audio API Affect Synthesizer (Zero-Failure Audio Output) ─────────────
+let audioCtx = null;
+let masterGain = null;
+let synthTimer = null;
+
+function initWebAudio() {
+  if (audioCtx) return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(masterVolume * 0.35, audioCtx.currentTime);
+    masterGain.connect(audioCtx.destination);
+    startAffectSynth();
+  } catch (err) {
+    console.error("Web Audio not supported", err);
+  }
+}
+
+// Generative harmonic chords matched to mood
+function playChord(freqs, type = "sine", duration = 1.2, decay = 0.8) {
+  if (!audioCtx || audioCtx.state === "suspended" || !isPlaying) return;
+  
+  freqs.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.12 / freqs.length, now + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * decay);
+    
+    osc.connect(gain);
+    gain.connect(masterGain);
+    
+    osc.start(now + (i * 0.04));
+    osc.stop(now + duration);
+  });
+}
+
+function startAffectSynth() {
+  if (synthTimer) clearInterval(synthTimer);
+  
+  synthTimer = setInterval(() => {
+    if (!audioCtx || audioCtx.state === "suspended" || !isPlaying) return;
+
+    const moodKey = getMoodCategory(mockArousal, mockValence);
+    
+    if (moodKey === "excited_happy") {
+      // Upbeat energetic major arpeggio (C Major / E / G / High C)
+      const roots = [261.63, 329.63, 392.00, 523.25];
+      playChord(roots, "triangle", 0.6, 0.5);
+    } else if (moodKey === "stressed_anxious") {
+      // Rapid intense minor bass pulse
+      const roots = [110.00, 130.81, 164.81];
+      playChord(roots, "sawtooth", 0.45, 0.4);
+    } else if (moodKey === "calm_relaxed") {
+      // Lush calming 432Hz harmonic meditation pads
+      const roots = [216.00, 271.93, 324.00, 432.00];
+      playChord(roots, "sine", 2.2, 1.8);
+    } else {
+      // Soft mellow reflective minor chords
+      const roots = [220.00, 261.63, 329.63];
+      playChord(roots, "sine", 1.8, 1.4);
+    }
+  }, 1400);
 }
 
 // ─── Real-time Cursor Kinematics ─────────────────────────────────────────────
@@ -207,7 +270,7 @@ const { invoke } = window.__TAURI__?.core || {
   }
 };
 
-// ─── Guaranteed Audio & Video Player Renderer ─────────────────────────────────
+// ─── Live Music Player Renderer ──────────────────────────────────────────────
 function renderPlayer(trackInfo) {
   const ytContainer = document.getElementById("yt-player-container");
   const spotContainer = document.getElementById("spotify-player-container");
@@ -219,44 +282,27 @@ function renderPlayer(trackInfo) {
 
   const autoplayVal = (audioUnlocked && isPlaying) ? "1" : "0";
 
-  if (currentProvider === "youtube") {
-    spotContainer.style.display = "none";
-    ytContainer.style.display = "block";
+  // Stream Player in YouTube Container
+  ytContainer.style.display = "block";
+  if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
+    ytContainer.innerHTML = `
+      <iframe width="100%" height="${currentProvider === 'youtube' ? '180' : '90'}"
+        src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1"
+        title="MoodTrace Audio"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        style="border: none; border-radius: 12px; width: 100%;">
+      </iframe>
+    `;
+    activeVideoId = videoId;
+  }
 
-    if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
-      ytContainer.innerHTML = `
-        <iframe width="100%" height="160"
-          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1"
-          title="MoodTrace Audio Stream"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          style="border: none; border-radius: 12px; width: 100%; height: 160px;">
-        </iframe>
-      `;
-      activeVideoId = videoId;
-    }
-  } else {
-    // Spotify Mode: Interactive Deck + Active Audio Stream
-    ytContainer.style.display = "block";
+  if (currentProvider === "spotify") {
     spotContainer.style.display = "block";
-
-    // Embed audio stream with minimal height to allow uninterrupted background playback
-    if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
-      ytContainer.innerHTML = `
-        <iframe width="100%" height="80"
-          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1"
-          title="MoodTrace Audio Stream"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          style="border: none; border-radius: 8px; width: 100%; height: 80px; margin-top: 6px;">
-        </iframe>
-      `;
-      activeVideoId = videoId;
-    }
-
     const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`;
 
     spotContainer.innerHTML = `
-      <div style="background: linear-gradient(135deg, rgba(29, 185, 84, 0.25), rgba(12, 8, 24, 0.95)); border: 1.5px solid rgba(29, 185, 84, 0.5); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
+      <div style="background: linear-gradient(135deg, rgba(29, 185, 84, 0.25), rgba(12, 8, 24, 0.95)); border: 1.5px solid rgba(29, 185, 84, 0.5); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#1db954">
@@ -265,17 +311,16 @@ function renderPlayer(trackInfo) {
             <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY DESI STREAM</span>
           </div>
           <span style="font-size: 0.72rem; font-weight: 700; color: ${isPlaying ? '#00ffaa' : '#ff77aa'}; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">
-            ${isPlaying ? '● AUDIO PLAYING' : '⏸ PAUSED'}
+            ${isPlaying ? '● LIVE AUDIO STREAMING' : '⏸ PAUSED'}
           </span>
         </div>
 
-        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 10px;">
           <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
             <span style="font-size: 0.95rem; font-weight: 800; color: #fff;">${track.title}</span>
             <span style="font-size: 0.78rem; color: var(--text-secondary);">${track.artist}</span>
           </div>
           
-          <!-- Animated Equalizer Waveform -->
           <div style="display: flex; align-items: flex-end; gap: 3px; height: 24px;">
             <div style="width: 4px; height: ${isPlaying ? '18px' : '4px'}; background: #1db954; border-radius: 2px;"></div>
             <div style="width: 4px; height: ${isPlaying ? '24px' : '6px'}; background: #1db954; border-radius: 2px;"></div>
@@ -292,22 +337,22 @@ function renderPlayer(trackInfo) {
         </div>
       </div>
     `;
+  } else {
+    spotContainer.style.display = "none";
   }
 }
 
-// ─── State Polling & Dynamic UI Dispatcher ─────────────────────────────────────
+// ─── State Polling ───────────────────────────────────────────────────────────
 async function pollState() {
   try {
     const s = await invoke("get_current_state");
     const { valence, arousal, provider } = s;
 
-    // Coordinates Readout
     const coordElem = document.getElementById("mood-coordinates");
     if (coordElem) {
       coordElem.innerText = `Valence: ${(+valence).toFixed(2)}   Arousal: ${(+arousal).toFixed(2)}`;
     }
 
-    // Mood Label
     let label = "Neutral";
     if (arousal > 0.25 && valence > 0.1) label = "Excited & Energized (Naatu / Tauba)";
     else if (arousal > 0.25 && valence <= 0.1) label = "Stressed & Intense (Arjan / Hukum)";
@@ -317,7 +362,6 @@ async function pollState() {
     const labelElem = document.getElementById("mood-label");
     if (labelElem) labelElem.innerText = label;
 
-    // 2D Russell Plane Dot
     const dot = document.getElementById("inferred-dot");
     if (dot) {
       const leftPx = Math.min(240, Math.max(8, ((+valence + 1) / 2) * 248));
@@ -326,7 +370,6 @@ async function pollState() {
       dot.style.top  = `${topPx}px`;
     }
 
-    // Dynamic Track Auto-Switch
     const moodKey = getMoodCategory(arousal, valence);
     const track = getActiveSongForMood(moodKey);
     
@@ -368,6 +411,11 @@ function syncProviderUI(provider) {
 }
 
 function unlockAudio() {
+  initWebAudio();
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
   if (audioUnlocked) return;
   audioUnlocked = true;
 
@@ -376,13 +424,16 @@ function unlockAudio() {
     banner.style.background = "rgba(0, 255, 170, 0.15)";
     banner.style.borderColor = "rgba(0, 255, 170, 0.4)";
     const text = document.getElementById("audio-banner-text");
-    if (text) text.innerText = "✨ Live Tracking & Audio Active — Move mouse fast/slow to change music!";
+    if (text) text.innerText = "✨ Live Audio Active — Moving cursor dynamically shifts mood & music!";
     const btn = document.getElementById("btn-enable-audio");
     if (btn) btn.style.display = "none";
   }
 
   const hint = document.getElementById("player-status-hint");
   if (hint) hint.innerText = "🔊 Audio Active • Auto-matching to mouse speed";
+
+  const soundStatus = document.getElementById("sound-engine-status");
+  if (soundStatus) soundStatus.innerText = "🟢 Audio Playing Live";
 
   const moodKey = getMoodCategory(mockArousal, mockValence);
   renderPlayer(getActiveSongForMood(moodKey));
@@ -417,6 +468,7 @@ function togglePlayPause() {
   isPlaying = !isPlaying;
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
+  const soundStatus = document.getElementById("sound-engine-status");
   
   if (playBtn) playBtn.innerText = isPlaying ? "⏸" : "▶";
   if (artGlow) {
@@ -424,14 +476,20 @@ function togglePlayPause() {
     else artGlow.classList.remove("playing");
   }
 
+  if (soundStatus) {
+    soundStatus.innerText = isPlaying ? "🟢 Audio Playing Live" : "⏸ Audio Paused";
+  }
+
   const moodKey = getMoodCategory(mockArousal, mockValence);
   const track = getActiveSongForMood(moodKey);
 
   if (isPlaying) {
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
     activeVideoId = null;
     renderPlayer(track);
     showToast("▶ Music Playing");
   } else {
+    if (audioCtx) audioCtx.suspend();
     const ytContainer = document.getElementById("yt-player-container");
     if (ytContainer) {
       ytContainer.innerHTML = "";
@@ -444,11 +502,15 @@ function togglePlayPause() {
 
 function stopTrack() {
   isPlaying = false;
+  if (audioCtx) audioCtx.suspend();
+  
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
+  const soundStatus = document.getElementById("sound-engine-status");
   
   if (playBtn) playBtn.innerText = "▶";
   if (artGlow) artGlow.classList.remove("playing");
+  if (soundStatus) soundStatus.innerText = "⏹ Audio Stopped";
 
   const ytContainer = document.getElementById("yt-player-container");
   if (ytContainer) {
@@ -764,11 +826,24 @@ window.addEventListener("DOMContentLoaded", () => {
   const btnStop = document.getElementById("btn-stop-track");
   const btnNext = document.getElementById("btn-next-track");
   const quickSelect = document.getElementById("quick-mood-select");
+  const volumeSlider = document.getElementById("volume-slider");
+  const volumeReadout = document.getElementById("volume-readout");
 
   if (btnPrev) btnPrev.addEventListener("click", () => cycleTrack("prev"));
   if (btnNext) btnNext.addEventListener("click", () => cycleTrack("next"));
   if (btnPlay) btnPlay.addEventListener("click", togglePlayPause);
   if (btnStop) btnStop.addEventListener("click", stopTrack);
+
+  // Volume slider
+  if (volumeSlider) {
+    volumeSlider.addEventListener("input", (e) => {
+      masterVolume = e.target.value / 100;
+      if (volumeReadout) volumeReadout.innerText = `${e.target.value}%`;
+      if (masterGain && audioCtx) {
+        masterGain.gain.setValueAtTime(masterVolume * 0.35, audioCtx.currentTime);
+      }
+    });
+  }
 
   // Quick Mood Select Dropdown
   if (quickSelect) {
