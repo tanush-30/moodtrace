@@ -246,36 +246,64 @@ function renderPlayer(trackInfo) {
       activeVideoId = track.videoId;
     }
   } else {
-    // Spotify Provider
-    ytContainer.style.display = "none";
+    // Spotify Provider: Full Interactive Native Deck + Background Stream
     spotContainer.style.display = "block";
     
-    const cleanId = cleanSpotifyId(track.spotifyId);
-    if (cleanId !== activeSpotifyId || spotContainer.innerHTML === "") {
-      spotContainer.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 14px; border: 1px solid rgba(29, 185, 84, 0.25);">
-          <iframe style="border-radius: 10px; width: 100%; border: none;"
-            src="https://open.spotify.com/embed/track/${cleanId}?utm_source=generator"
-            width="100%" height="152"
-            frameBorder="0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-          </iframe>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 6px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1db954">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-              </svg>
-              <span style="font-size: 0.75rem; font-weight: 700; color: #1db954;">Spotify Live Active</span>
-            </div>
-            <a href="https://open.spotify.com/track/${cleanId}" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #1db954; background: rgba(29, 185, 84, 0.15); border: 1px solid rgba(29, 185, 84, 0.35); padding: 4px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
-              <span>Open in Spotify Web ↗</span>
-            </a>
+    // Maintain underlying audio stream
+    if (track.videoId && (track.videoId !== activeVideoId || !isPlaying)) {
+      const autoplayParam = audioUnlocked && isPlaying ? 1 : 0;
+      ytContainer.style.display = "none";
+      ytContainer.innerHTML = `
+        <iframe width="1" height="1"
+          src="https://www.youtube.com/embed/${track.videoId}?autoplay=${autoplayParam}&mute=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
+          title="MoodTrace Audio Stream"
+          allow="autoplay; encrypted-media"
+          style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;">
+        </iframe>
+      `;
+      activeVideoId = track.videoId;
+    }
+
+    const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`;
+    
+    spotContainer.innerHTML = `
+      <div style="background: linear-gradient(135deg, rgba(29, 185, 84, 0.22), rgba(12, 8, 24, 0.95)); border: 1.5px solid rgba(29, 185, 84, 0.45); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#1db954">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>
+            <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY LIVE SYNC</span>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: ${isPlaying ? '#00ffaa' : '#ff77aa'}; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">
+            ${isPlaying ? '● STREAMING LIVE' : '⏸ PAUSED'}
+          </span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
+            <span style="font-size: 0.95rem; font-weight: 800; color: #fff;">${track.title}</span>
+            <span style="font-size: 0.78rem; color: var(--text-secondary);">${track.artist}</span>
+          </div>
+          
+          <!-- Animated Equalizer Waveform -->
+          <div style="display: flex; align-items: flex-end; gap: 3px; height: 24px;">
+            <div style="width: 4px; height: ${isPlaying ? '18px' : '4px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '24px' : '6px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '14px' : '4px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '20px' : '5px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
           </div>
         </div>
-      `;
-      activeSpotifyId = cleanId;
-    }
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+          <span style="font-size: 0.72rem; color: var(--text-secondary);">Mood: <b style="color: #fff;">${moodKey.replace('_', ' ').toUpperCase()}</b></span>
+          <a href="${spotifySearchUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.74rem; color: #1db954; background: rgba(29, 185, 84, 0.18); border: 1px solid rgba(29, 185, 84, 0.45); padding: 5px 12px; border-radius: 20px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+            <span>Open in Spotify App ↗</span>
+          </a>
+        </div>
+      </div>
+    `;
+    activeSpotifyId = track.title;
   }
 }
 
@@ -419,12 +447,32 @@ function togglePlayPause() {
     showToast("▶ Music Resumed");
   } else {
     const ytContainer = document.getElementById("yt-player-container");
-    if (ytContainer && currentProvider === "youtube") {
+    if (ytContainer) {
       ytContainer.innerHTML = "";
       activeVideoId = null;
     }
+    renderPlayer(track);
     showToast("⏸ Music Paused");
   }
+}
+
+function stopTrack() {
+  isPlaying = false;
+  const playBtn = document.getElementById("btn-play-pause");
+  const artGlow = document.getElementById("track-art-glow");
+  
+  if (playBtn) playBtn.innerText = "▶";
+  if (artGlow) artGlow.classList.remove("playing");
+
+  const ytContainer = document.getElementById("yt-player-container");
+  if (ytContainer) {
+    ytContainer.innerHTML = "";
+    activeVideoId = null;
+  }
+  
+  const moodKey = getMoodCategory(mockArousal, mockValence);
+  renderPlayer(getActiveSongForMood(moodKey));
+  showToast("⏹ Music Stopped");
 }
 
 // ─── Modal: Affect Grid Manager ───────────────────────────────────────────────
@@ -742,11 +790,35 @@ window.addEventListener("DOMContentLoaded", () => {
   // Playback Control Buttons
   const btnPrev = document.getElementById("btn-prev-track");
   const btnPlay = document.getElementById("btn-play-pause");
+  const btnStop = document.getElementById("btn-stop-track");
   const btnNext = document.getElementById("btn-next-track");
+  const quickSelect = document.getElementById("quick-mood-select");
 
   if (btnPrev) btnPrev.addEventListener("click", () => cycleTrack("prev"));
   if (btnNext) btnNext.addEventListener("click", () => cycleTrack("next"));
   if (btnPlay) btnPlay.addEventListener("click", togglePlayPause);
+  if (btnStop) btnStop.addEventListener("click", stopTrack);
+
+  // Quick Mood Select Dropdown
+  if (quickSelect) {
+    quickSelect.addEventListener("change", (e) => {
+      const selectedMood = e.target.value;
+      if (selectedMood === "excited_happy") { mockArousal = 0.75; mockValence = 0.65; }
+      else if (selectedMood === "stressed_anxious") { mockArousal = 0.75; mockValence = -0.55; }
+      else if (selectedMood === "calm_relaxed") { mockArousal = -0.65; mockValence = 0.65; }
+      else if (selectedMood === "mellow_melancholy") { mockArousal = -0.65; mockValence = -0.55; }
+      
+      manualCalibrationUntil = Date.now() + 12000;
+      lastTitle = "";
+      activeVideoId = null;
+      isPlaying = true;
+      const playBtn = document.getElementById("btn-play-pause");
+      if (playBtn) playBtn.innerText = "⏸";
+      unlockAudio();
+      pollState();
+      showToast(`✨ Selected Mood: ${selectedMood.replace('_', ' ').toUpperCase()}`);
+    });
+  }
 
   // Provider toggle switches
   async function switchProvider(name) {
