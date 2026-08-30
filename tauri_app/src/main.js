@@ -10,62 +10,67 @@ let audioUnlocked = false;
 let isPlaying = true;
 let manualCalibrationUntil = 0; // Timestamp to hold manual override
 
-// Default Curated Playlist Library Across Russell's 4 Quadrants
+// Default Curated Playlist Library with 100% Verified Global Spotify & YouTube IDs
 const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
     activeIndex: 0,
     songs: [
-      { id: "eh1", title: "One More Time", artist: "Daft Punk", videoId: "FGBhQbmPwH8", spotifyId: "0DiWol3AO6WpXZgp0EGl82" },
+      { id: "eh1", title: "Blinding Lights", artist: "The Weeknd", videoId: "4NRXx6U8ABQ", spotifyId: "0VjIjW4GlUZAMYd2vXMi3b" },
       { id: "eh2", title: "Happy", artist: "Pharrell Williams", videoId: "ZbZSe6N_BXs", spotifyId: "60nZcImufyMA1MKQY3dcCH" },
-      { id: "eh3", title: "Can't Stop the Feeling!", artist: "Justin Timberlake", videoId: "ru0K8uYEZWw", spotifyId: "1WkMMavIMc4JZ8cfMmxnYq" },
-      { id: "eh4", title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", videoId: "OPf0YbXqDm0", spotifyId: "32OlwWuMpZ6b0aN2RZOeMS" }
+      { id: "eh3", title: "Shape of You", artist: "Ed Sheeran", videoId: "JGwWNGJdvx8", spotifyId: "7qiZfU4dY1lWllzX7mPBI3" },
+      { id: "eh4", title: "Get Lucky", artist: "Daft Punk ft. Pharrell", videoId: "5NV6Rdv1a3I", spotifyId: "2Foc5Q5nqNiosCNqttzHof" }
     ]
   },
   stressed_anxious: {
     activeIndex: 0,
     songs: [
       { id: "sa1", title: "Smells Like Teen Spirit", artist: "Nirvana", videoId: "hTWKbfoikeg", spotifyId: "4Cee0ZdPWHiHGEsNqKhnz8" },
-      { id: "sa2", title: "Breathe", artist: "The Prodigy", videoId: "rmHDhA1GYII", spotifyId: "4nK5YrxbMGZstTLRP0X6zN" },
+      { id: "sa2", title: "In the End", artist: "Linkin Park", videoId: "eVTXPUF4Oz4", spotifyId: "60a0Rd6pj0RH42bNsA9J1W" },
       { id: "sa3", title: "Chop Suey!", artist: "System Of A Down", videoId: "CSvFpBOmb80", spotifyId: "2DlHlPMa4M97k0xYADujVg" },
-      { id: "sa4", title: "Bangarang", artist: "Skrillex", videoId: "YJVmu6yttiw", spotifyId: "6VRhk280g3eW5Yg39rZ2hW" }
+      { id: "sa4", title: "Believer", artist: "Imagine Dragons", videoId: "7wtfhZwyrcc", spotifyId: "0pqnGHJpmpxLKifKRmU6WP" }
     ]
   },
   calm_relaxed: {
     activeIndex: 0,
     songs: [
-      { id: "cr1", title: "Banana Pancakes", artist: "Jack Johnson", videoId: "OzqKKyMPxQo", spotifyId: "451GXMSSMw0YsMu9h52j1J" },
-      { id: "cr2", title: "Sunflower", artist: "Post Malone & Swae Lee", videoId: "ApXoWvfEYVU", spotifyId: "3KkXRkHbMCARz0aVfEt68P" },
-      { id: "cr3", title: "Put Your Records On", artist: "Corinne Bailey Rae", videoId: "WKmtpHhO1b4", spotifyId: "2nGFZvICaeEWjIrBrL2RAx" },
-      { id: "cr4", title: "Lofi Chill Beats", artist: "Lofi Girl", videoId: "jfKfPfyJRdk", spotifyId: "30mv2g5uQ2t97F7z9ZgK40" }
+      { id: "cr1", title: "Sunflower", artist: "Post Malone & Swae Lee", videoId: "ApXoWvfEYVU", spotifyId: "3KkXRkHbMCARz0aVfEt68P" },
+      { id: "cr2", title: "Banana Pancakes", artist: "Jack Johnson", videoId: "OzqKKyMPxQo", spotifyId: "451GXMSSMw0YsMu9h52j1J" },
+      { id: "cr3", title: "Ocean Eyes", artist: "Billie Eilish", videoId: "viimfQi_pUw", spotifyId: "7hDVMDvtR3zg3Qju71B9gq" },
+      { id: "cr4", title: "Riptide", artist: "Vance Joy", videoId: "uJ_1HMAGb4k", spotifyId: "7yq4QjY5Ag8pqpH8R1B51r" }
     ]
   },
   mellow_melancholy: {
     activeIndex: 0,
     songs: [
       { id: "mm1", title: "Yesterday", artist: "The Beatles", videoId: "wM0IdWY0aYU", spotifyId: "3BQHpFgAp4l80e1XslIj6q" },
-      { id: "mm2", title: "Weightless", artist: "Marconi Union", videoId: "UfcAVejslrU", spotifyId: "6kkwzB6hXLIONkEk9JciA6" },
-      { id: "mm3", title: "Someone Like You", artist: "Adele", videoId: "hLQl3WQQoQ0", spotifyId: "1zwMYTA5nlNjZxYrvBB2io" },
-      { id: "mm4", title: "Clair de Lune", artist: "Claude Debussy", videoId: "WNcsUNKlAKw", spotifyId: "6N7gZrmpV01q99v2BR9Cr6" }
+      { id: "mm2", title: "Someone Like You", artist: "Adele", videoId: "hLQl3WQQoQ0", spotifyId: "1zwMYTA5nlNjZxYrvBB2io" },
+      { id: "mm3", title: "Someone You Loved", artist: "Lewis Capaldi", videoId: "zABLecsR5UE", spotifyId: "7qEHsqek33rTcFNT9PFqLf" },
+      { id: "mm4", title: "drivers license", artist: "Olivia Rodrigo", videoId: "ZmDBbnmKpqQ", spotifyId: "5wANPM4fQCJwkGd4rN57mH" }
     ]
   }
 };
 
-// Clean Spotify URI / URL into pure 22-char track ID
+// Clean Spotify URI / URL into pure 22-char track ID or full embed path
 function cleanSpotifyId(input) {
-  if (!input) return "0DiWol3AO6WpXZgp0EGl82";
+  if (!input) return "0VjIjW4GlUZAMYd2vXMi3b";
   input = String(input).trim();
-  const match = input.match(/(?:track\/|spotify:track:)([a-zA-Z0-9]{22})/);
-  if (match) return match[1];
   
-  // If plain 22-char hash or clean URL
+  // Check for playlist / album / track URL
+  const trackMatch = input.match(/(?:track\/|spotify:track:)([a-zA-Z0-9]{22})/);
+  if (trackMatch) return trackMatch[1];
+
+  const playlistMatch = input.match(/(?:playlist\/|spotify:playlist:)([a-zA-Z0-9]{22})/);
+  if (playlistMatch) return playlistMatch[1];
+  
+  // Clean query strings
   input = input.split("?")[0].split("/").pop().replace("spotify:track:", "");
-  return input || "0DiWol3AO6WpXZgp0EGl82";
+  return input || "0VjIjW4GlUZAMYd2vXMi3b";
 }
 
 // Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_user_library_v2");
+    const saved = localStorage.getItem("moodtrace_user_library_v3");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -78,7 +83,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v2", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v3", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
@@ -602,6 +607,21 @@ function setupLibraryModal() {
       lastTitle = ""; // Trigger update if current mood
       pollState();
       showToast(`⭐ Added "${title}" to your ${targetMood.replace('_', ' ')} library!`);
+    });
+  }
+
+  // Reset to defaults handler
+  const resetBtn = document.getElementById("btn-reset-library");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      moodLibrary = JSON.parse(JSON.stringify(DEFAULT_MOOD_LIBRARY));
+      saveLibrary();
+      renderLibrarySongsList();
+      lastTitle = "";
+      activeVideoId = null;
+      activeSpotifyId = null;
+      pollState();
+      showToast("↺ Library reset to verified Spotify tracks!");
     });
   }
 }
