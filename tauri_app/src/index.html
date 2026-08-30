@@ -9,9 +9,8 @@
     <title>Moodtrace Dashboard</title>
     <!-- Import Premium Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=6" />
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script type="module" src="main.js?v=6" defer></script>
+    <link rel="stylesheet" href="styles.css?v=7" />
+    <script type="module" src="main.js?v=7" defer></script>
   </head>
 
   <body>
@@ -22,7 +21,7 @@
       <div id="audio-activation-banner" class="audio-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(154, 77, 255, 0.25), rgba(0, 191, 255, 0.25)); border: 1px solid rgba(154, 77, 255, 0.4); border-radius: 12px; padding: 10px 16px; cursor: pointer; transition: all 0.3s ease;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.2rem;">🎵</span>
-          <span id="audio-banner-text" style="font-size: 0.85rem; font-weight: 600; color: #fff;">Click here to enable live audio playback & mouse mood-tracking</span>
+          <span id="audio-banner-text" style="font-size: 0.85rem; font-weight: 600; color: #fff;">Click ▶ to start playing real Telugu & Hindi song previews (30-sec via iTunes)</span>
         </div>
         <button id="btn-enable-audio" style="background: var(--accent-purple); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">Enable Audio</button>
       </div>
@@ -140,7 +139,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-size: 1.2rem;">🎶</span>
-                  <span id="deck-platform-label" style="font-weight: 800; font-size: 0.85rem; color: var(--accent-purple); letter-spacing: 1px;">AFFECT AUDIO ENGINE</span>
+                  <span id="deck-platform-label" style="font-weight: 800; font-size: 0.85rem; color: var(--accent-purple); letter-spacing: 1px;">iTunes Preview • Real Audio</span>
                 </div>
                 <span id="deck-live-badge" style="font-size: 0.72rem; font-weight: 700; color: #00ffaa; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 8px; border: 1px solid rgba(0,255,170,0.3);">
                   ● AUDIO ACTIVE
@@ -280,13 +279,8 @@
           <h4 style="font-size: 0.88rem; font-weight: 700; color: #fff;">➕ Add Custom Favorite Song</h4>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input type="text" id="new-song-title" placeholder="Song Title (e.g. Midnight City)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
-            <input type="text" id="new-song-artist" placeholder="Artist (e.g. M83)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
-          </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input type="text" id="new-song-yt" placeholder="YouTube Video ID or URL" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
-            <input type="text" id="new-song-spotify" placeholder="Spotify Track ID or URL (optional)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
+            <input type="text" id="new-song-title" placeholder="Song Title (e.g. Kesariya)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
+            <input type="text" id="new-song-artist" placeholder="Artist (e.g. Arijit Singh)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center;">
