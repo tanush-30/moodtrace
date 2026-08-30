@@ -1,6 +1,15 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "outputDirectory": "tauri_app/src",
-  "buildCommand": null,
-  "cleanUrls": true
+  "version": 2,
+  "builds": [
+    {
+      "src": "tauri_app/src/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/tauri_app/src/$1"
+    }
+  ]
 }
