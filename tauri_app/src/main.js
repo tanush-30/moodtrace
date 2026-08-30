@@ -24,8 +24,8 @@ const DEFAULT_MOOD_LIBRARY = {
   stressed_anxious: {
     activeIndex: 0,
     songs: [
-      { id: "sa1", title: "Smells Like Teen Spirit", artist: "Nirvana", videoId: "hTWKbfoikeg", spotifyId: "5N5k9ndv5i4QecR6zgM2gO" },
-      { id: "sa2", title: "Breathe", artist: "The Prodigy", videoId: "rmHDhA1GYII", spotifyId: "6j9vUeU3pWqCqgS03GjW6I" },
+      { id: "sa1", title: "Smells Like Teen Spirit", artist: "Nirvana", videoId: "hTWKbfoikeg", spotifyId: "4Cee0ZdPWHiHGEsNqKhnz8" },
+      { id: "sa2", title: "Breathe", artist: "The Prodigy", videoId: "rmHDhA1GYII", spotifyId: "4nK5YrxbMGZstTLRP0X6zN" },
       { id: "sa3", title: "Chop Suey!", artist: "System Of A Down", videoId: "CSvFpBOmb80", spotifyId: "2DlHlPMa4M97k0xYADujVg" },
       { id: "sa4", title: "Bangarang", artist: "Skrillex", videoId: "YJVmu6yttiw", spotifyId: "6VRhk280g3eW5Yg39rZ2hW" }
     ]
@@ -50,10 +50,22 @@ const DEFAULT_MOOD_LIBRARY = {
   }
 };
 
+// Clean Spotify URI / URL into pure 22-char track ID
+function cleanSpotifyId(input) {
+  if (!input) return "0DiWol3AO6WpXZgp0EGl82";
+  input = String(input).trim();
+  const match = input.match(/(?:track\/|spotify:track:)([a-zA-Z0-9]{22})/);
+  if (match) return match[1];
+  
+  // If plain 22-char hash or clean URL
+  input = input.split("?")[0].split("/").pop().replace("spotify:track:", "");
+  return input || "0DiWol3AO6WpXZgp0EGl82";
+}
+
 // Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_user_library");
+    const saved = localStorage.getItem("moodtrace_user_library_v2");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -66,7 +78,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v2", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
@@ -229,17 +241,27 @@ function renderPlayer(trackInfo) {
     ytContainer.style.display = "none";
     spotContainer.style.display = "block";
     
-    if (track.spotifyId && track.spotifyId !== activeSpotifyId) {
+    const cleanId = cleanSpotifyId(track.spotifyId);
+    if (cleanId !== activeSpotifyId) {
       spotContainer.innerHTML = `
-        <iframe style="border-radius:12px; width:100%; border:none;"
-          src="https://open.spotify.com/embed/track/${track.spotifyId}?utm_source=generator&theme=0"
-          width="100%" height="152"
-          allowfullscreen=""
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy">
-        </iframe>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <iframe style="border-radius: 12px; width: 100%; border: none;"
+            src="https://open.spotify.com/embed/track/${cleanId}?utm_source=generator&theme=0"
+            width="100%" height="152"
+            frameBorder="0"
+            allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy">
+          </iframe>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+            <span style="font-size: 0.72rem; color: var(--text-secondary);">Spotify Web Player</span>
+            <a href="https://open.spotify.com/track/${cleanId}" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #1db954; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+              <span>↗ Open in Spotify App</span>
+            </a>
+          </div>
+        </div>
       `;
-      activeSpotifyId = track.spotifyId;
+      activeSpotifyId = cleanId;
     }
   }
 }
@@ -541,16 +563,15 @@ function setupLibraryModal() {
       const ytMatch = videoId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
       if (ytMatch) videoId = ytMatch[1];
 
-      // Extract Spotify Track ID if full URL provided
-      const spotMatch = spotifyId.match(/track\/([a-zA-Z0-9]+)/);
-      if (spotMatch) spotifyId = spotMatch[1];
+      // Extract Spotify Track ID if provided
+      spotifyId = spotifyId ? cleanSpotifyId(spotifyId) : "0DiWol3AO6WpXZgp0EGl82";
 
       const newSong = {
         id: "custom_" + Date.now(),
         title,
         artist,
         videoId,
-        spotifyId: spotifyId || "0DiWol3AO6WpXZgp0EGl82",
+        spotifyId: spotifyId,
         isCustom: true
       };
 
