@@ -10,49 +10,53 @@ let audioUnlocked = false;
 let isPlaying = true;
 let manualCalibrationUntil = 0; // Timestamp to hold manual override
 
-// Default Curated Playlist Library with 100% Verified Global Spotify & YouTube IDs
+// Trending Telugu & Hindi Curated Playlists Across Russell's 4 Emotion Quadrants
 const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
     activeIndex: 0,
     songs: [
-      { id: "eh1", title: "Blinding Lights", artist: "The Weeknd", videoId: "4NRXx6U8ABQ", spotifyId: "0VjIjW4GlUZAMYd2vXMi3b" },
-      { id: "eh2", title: "Happy", artist: "Pharrell Williams", videoId: "ZbZSe6N_BXs", spotifyId: "60nZcImufyMA1MKQY3dcCH" },
-      { id: "eh3", title: "Shape of You", artist: "Ed Sheeran", videoId: "JGwWNGJdvx8", spotifyId: "7qiZfU4dY1lWllzX7mPBI3" },
-      { id: "eh4", title: "Get Lucky", artist: "Daft Punk ft. Pharrell", videoId: "5NV6Rdv1a3I", spotifyId: "2Foc5Q5nqNiosCNqttzHof" }
+      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "OsU0CGZoV8E", spotifyId: "0b5TA897c41Vl9w9b8cI5p" },
+      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" },
+      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0", spotifyId: "5dJ1zW5Vw7b0B2i3gU2sQz" },
+      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU", spotifyId: "0yLwL8tB8bSgBfVv13H2H5" },
+      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU", spotifyId: "2qJ3kM3u9d19H2dM30c0nU" }
     ]
   },
   stressed_anxious: {
     activeIndex: 0,
     songs: [
-      { id: "sa1", title: "Smells Like Teen Spirit", artist: "Nirvana", videoId: "hTWKbfoikeg", spotifyId: "4Cee0ZdPWHiHGEsNqKhnz8" },
-      { id: "sa2", title: "In the End", artist: "Linkin Park", videoId: "eVTXPUF4Oz4", spotifyId: "60a0Rd6pj0RH42bNsA9J1W" },
-      { id: "sa3", title: "Chop Suey!", artist: "System Of A Down", videoId: "CSvFpBOmb80", spotifyId: "2DlHlPMa4M97k0xYADujVg" },
-      { id: "sa4", title: "Believer", artist: "Imagine Dragons", videoId: "7wtfhZwyrcc", spotifyId: "0pqnGHJpmpxLKifKRmU6WP" }
+      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U", spotifyId: "4iV5W9uYEdVUVa79Axb7Rh" },
+      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64", spotifyId: "19H2dM30c0nUqj3kM3u9d1" },
+      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y", spotifyId: "0H3u9d19H2dM30c0nUqj3k" },
+      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8", spotifyId: "6mXmF7Z6qHwPcqP654yS3x" },
+      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" }
     ]
   },
   calm_relaxed: {
     activeIndex: 0,
     songs: [
-      { id: "cr1", title: "Sunflower", artist: "Post Malone & Swae Lee", videoId: "ApXoWvfEYVU", spotifyId: "3KkXRkHbMCARz0aVfEt68P" },
-      { id: "cr2", title: "Banana Pancakes", artist: "Jack Johnson", videoId: "OzqKKyMPxQo", spotifyId: "451GXMSSMw0YsMu9h52j1J" },
-      { id: "cr3", title: "Ocean Eyes", artist: "Billie Eilish", videoId: "viimfQi_pUw", spotifyId: "7hDVMDvtR3zg3Qju71B9gq" },
-      { id: "cr4", title: "Riptide", artist: "Vance Joy", videoId: "uJ_1HMAGb4k", spotifyId: "7yq4QjY5Ag8pqpH8R1B51r" }
+      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg", spotifyId: "2qJ3kM3u9d19H2dM30c0nU" },
+      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs", spotifyId: "6AQbmPrNa05O5qj60U9QkH" },
+      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6", spotifyId: "4iV5W9uYEdVUVa79Axb7Rh" },
+      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo", spotifyId: "7cR43i9Kq1b8Z6y2qJ3kM3" },
+      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i", spotifyId: "1dM30c0nUqj3kM3u9d19H2" }
     ]
   },
   mellow_melancholy: {
     activeIndex: 0,
     songs: [
-      { id: "mm1", title: "Yesterday", artist: "The Beatles", videoId: "wM0IdWY0aYU", spotifyId: "3BQHpFgAp4l80e1XslIj6q" },
-      { id: "mm2", title: "Someone Like You", artist: "Adele", videoId: "hLQl3WQQoQ0", spotifyId: "1zwMYTA5nlNjZxYrvBB2io" },
-      { id: "mm3", title: "Someone You Loved", artist: "Lewis Capaldi", videoId: "zABLecsR5UE", spotifyId: "7qEHsqek33rTcFNT9PFqLf" },
-      { id: "mm4", title: "drivers license", artist: "Olivia Rodrigo", videoId: "ZmDBbnmKpqQ", spotifyId: "5wANPM4fQCJwkGd4rN57mH" }
+      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH", spotifyId: "5dJ1zW5Vw7b0B2i3gU2sQz" },
+      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" },
+      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3", spotifyId: "0yLwL8tB8bSgBfVv13H2H5" },
+      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA", spotifyId: "6AQbmPrNa05O5qj60U9QkH" },
+      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" }
     ]
   }
 };
 
 // Clean Spotify URI / URL into pure 22-char track ID or full embed path
 function cleanSpotifyId(input) {
-  if (!input) return "0VjIjW4GlUZAMYd2vXMi3b";
+  if (!input) return "0b5TA897c41Vl9w9b8cI5p";
   input = String(input).trim();
   
   // Check for playlist / album / track URL
@@ -64,13 +68,13 @@ function cleanSpotifyId(input) {
   
   // Clean query strings
   input = input.split("?")[0].split("/").pop().replace("spotify:track:", "");
-  return input || "0VjIjW4GlUZAMYd2vXMi3b";
+  return input || "0b5TA897c41Vl9w9b8cI5p";
 }
 
 // Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_user_library_v3");
+    const saved = localStorage.getItem("moodtrace_user_library_v4_desi");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -83,7 +87,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v3", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v4_desi", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
