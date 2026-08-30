@@ -74,7 +74,12 @@ function cleanSpotifyId(input) {
 // Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_user_library_v4_desi");
+    // Purge old legacy keys that contained invalid hashes
+    localStorage.removeItem("moodtrace_user_library");
+    localStorage.removeItem("moodtrace_user_library_v2");
+    localStorage.removeItem("moodtrace_user_library_v3");
+
+    const saved = localStorage.getItem("moodtrace_user_library_v5_desi");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -87,7 +92,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v4_desi", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v5_desi", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
