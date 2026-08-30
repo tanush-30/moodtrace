@@ -1,6 +1,6 @@
 // ─── Real-time Mouse Dynamics & Affect Engine ────────────────────────────────
-let mockArousal = -0.5;
-let mockValence = 0.6;
+let mockArousal = 0.6;
+let mockValence = 0.5;
 let currentSpeed = 0;
 let lastMouseX = null, lastMouseY = null, lastMouseTime = null;
 let lastDx = 0, lastDy = 0;
@@ -8,104 +8,95 @@ let jerkScore = 0;
 const recentSpeeds = [];
 let audioUnlocked = false;
 let isPlaying = true;
-let manualCalibrationUntil = 0; // Timestamp to hold manual override
+let manualCalibrationUntil = 0;
 
 // Trending Telugu & Hindi Curated Playlists Across Russell's 4 Emotion Quadrants
 const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
     activeIndex: 0,
     songs: [
-      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "OsU0CGZoV8E", spotifyId: "0b5TA897c41Vl9w9b8cI5p" },
-      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" },
-      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0", spotifyId: "5dJ1zW5Vw7b0B2i3gU2sQz" },
-      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU", spotifyId: "0yLwL8tB8bSgBfVv13H2H5" },
-      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU", spotifyId: "2qJ3kM3u9d19H2dM30c0nU" }
+      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "OsU0CGZoV8E" },
+      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE" },
+      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0" },
+      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU" },
+      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU" }
     ]
   },
   stressed_anxious: {
     activeIndex: 0,
     songs: [
-      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U", spotifyId: "4iV5W9uYEdVUVa79Axb7Rh" },
-      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64", spotifyId: "19H2dM30c0nUqj3kM3u9d1" },
-      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y", spotifyId: "0H3u9d19H2dM30c0nUqj3k" },
-      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8", spotifyId: "6mXmF7Z6qHwPcqP654yS3x" },
-      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" }
+      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U" },
+      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64" },
+      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y" },
+      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8" },
+      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4" }
     ]
   },
   calm_relaxed: {
     activeIndex: 0,
     songs: [
-      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg", spotifyId: "2qJ3kM3u9d19H2dM30c0nU" },
-      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs", spotifyId: "6AQbmPrNa05O5qj60U9QkH" },
-      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6", spotifyId: "4iV5W9uYEdVUVa79Axb7Rh" },
-      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo", spotifyId: "7cR43i9Kq1b8Z6y2qJ3kM3" },
-      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i", spotifyId: "1dM30c0nUqj3kM3u9d19H2" }
+      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg" },
+      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs" },
+      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6" },
+      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo" },
+      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i" }
     ]
   },
   mellow_melancholy: {
     activeIndex: 0,
     songs: [
-      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH", spotifyId: "5dJ1zW5Vw7b0B2i3gU2sQz" },
-      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" },
-      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3", spotifyId: "0yLwL8tB8bSgBfVv13H2H5" },
-      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA", spotifyId: "6AQbmPrNa05O5qj60U9QkH" },
-      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4", spotifyId: "3yHqvt1Gv167DVI1zZ4W6I" }
+      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH" },
+      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x" },
+      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3" },
+      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA" },
+      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4" }
     ]
   }
 };
 
-// Clean Spotify URI / URL into pure 22-char track ID or full embed path
-function cleanSpotifyId(input) {
-  if (!input) return "0b5TA897c41Vl9w9b8cI5p";
+// Clean YouTube video ID from URL or plain ID
+function cleanVideoId(input) {
+  if (!input) return "OsU0CGZoV8E";
   input = String(input).trim();
-  
-  // Check for playlist / album / track URL
-  const trackMatch = input.match(/(?:track\/|spotify:track:)([a-zA-Z0-9]{22})/);
-  if (trackMatch) return trackMatch[1];
-
-  const playlistMatch = input.match(/(?:playlist\/|spotify:playlist:)([a-zA-Z0-9]{22})/);
-  if (playlistMatch) return playlistMatch[1];
-  
-  // Clean query strings
-  input = input.split("?")[0].split("/").pop().replace("spotify:track:", "");
-  return input || "0b5TA897c41Vl9w9b8cI5p";
+  const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (match) return match[1];
+  return input.split("?")[0].split("&")[0];
 }
 
 // Load or initialize user library from localStorage
 function loadLibrary() {
   try {
-    // Purge old legacy keys that contained invalid hashes
     localStorage.removeItem("moodtrace_user_library");
     localStorage.removeItem("moodtrace_user_library_v2");
     localStorage.removeItem("moodtrace_user_library_v3");
+    localStorage.removeItem("moodtrace_user_library_v4_desi");
 
-    const saved = localStorage.getItem("moodtrace_user_library_v5_desi");
+    const saved = localStorage.getItem("moodtrace_user_library_v6_desi");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
     }
   } catch (e) {
-    console.error("Could not load library from storage", e);
+    console.error("Could not load library", e);
   }
   return JSON.parse(JSON.stringify(DEFAULT_MOOD_LIBRARY));
 }
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_user_library_v5_desi", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_user_library_v6_desi", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
 let moodLibrary = loadLibrary();
 
-// Helper to get active song for a mood
 function getActiveSongForMood(moodKey) {
-  const group = moodLibrary[moodKey] || moodLibrary["calm_relaxed"];
+  const group = moodLibrary[moodKey] || moodLibrary["excited_happy"];
   const idx = Math.max(0, Math.min(group.activeIndex, group.songs.length - 1));
   return group.songs[idx] || DEFAULT_MOOD_LIBRARY[moodKey].songs[0];
 }
 
-// ─── Real-time Browser Cursor Kinematics ──────────────────────────────────────
+// ─── Real-time Cursor Kinematics ─────────────────────────────────────────────
 window.addEventListener("mousemove", (e) => {
   const now = Date.now();
   if (lastMouseX !== null && lastMouseTime !== null) {
@@ -118,7 +109,6 @@ window.addEventListener("mousemove", (e) => {
       currentSpeed = instSpeed;
       recentSpeeds.push({ t: now, speed: instSpeed });
 
-      // Compute directional jerk
       const angleChange = Math.abs(Math.atan2(dy, dx) - Math.atan2(lastDy, lastDx));
       if (angleChange > 1.2 && instSpeed > 300) {
         jerkScore = Math.min(1.0, jerkScore + 0.15);
@@ -135,7 +125,6 @@ window.addEventListener("mousemove", (e) => {
   lastMouseTime = now;
 });
 
-// Click dynamics boost arousal momentarily
 window.addEventListener("click", () => {
   if (Date.now() > manualCalibrationUntil) {
     mockArousal = Math.min(1.0, mockArousal + 0.10);
@@ -143,10 +132,9 @@ window.addEventListener("click", () => {
   unlockAudio();
 });
 
-// ─── Affect Inference Loop (50 Hz / 20ms) ────────────────────────────────────
+// ─── Affect Inference Loop (50 Hz) ───────────────────────────────────────────
 setInterval(() => {
   const now = Date.now();
-  
   while (recentSpeeds.length && now - recentSpeeds[0].t > 2500) {
     recentSpeeds.shift();
   }
@@ -154,7 +142,6 @@ setInterval(() => {
   if (now > manualCalibrationUntil) {
     if (recentSpeeds.length > 0) {
       const avgSpeed = recentSpeeds.reduce((acc, x) => acc + x.speed, 0) / recentSpeeds.length;
-      
       const targetArousal = Math.min(1, Math.max(-1, (avgSpeed / 450) - 1));
       mockArousal = mockArousal * 0.88 + targetArousal * 0.12;
 
@@ -167,7 +154,6 @@ setInterval(() => {
     }
   }
 
-  // Update speed UI bar & live stats
   const speedElem = document.getElementById("speed-indicator");
   const meterElem = document.getElementById("speed-meter-fill");
   if (speedElem && meterElem) {
@@ -178,7 +164,6 @@ setInterval(() => {
   }
 }, 50);
 
-// ─── Determine Mood Category ──────────────────────────────────────────────────
 function getMoodCategory(arousal, valence) {
   if (arousal >= 0.0) {
     return valence >= 0.0 ? "excited_happy" : "stressed_anxious";
@@ -187,10 +172,9 @@ function getMoodCategory(arousal, valence) {
   }
 }
 
-// ─── Tauri IPC / Browser Fallback Bridge ──────────────────────────────────────
+// ─── Tauri IPC / Fallback Bridge ──────────────────────────────────────────────
 let currentProvider = "youtube";
 let activeVideoId = null;
-let activeSpotifyId = null;
 let lastTitle = "";
 
 const { invoke } = window.__TAURI__?.core || {
@@ -203,9 +187,8 @@ const { invoke } = window.__TAURI__?.core || {
         arousal: mockArousal,
         track_title: track.title,
         track_artist: track.artist,
-        track_provider_id: currentProvider === "spotify" ? track.spotifyId : track.videoId,
+        track_provider_id: track.videoId,
         youtube_id: track.videoId,
-        spotify_id: track.spotifyId,
         provider: currentProvider,
         mood_key: moodKey
       };
@@ -213,7 +196,7 @@ const { invoke } = window.__TAURI__?.core || {
     if (cmd === "submit_label" && args) {
       mockValence = args.valence;
       mockArousal = args.arousal;
-      manualCalibrationUntil = Date.now() + 8000;
+      manualCalibrationUntil = Date.now() + 10000;
       return { ok: true };
     }
     if (cmd === "set_provider" && args) {
@@ -224,7 +207,7 @@ const { invoke } = window.__TAURI__?.core || {
   }
 };
 
-// ─── Embedded Music Players (YouTube & Spotify) ───────────────────────────────
+// ─── Guaranteed Audio & Video Player Renderer ─────────────────────────────────
 function renderPlayer(trackInfo) {
   const ytContainer = document.getElementById("yt-player-container");
   const spotContainer = document.getElementById("spotify-player-container");
@@ -232,56 +215,57 @@ function renderPlayer(trackInfo) {
 
   const moodKey = getMoodCategory(mockArousal, mockValence);
   const track = trackInfo || getActiveSongForMood(moodKey);
-  
+  const videoId = cleanVideoId(track.videoId);
+
+  const autoplayVal = (audioUnlocked && isPlaying) ? "1" : "0";
+
   if (currentProvider === "youtube") {
-    ytContainer.style.display = "block";
     spotContainer.style.display = "none";
-    
-    if (track.videoId && (track.videoId !== activeVideoId || !isPlaying)) {
-      const autoplayParam = audioUnlocked && isPlaying ? 1 : 0;
+    ytContainer.style.display = "block";
+
+    if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
       ytContainer.innerHTML = `
         <iframe width="100%" height="160"
-          src="https://www.youtube.com/embed/${track.videoId}?autoplay=${autoplayParam}&mute=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
-          title="MoodTrace YouTube Audio"
+          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1"
+          title="MoodTrace Audio Stream"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen
-          style="border: none; border-radius: 10px; width: 100%;">
+          style="border: none; border-radius: 12px; width: 100%; height: 160px;">
         </iframe>
       `;
-      activeVideoId = track.videoId;
+      activeVideoId = videoId;
     }
   } else {
-    // Spotify Provider: Full Interactive Native Deck + Background Stream
+    // Spotify Mode: Interactive Deck + Active Audio Stream
+    ytContainer.style.display = "block";
     spotContainer.style.display = "block";
-    
-    // Maintain underlying audio stream
-    if (track.videoId && (track.videoId !== activeVideoId || !isPlaying)) {
-      const autoplayParam = audioUnlocked && isPlaying ? 1 : 0;
-      ytContainer.style.display = "none";
+
+    // Embed audio stream with minimal height to allow uninterrupted background playback
+    if (videoId !== activeVideoId || ytContainer.innerHTML === "") {
       ytContainer.innerHTML = `
-        <iframe width="1" height="1"
-          src="https://www.youtube.com/embed/${track.videoId}?autoplay=${autoplayParam}&mute=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
+        <iframe width="100%" height="80"
+          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1"
           title="MoodTrace Audio Stream"
-          allow="autoplay; encrypted-media"
-          style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;">
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          style="border: none; border-radius: 8px; width: 100%; height: 80px; margin-top: 6px;">
         </iframe>
       `;
-      activeVideoId = track.videoId;
+      activeVideoId = videoId;
     }
 
     const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`;
-    
+
     spotContainer.innerHTML = `
-      <div style="background: linear-gradient(135deg, rgba(29, 185, 84, 0.22), rgba(12, 8, 24, 0.95)); border: 1.5px solid rgba(29, 185, 84, 0.45); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
+      <div style="background: linear-gradient(135deg, rgba(29, 185, 84, 0.25), rgba(12, 8, 24, 0.95)); border: 1.5px solid rgba(29, 185, 84, 0.5); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#1db954">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
-            <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY LIVE SYNC</span>
+            <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY DESI STREAM</span>
           </div>
           <span style="font-size: 0.72rem; font-weight: 700; color: ${isPlaying ? '#00ffaa' : '#ff77aa'}; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">
-            ${isPlaying ? '● STREAMING LIVE' : '⏸ PAUSED'}
+            ${isPlaying ? '● AUDIO PLAYING' : '⏸ PAUSED'}
           </span>
         </div>
 
@@ -293,22 +277,21 @@ function renderPlayer(trackInfo) {
           
           <!-- Animated Equalizer Waveform -->
           <div style="display: flex; align-items: flex-end; gap: 3px; height: 24px;">
-            <div style="width: 4px; height: ${isPlaying ? '18px' : '4px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '24px' : '6px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '14px' : '4px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '20px' : '5px'}; background: #1db954; border-radius: 2px; transition: height 0.2s;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '18px' : '4px'}; background: #1db954; border-radius: 2px;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '24px' : '6px'}; background: #1db954; border-radius: 2px;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '14px' : '4px'}; background: #1db954; border-radius: 2px;"></div>
+            <div style="width: 4px; height: ${isPlaying ? '20px' : '5px'}; background: #1db954; border-radius: 2px;"></div>
           </div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
           <span style="font-size: 0.72rem; color: var(--text-secondary);">Mood: <b style="color: #fff;">${moodKey.replace('_', ' ').toUpperCase()}</b></span>
-          <a href="${spotifySearchUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.74rem; color: #1db954; background: rgba(29, 185, 84, 0.18); border: 1px solid rgba(29, 185, 84, 0.45); padding: 5px 12px; border-radius: 20px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+          <a href="${spotifySearchUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.74rem; color: #1db954; background: rgba(29, 185, 84, 0.18); border: 1px solid rgba(29, 185, 84, 0.45); padding: 5px 12px; border-radius: 20px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
             <span>Open in Spotify App ↗</span>
           </a>
         </div>
       </div>
     `;
-    activeSpotifyId = track.title;
   }
 }
 
@@ -318,23 +301,23 @@ async function pollState() {
     const s = await invoke("get_current_state");
     const { valence, arousal, provider } = s;
 
-    // ── 1. Update Coordinates Readout ──
+    // Coordinates Readout
     const coordElem = document.getElementById("mood-coordinates");
     if (coordElem) {
       coordElem.innerText = `Valence: ${(+valence).toFixed(2)}   Arousal: ${(+arousal).toFixed(2)}`;
     }
 
-    // ── 2. Determine Mood Label ──
+    // Mood Label
     let label = "Neutral";
-    if (arousal > 0.25 && valence > 0.1) label = "Excited & Energized";
-    else if (arousal > 0.25 && valence <= 0.1) label = "Stressed & Intense";
-    else if (arousal <= 0.25 && valence > 0.1) label = "Calm & Relaxed";
-    else label = "Mellow & Reflective";
+    if (arousal > 0.25 && valence > 0.1) label = "Excited & Energized (Naatu / Tauba)";
+    else if (arousal > 0.25 && valence <= 0.1) label = "Stressed & Intense (Arjan / Hukum)";
+    else if (arousal <= 0.25 && valence > 0.1) label = "Calm & Relaxed (Samajavaragamana)";
+    else label = "Mellow & Reflective (O Maahi / Adiga)";
     
     const labelElem = document.getElementById("mood-label");
     if (labelElem) labelElem.innerText = label;
 
-    // ── 3. Smooth 2D Russell Plane Dot ──
+    // 2D Russell Plane Dot
     const dot = document.getElementById("inferred-dot");
     if (dot) {
       const leftPx = Math.min(240, Math.max(8, ((+valence + 1) / 2) * 248));
@@ -343,7 +326,7 @@ async function pollState() {
       dot.style.top  = `${topPx}px`;
     }
 
-    // ── 4. Dynamic Track Selection & Auto-Play ──
+    // Dynamic Track Auto-Switch
     const moodKey = getMoodCategory(arousal, valence);
     const track = getActiveSongForMood(moodKey);
     
@@ -363,13 +346,11 @@ async function pollState() {
       renderPlayer(track);
     }
 
-    // ── 5. Provider Sync ──
     if (provider && provider !== currentProvider) {
       syncProviderUI(provider);
       renderPlayer(track);
     }
 
-    // ── 6. Velocity Samples Counter ──
     const countElem = document.getElementById("events-count");
     if (countElem) countElem.innerText = recentSpeeds.length;
 
@@ -378,7 +359,6 @@ async function pollState() {
   }
 }
 
-// ─── Provider UI Sync ─────────────────────────────────────────────────────────
 function syncProviderUI(provider) {
   currentProvider = provider;
   const btnYt = document.getElementById("btn-yt");
@@ -387,7 +367,6 @@ function syncProviderUI(provider) {
   if (btnSpot) btnSpot.classList.toggle("active", provider === "spotify");
 }
 
-// ─── Audio Permission Unlocker ───────────────────────────────────────────────
 function unlockAudio() {
   if (audioUnlocked) return;
   audioUnlocked = true;
@@ -409,7 +388,7 @@ function unlockAudio() {
   renderPlayer(getActiveSongForMood(moodKey));
 }
 
-// ─── Playback Controls: Next, Prev, Play/Pause ────────────────────────────────
+// ─── Playback Controls ────────────────────────────────────────────────────────
 function cycleTrack(direction) {
   unlockAudio();
   const moodKey = getMoodCategory(mockArousal, mockValence);
@@ -424,9 +403,11 @@ function cycleTrack(direction) {
   saveLibrary();
   
   const track = getActiveSongForMood(moodKey);
-  lastTitle = ""; // Force re-render
+  lastTitle = "";
   activeVideoId = null;
-  activeSpotifyId = null;
+  isPlaying = true;
+  const playBtn = document.getElementById("btn-play-pause");
+  if (playBtn) playBtn.innerText = "⏸";
   pollState();
   showToast(`Switched track to "${track.title}" (${track.artist})`);
 }
@@ -447,9 +428,9 @@ function togglePlayPause() {
   const track = getActiveSongForMood(moodKey);
 
   if (isPlaying) {
-    activeVideoId = null; // Re-trigger autoplay
+    activeVideoId = null;
     renderPlayer(track);
-    showToast("▶ Music Resumed");
+    showToast("▶ Music Playing");
   } else {
     const ytContainer = document.getElementById("yt-player-container");
     if (ytContainer) {
@@ -523,10 +504,10 @@ function setupAffectGridModal() {
     const hoverA = (1 - (y / rect.height) * 2).toFixed(2);
     
     let hoverLabel = "Neutral";
-    if (hoverA > 0.2 && hoverV > 0.1) hoverLabel = "Excited & Happy";
-    else if (hoverA > 0.2 && hoverV <= 0.1) hoverLabel = "Stressed & Intense";
-    else if (hoverA <= 0.2 && hoverV > 0.1) hoverLabel = "Calm & Relaxed";
-    else hoverLabel = "Mellow & Reflective";
+    if (hoverA > 0.2 && hoverV > 0.1) hoverLabel = "Excited & Happy (Naatu / Tauba)";
+    else if (hoverA > 0.2 && hoverV <= 0.1) hoverLabel = "Stressed & Intense (Arjan / Hukum)";
+    else if (hoverA <= 0.2 && hoverV > 0.1) hoverLabel = "Calm & Relaxed (Samajavaragamana)";
+    else hoverLabel = "Mellow & Reflective (O Maahi / Adiga)";
 
     if (readout) {
       readout.innerText = `[${hoverLabel}]  Valence: ${hoverV}, Arousal: ${hoverA}`;
@@ -595,7 +576,6 @@ function setupLibraryModal() {
     if (e.key === "Escape" && modal.style.display === "flex") closeLibrary();
   });
 
-  // Tab switching
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
       tabs.forEach(t => t.classList.remove("active"));
@@ -605,39 +585,30 @@ function setupLibraryModal() {
     });
   });
 
-  // Add new song submit handler
   if (saveNewSongBtn) {
     saveNewSongBtn.addEventListener("click", () => {
       const titleInput = document.getElementById("new-song-title");
       const artistInput = document.getElementById("new-song-artist");
       const ytInput = document.getElementById("new-song-yt");
-      const spotInput = document.getElementById("new-song-spotify");
       const moodSelect = document.getElementById("new-song-mood");
 
       const title = titleInput.value.trim();
-      const artist = artistInput.value.trim() || "Unknown Artist";
+      const artist = artistInput.value.trim() || "Telugu / Hindi Artist";
       let videoId = ytInput.value.trim();
-      let spotifyId = spotInput.value.trim();
       const targetMood = moodSelect.value;
 
       if (!title || !videoId) {
-        showToast("⚠️ Please provide at least Song Title and YouTube Video ID/Link");
+        showToast("⚠️ Please provide Song Title and YouTube Link / Video ID");
         return;
       }
 
-      // Extract YouTube Video ID if a full URL was provided
-      const ytMatch = videoId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-      if (ytMatch) videoId = ytMatch[1];
-
-      // Extract Spotify Track ID if provided
-      spotifyId = spotifyId ? cleanSpotifyId(spotifyId) : "0DiWol3AO6WpXZgp0EGl82";
+      videoId = cleanVideoId(videoId);
 
       const newSong = {
         id: "custom_" + Date.now(),
         title,
         artist,
-        videoId,
-        spotifyId: spotifyId,
+        videoId: videoId,
         isCustom: true
       };
 
@@ -646,14 +617,12 @@ function setupLibraryModal() {
       }
 
       moodLibrary[targetMood].songs.push(newSong);
-      moodLibrary[targetMood].activeIndex = moodLibrary[targetMood].songs.length - 1; // Auto select
+      moodLibrary[targetMood].activeIndex = moodLibrary[targetMood].songs.length - 1;
       saveLibrary();
 
-      // Clear inputs
       titleInput.value = "";
       artistInput.value = "";
       ytInput.value = "";
-      spotInput.value = "";
 
       selectedLibTabMood = targetMood;
       tabs.forEach(t => {
@@ -661,13 +630,13 @@ function setupLibraryModal() {
       });
 
       renderLibrarySongsList();
-      lastTitle = ""; // Trigger update if current mood
+      lastTitle = "";
+      activeVideoId = null;
       pollState();
-      showToast(`⭐ Added "${title}" to your ${targetMood.replace('_', ' ')} library!`);
+      showToast(`⭐ Added "${title}" to ${targetMood.replace('_', ' ')} playlist!`);
     });
   }
 
-  // Reset to defaults handler
   const resetBtn = document.getElementById("btn-reset-library");
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
@@ -676,9 +645,8 @@ function setupLibraryModal() {
       renderLibrarySongsList();
       lastTitle = "";
       activeVideoId = null;
-      activeSpotifyId = null;
       pollState();
-      showToast("↺ Library reset to verified Spotify tracks!");
+      showToast("↺ Library reset to trending Telugu & Hindi songs!");
     });
   }
 }
@@ -714,7 +682,6 @@ function renderLibrarySongsList() {
       </div>
     `;
 
-    // Click handler to set active song
     const selectBtn = card.querySelector(".btn-select-song");
     selectBtn.addEventListener("click", () => {
       group.activeIndex = idx;
@@ -722,12 +689,13 @@ function renderLibrarySongsList() {
       renderLibrarySongsList();
       lastTitle = "";
       activeVideoId = null;
-      activeSpotifyId = null;
+      isPlaying = true;
+      const playBtn = document.getElementById("btn-play-pause");
+      if (playBtn) playBtn.innerText = "⏸";
       pollState();
-      showToast(`⭐ Active song for ${selectedLibTabMood.replace('_', ' ')} set to "${song.title}"`);
+      showToast(`⭐ Active track set to "${song.title}"`);
     });
 
-    // Delete custom song handler
     const delBtn = card.querySelector(".btn-delete-song");
     if (delBtn) {
       delBtn.addEventListener("click", () => {
@@ -781,14 +749,12 @@ function showToast(msg) {
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", () => {
-  // Audio activation listeners
   const banner = document.getElementById("audio-activation-banner");
   if (banner) banner.addEventListener("click", unlockAudio);
   
   const enableBtn = document.getElementById("btn-enable-audio");
   if (enableBtn) enableBtn.addEventListener("click", unlockAudio);
 
-  // Affect Grid Modal & Library Modal setup
   setupAffectGridModal();
   setupLibraryModal();
 
@@ -830,7 +796,6 @@ window.addEventListener("DOMContentLoaded", () => {
     try { await invoke("set_provider", { provider: name }); } catch {}
     syncProviderUI(name);
     activeVideoId = null;
-    activeSpotifyId = null;
     const moodKey = getMoodCategory(mockArousal, mockValence);
     renderPlayer(getActiveSongForMood(moodKey));
     showToast(`Switched music platform to ${name === "spotify" ? "Spotify" : "YouTube"}`);
@@ -841,7 +806,6 @@ window.addEventListener("DOMContentLoaded", () => {
   if (btnYt) btnYt.addEventListener("click", () => switchProvider("youtube"));
   if (btnSpot) btnSpot.addEventListener("click", () => switchProvider("spotify"));
 
-  // Click spinning disc to trigger audio / unmute
   const artGlow = document.getElementById("track-art-glow");
   if (artGlow) {
     artGlow.addEventListener("click", () => {
@@ -850,10 +814,8 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Any initial click on body unlocks audio
   document.body.addEventListener("click", unlockAudio, { once: false });
 
-  // Initial poll and recurring timer
   pollState();
   setInterval(pollState, 400);
 });
