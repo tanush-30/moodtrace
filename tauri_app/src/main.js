@@ -11,46 +11,46 @@ let isPlaying = true;
 let masterVolume = 0.85;
 let manualCalibrationUntil = 0;
 
-// Trending Telugu & Hindi Curated Playlists with Verified Audio Streams
+// Trending Telugu & Hindi Curated Playlists Across 4 Mood Quadrants
 const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
     activeIndex: 0,
     songs: [
-      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "gt_0GfWfF14", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" }
+      { id: "te_eh1", title: "Naatu Naatu", artist: "Rahul Sipligunj, Kaala Bhairava (RRR)", videoId: "gt_0GfWfF14" },
+      { id: "hi_eh1", title: "Tauba Tauba", artist: "Karan Aujla (Bad Newz)", videoId: "LK7-_dgAVQE" },
+      { id: "te_eh2", title: "Kurchi Madathapetti", artist: "Thaman S, Sri Krishna (Guntur Kaaram)", videoId: "0l0Q5j_t5k0" },
+      { id: "hi_eh2", title: "Chaleya", artist: "Arijit Singh, Shilpa Rao (Jawan)", videoId: "VAdGW7QDJhU" },
+      { id: "te_eh3", title: "Ramuloo Ramulaa", artist: "Anurag Kulkarni (Ala Vaikunthapurramuloo)", videoId: "2mDC8bZc-XU" }
     ]
   },
   stressed_anxious: {
     activeIndex: 0,
     songs: [
-      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+      { id: "hi_sa1", title: "Arjan Vailly", artist: "Bhupinder Babbal (ANIMAL)", videoId: "sVf3p6YpC0U" },
+      { id: "te_sa1", title: "Hukum (Thalaivar Alappara)", artist: "Anirudh Ravichander (Jailer)", videoId: "1F3hm63Su64" },
+      { id: "te_sa2", title: "Fear Song", artist: "Anirudh Ravichander (Devara)", videoId: "v1yT9U0wT2Y" },
+      { id: "te_sa3", title: "Badass", artist: "Anirudh Ravichander (Leo)", videoId: "ozrkpmsUvK8" },
+      { id: "hi_sa2", title: "Zinda Banda", artist: "Anirudh Ravichander (Jawan)", videoId: "dZ4_kMh1qF4" }
     ]
   },
   calm_relaxed: {
     activeIndex: 0,
     songs: [
-      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+      { id: "te_cr1", title: "Samajavaragamana", artist: "Sid Sriram (Ala Vaikunthapurramuloo)", videoId: "peL04hO_Vcg" },
+      { id: "hi_cr1", title: "Kesariya", artist: "Arijit Singh, Pritam (Brahmāstra)", videoId: "BddP6PYo2gs" },
+      { id: "te_cr2", title: "Chuttamalle", artist: "Shilpa Rao, Anirudh (Devara)", videoId: "7oV3H2H5qP6" },
+      { id: "hi_cr2", title: "Heeriye", artist: "Jasleen Royal, Arijit Singh", videoId: "RLzC55ai0eo" },
+      { id: "te_cr3", title: "Inkem Inkem Inkem Kaavaale", artist: "Sid Sriram (Geetha Govindam)", videoId: "8V8Vw6b0B2i" }
     ]
   },
   mellow_melancholy: {
     activeIndex: 0,
     songs: [
-      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4", audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
+      { id: "hi_mm1", title: "O Maahi", artist: "Arijit Singh, Pritam (Dunki)", videoId: "i23m8t6Z9qH" },
+      { id: "te_mm1", title: "Adiga Adiga", artist: "Sid Sriram (Ninnu Kori)", videoId: "d0qP654yS3x" },
+      { id: "hi_mm2", title: "Satranga", artist: "Arijit Singh (ANIMAL)", videoId: "UK0qP654yS3" },
+      { id: "te_mm2", title: "Urike Urike", artist: "Sid Sriram, Ramya Behara (HIT 2)", videoId: "284Ov7ysmfA" },
+      { id: "hi_mm3", title: "Agar Tum Saath Ho", artist: "Arijit Singh, Alka Yagnik (Tamasha)", videoId: "sK7riqg2mr4" }
     ]
   }
 };
@@ -65,7 +65,7 @@ function cleanVideoId(input) {
 
 function loadLibrary() {
   try {
-    const saved = localStorage.getItem("moodtrace_clean_library_v9");
+    const saved = localStorage.getItem("moodtrace_clean_desi_library_v10");
     if (saved) {
       const parsed = JSON.parse(saved);
       return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
@@ -76,7 +76,7 @@ function loadLibrary() {
 
 function saveLibrary() {
   try {
-    localStorage.setItem("moodtrace_clean_library_v9", JSON.stringify(moodLibrary));
+    localStorage.setItem("moodtrace_clean_desi_library_v10", JSON.stringify(moodLibrary));
   } catch (e) {}
 }
 
@@ -86,24 +86,6 @@ function getActiveSongForMood(moodKey) {
   const group = moodLibrary[moodKey] || moodLibrary["excited_happy"];
   const idx = Math.max(0, Math.min(group.activeIndex, group.songs.length - 1));
   return group.songs[idx] || DEFAULT_MOOD_LIBRARY[moodKey].songs[0];
-}
-
-// ─── Native Audio Playback Engine ─────────────────────────────────────────────
-function playNativeAudio(url) {
-  const audioElem = document.getElementById("mood-native-audio");
-  if (!audioElem) return;
-
-  if (url && (audioElem.src !== url || audioElem.paused)) {
-    audioElem.src = url;
-    audioElem.volume = masterVolume;
-    audioElem.loop = true;
-    
-    if (audioUnlocked && isPlaying) {
-      audioElem.play().catch(e => {
-        console.log("Audio waiting for user gesture:", e);
-      });
-    }
-  }
 }
 
 // ─── Real-time Cursor Kinematics ─────────────────────────────────────────────
@@ -217,7 +199,7 @@ const { invoke } = window.__TAURI__?.core || {
   }
 };
 
-// ─── Live Music Player Renderer (100% Error-Free Media Decks) ─────────────────
+// ─── Live Music Player Renderer ──────────────────────────────────────────────
 function renderPlayer(trackInfo) {
   const ytContainer = document.getElementById("yt-player-container");
   const spotContainer = document.getElementById("spotify-player-container");
@@ -227,11 +209,7 @@ function renderPlayer(trackInfo) {
   const track = trackInfo || getActiveSongForMood(moodKey);
   const videoId = cleanVideoId(track.videoId);
 
-  // Play Native Audio Stream immediately
-  if (track.audioUrl) {
-    playNativeAudio(track.audioUrl);
-  }
-
+  const autoplayVal = (audioUnlocked && isPlaying) ? "1" : "0";
   const ytWatchUrl = `https://www.youtube.com/watch?v=${videoId}`;
   const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`;
 
@@ -239,43 +217,38 @@ function renderPlayer(trackInfo) {
     ytContainer.style.display = "block";
     spotContainer.style.display = "none";
 
-    ytContainer.innerHTML = `
-      <div style="background: linear-gradient(135deg, rgba(255, 0, 51, 0.22), rgba(15, 10, 25, 0.95)); border: 1.5px solid rgba(255, 0, 51, 0.45); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff0033">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-            <span style="font-weight: 800; font-size: 0.85rem; color: #ff3355; letter-spacing: 1.5px;">YOUTUBE LIVE AUDIO</span>
+    if (videoId !== activeVideoId || ytContainer.innerHTML === "" || !isPlaying) {
+      if (isPlaying) {
+        ytContainer.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <iframe width="100%" height="180"
+              src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplayVal}&enablejsapi=1&playsinline=1&rel=0"
+              title="${track.title} - ${track.artist}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              style="border: none; border-radius: 12px; width: 100%;">
+            </iframe>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 4px;">
+              <span style="font-size: 0.74rem; color: var(--text-secondary);">Playing: <b style="color: #fff;">${track.title}</b></span>
+              <a href="${ytWatchUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #ff3355; background: rgba(255,0,51,0.15); border: 1px solid rgba(255,0,51,0.35); padding: 4px 10px; border-radius: 6px; text-decoration: none; font-weight: 700;">
+                Watch on YouTube ↗
+              </a>
+            </div>
           </div>
-          <span style="font-size: 0.72rem; font-weight: 700; color: ${isPlaying ? '#00ffaa' : '#ff77aa'}; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">
-            ${isPlaying ? '● AUDIO PLAYING LIVE' : '⏸ PAUSED'}
-          </span>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-          <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
-            <span style="font-size: 0.96rem; font-weight: 800; color: #fff;">${track.title}</span>
-            <span style="font-size: 0.78rem; color: var(--text-secondary);">${track.artist}</span>
+        `;
+      } else {
+        ytContainer.innerHTML = `
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px 16px; text-align: center;">
+            <p style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 4px;">${track.title}</p>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 12px;">${track.artist}</p>
+            <span style="font-size: 0.78rem; color: #ff77aa; font-weight: 600;">⏸ Playback Paused — Click ▶ Play to Resume</span>
           </div>
-          
-          <div style="display: flex; align-items: flex-end; gap: 3px; height: 24px;">
-            <div style="width: 4px; height: ${isPlaying ? '18px' : '4px'}; background: #ff3355; border-radius: 2px;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '24px' : '6px'}; background: #ff3355; border-radius: 2px;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '14px' : '4px'}; background: #ff3355; border-radius: 2px;"></div>
-            <div style="width: 4px; height: ${isPlaying ? '20px' : '5px'}; background: #ff3355; border-radius: 2px;"></div>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
-          <span style="font-size: 0.72rem; color: var(--text-secondary);">Mood: <b style="color: #fff;">${moodKey.replace('_', ' ').toUpperCase()}</b></span>
-          <a href="${ytWatchUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.74rem; color: #fff; background: rgba(255, 0, 51, 0.25); border: 1px solid rgba(255, 0, 51, 0.5); padding: 5px 12px; border-radius: 20px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-            <span>Watch HD on YouTube ↗</span>
-          </a>
-        </div>
-      </div>
-    `;
+        `;
+      }
+      activeVideoId = videoId;
+    }
   } else {
+    // Spotify Provider
     ytContainer.style.display = "none";
     spotContainer.style.display = "block";
 
@@ -286,10 +259,10 @@ function renderPlayer(trackInfo) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#1db954">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
-            <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY LIVE AUDIO</span>
+            <span style="font-weight: 800; font-size: 0.85rem; color: #1db954; letter-spacing: 1.5px;">SPOTIFY DESI STREAM</span>
           </div>
           <span style="font-size: 0.72rem; font-weight: 700; color: ${isPlaying ? '#00ffaa' : '#ff77aa'}; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">
-            ${isPlaying ? '● AUDIO PLAYING LIVE' : '⏸ PAUSED'}
+            ${isPlaying ? '● LIVE AUDIO STREAMING' : '⏸ PAUSED'}
           </span>
         </div>
 
@@ -387,11 +360,6 @@ function syncProviderUI(provider) {
 }
 
 function unlockAudio() {
-  const audioElem = document.getElementById("mood-native-audio");
-  if (audioElem && isPlaying) {
-    audioElem.play().catch(() => {});
-  }
-
   if (audioUnlocked) return;
   audioUnlocked = true;
 
@@ -445,7 +413,6 @@ function togglePlayPause() {
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
   const soundStatus = document.getElementById("sound-engine-status");
-  const audioElem = document.getElementById("mood-native-audio");
   
   if (playBtn) playBtn.innerText = isPlaying ? "⏸" : "▶";
   if (artGlow) {
@@ -460,26 +427,13 @@ function togglePlayPause() {
   const moodKey = getMoodCategory(mockArousal, mockValence);
   const track = getActiveSongForMood(moodKey);
 
-  if (isPlaying) {
-    if (audioElem) audioElem.play().catch(() => {});
-    activeVideoId = null;
-    renderPlayer(track);
-    showToast("▶ Music Playing");
-  } else {
-    if (audioElem) audioElem.pause();
-    renderPlayer(track);
-    showToast("⏸ Music Paused");
-  }
+  activeVideoId = null;
+  renderPlayer(track);
+  showToast(isPlaying ? "▶ Music Resumed" : "⏸ Music Paused");
 }
 
 function stopTrack() {
   isPlaying = false;
-  const audioElem = document.getElementById("mood-native-audio");
-  if (audioElem) {
-    audioElem.pause();
-    audioElem.currentTime = 0;
-  }
-  
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
   const soundStatus = document.getElementById("sound-engine-status");
@@ -488,6 +442,12 @@ function stopTrack() {
   if (artGlow) artGlow.classList.remove("playing");
   if (soundStatus) soundStatus.innerText = "⏹ Audio Stopped";
 
+  const ytContainer = document.getElementById("yt-player-container");
+  if (ytContainer) {
+    ytContainer.innerHTML = "";
+    activeVideoId = null;
+  }
+  
   const moodKey = getMoodCategory(mockArousal, mockValence);
   renderPlayer(getActiveSongForMood(moodKey));
   showToast("⏹ Music Stopped");
@@ -641,7 +601,6 @@ function setupLibraryModal() {
         title,
         artist,
         videoId: videoId,
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         isCustom: true
       };
 
@@ -797,23 +756,11 @@ window.addEventListener("DOMContentLoaded", () => {
   const btnStop = document.getElementById("btn-stop-track");
   const btnNext = document.getElementById("btn-next-track");
   const quickSelect = document.getElementById("quick-mood-select");
-  const volumeSlider = document.getElementById("volume-slider");
-  const volumeReadout = document.getElementById("volume-readout");
 
   if (btnPrev) btnPrev.addEventListener("click", () => cycleTrack("prev"));
   if (btnNext) btnNext.addEventListener("click", () => cycleTrack("next"));
   if (btnPlay) btnPlay.addEventListener("click", togglePlayPause);
   if (btnStop) btnStop.addEventListener("click", stopTrack);
-
-  // Volume slider
-  if (volumeSlider) {
-    volumeSlider.addEventListener("input", (e) => {
-      masterVolume = e.target.value / 100;
-      if (volumeReadout) volumeReadout.innerText = `${e.target.value}%`;
-      const audioElem = document.getElementById("mood-native-audio");
-      if (audioElem) audioElem.volume = masterVolume;
-    });
-  }
 
   // Quick Mood Select Dropdown
   if (quickSelect) {
