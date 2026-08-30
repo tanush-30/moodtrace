@@ -7,7 +7,7 @@ let lastDx = 0, lastDy = 0;
 let jerkScore = 0;
 const recentSpeeds = [];
 let audioUnlocked = false;
-let isPlaying = true;
+let isPlaying = false;
 let masterVolume = 0.85;
 let manualCalibrationUntil = 0;
 
@@ -87,17 +87,21 @@ let synthInterval = null;
 let currentStep = 0;
 
 function initAudioEngine() {
-  if (audioCtx) {
-    if (audioCtx.state === "suspended") audioCtx.resume();
-    return;
-  }
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioCtx = new AudioContextClass();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(masterVolume * 0.45, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
-    startMelodyLoop();
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContextClass();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(masterVolume * 0.45, audioCtx.currentTime);
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume().then(() => {
+        if (isPlaying) startMelodyLoop();
+      });
+    } else if (audioCtx.state === "running" && isPlaying) {
+      startMelodyLoop();
+    }
   } catch (e) {
     console.error("AudioContext init error", e);
   }
@@ -385,6 +389,15 @@ function syncProviderUI(provider) {
 }
 
 function unlockAudio() {
+  // Only start playing if not already started
+  if (!isPlaying) {
+    isPlaying = true;
+    const playBtn = document.getElementById("btn-play-pause");
+    if (playBtn) playBtn.innerText = "⏸";
+    const artGlow = document.getElementById("track-art-glow");
+    if (artGlow) artGlow.classList.add("playing");
+  }
+
   initAudioEngine();
 
   if (audioUnlocked) return;
@@ -412,7 +425,6 @@ function unlockAudio() {
 
 // ─── Playback Controls ────────────────────────────────────────────────────────
 function cycleTrack(direction) {
-  unlockAudio();
   const moodKey = getMoodCategory(mockArousal, mockValence);
   const group = moodLibrary[moodKey];
   if (!group || !group.songs.length) return;
@@ -426,15 +438,17 @@ function cycleTrack(direction) {
   
   const track = getActiveSongForMood(moodKey);
   lastTitle = "";
-  isPlaying = true;
-  const playBtn = document.getElementById("btn-play-pause");
-  if (playBtn) playBtn.innerText = "⏸";
+  if (!isPlaying) {
+    isPlaying = true;
+    const playBtn = document.getElementById("btn-play-pause");
+    if (playBtn) playBtn.innerText = "⏸";
+  }
+  unlockAudio();
   pollState();
   showToast(`Switched track to "${track.title}" (${track.artist})`);
 }
 
 function togglePlayPause() {
-  unlockAudio();
   isPlaying = !isPlaying;
   const playBtn = document.getElementById("btn-play-pause");
   const artGlow = document.getElementById("track-art-glow");
@@ -450,18 +464,27 @@ function togglePlayPause() {
     soundStatus.innerText = isPlaying ? "🟢 Audio Playing Live" : "⏸ Audio Paused";
   }
 
-  if (audioCtx) {
-    if (isPlaying && audioCtx.state === "suspended") audioCtx.resume();
-    else if (!isPlaying && audioCtx.state === "running") audioCtx.suspend();
+  if (isPlaying) {
+    // Start or resume audio engine
+    if (!audioCtx) {
+      unlockAudio(); // creates context and starts loop
+    } else {
+      audioCtx.resume().then(() => startMelodyLoop());
+    }
+  } else {
+    // Pause audio engine
+    if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
+    if (audioCtx && audioCtx.state === "running") audioCtx.suspend();
   }
 
   const moodKey = getMoodCategory(mockArousal, mockValence);
   renderPlayer(getActiveSongForMood(moodKey));
-  showToast(isPlaying ? "▶ Music Resumed" : "⏸ Music Paused");
+  showToast(isPlaying ? "▶ Music Playing" : "⏸ Music Paused");
 }
 
 function stopTrack() {
   isPlaying = false;
+  if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
   if (audioCtx && audioCtx.state === "running") audioCtx.suspend();
 
   const playBtn = document.getElementById("btn-play-pause");
