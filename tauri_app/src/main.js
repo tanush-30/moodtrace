@@ -7,39 +7,77 @@ let lastDx = 0, lastDy = 0;
 let jerkScore = 0;
 const recentSpeeds = [];
 let audioUnlocked = false;
+let isPlaying = true;
 let manualCalibrationUntil = 0; // Timestamp to hold manual override
 
-// Track library across the 4 emotion quadrants (YouTube + Spotify IDs)
-const MOOD_TRACKS = {
+// Default Curated Playlist Library Across Russell's 4 Quadrants
+const DEFAULT_MOOD_LIBRARY = {
   excited_happy: {
-    title: "One More Time",
-    artist: "Daft Punk",
-    videoId: "FGBhQbmPwH8",
-    spotifyId: "0DiWol3AO6WpXZgp0EGl82",
-    description: "High Energy • Positive Affect"
+    activeIndex: 0,
+    songs: [
+      { id: "eh1", title: "One More Time", artist: "Daft Punk", videoId: "FGBhQbmPwH8", spotifyId: "0DiWol3AO6WpXZgp0EGl82" },
+      { id: "eh2", title: "Happy", artist: "Pharrell Williams", videoId: "ZbZSe6N_BXs", spotifyId: "60nZcImufyMA1MKQY3dcCH" },
+      { id: "eh3", title: "Can't Stop the Feeling!", artist: "Justin Timberlake", videoId: "ru0K8uYEZWw", spotifyId: "1WkMMavIMc4JZ8cfMmxnYq" },
+      { id: "eh4", title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", videoId: "OPf0YbXqDm0", spotifyId: "32OlwWuMpZ6b0aN2RZOeMS" }
+    ]
   },
   stressed_anxious: {
-    title: "Smells Like Teen Spirit",
-    artist: "Nirvana",
-    videoId: "hTWKbfoikeg",
-    spotifyId: "5N5k9ndv5i4QecR6zgM2gO",
-    description: "High Energy • Urgent/Tense Affect"
+    activeIndex: 0,
+    songs: [
+      { id: "sa1", title: "Smells Like Teen Spirit", artist: "Nirvana", videoId: "hTWKbfoikeg", spotifyId: "5N5k9ndv5i4QecR6zgM2gO" },
+      { id: "sa2", title: "Breathe", artist: "The Prodigy", videoId: "rmHDhA1GYII", spotifyId: "6j9vUeU3pWqCqgS03GjW6I" },
+      { id: "sa3", title: "Chop Suey!", artist: "System Of A Down", videoId: "CSvFpBOmb80", spotifyId: "2DlHlPMa4M97k0xYADujVg" },
+      { id: "sa4", title: "Bangarang", artist: "Skrillex", videoId: "YJVmu6yttiw", spotifyId: "6VRhk280g3eW5Yg39rZ2hW" }
+    ]
   },
   calm_relaxed: {
-    title: "Banana Pancakes",
-    artist: "Jack Johnson",
-    videoId: "OzqKKyMPxQo",
-    spotifyId: "451GXMSSMw0YsMu9h52j1J",
-    description: "Low Energy • Warm/Positive Affect"
+    activeIndex: 0,
+    songs: [
+      { id: "cr1", title: "Banana Pancakes", artist: "Jack Johnson", videoId: "OzqKKyMPxQo", spotifyId: "451GXMSSMw0YsMu9h52j1J" },
+      { id: "cr2", title: "Sunflower", artist: "Post Malone & Swae Lee", videoId: "ApXoWvfEYVU", spotifyId: "3KkXRkHbMCARz0aVfEt68P" },
+      { id: "cr3", title: "Put Your Records On", artist: "Corinne Bailey Rae", videoId: "WKmtpHhO1b4", spotifyId: "2nGFZvICaeEWjIrBrL2RAx" },
+      { id: "cr4", title: "Lofi Chill Beats", artist: "Lofi Girl", videoId: "jfKfPfyJRdk", spotifyId: "30mv2g5uQ2t97F7z9ZgK40" }
+    ]
   },
   mellow_melancholy: {
-    title: "Yesterday",
-    artist: "The Beatles",
-    videoId: "wM0IdWY0aYU",
-    spotifyId: "3BQHpFgAp4l80e1XslIj6q",
-    description: "Low Energy • Reflective Affect"
+    activeIndex: 0,
+    songs: [
+      { id: "mm1", title: "Yesterday", artist: "The Beatles", videoId: "wM0IdWY0aYU", spotifyId: "3BQHpFgAp4l80e1XslIj6q" },
+      { id: "mm2", title: "Weightless", artist: "Marconi Union", videoId: "UfcAVejslrU", spotifyId: "6kkwzB6hXLIONkEk9JciA6" },
+      { id: "mm3", title: "Someone Like You", artist: "Adele", videoId: "hLQl3WQQoQ0", spotifyId: "1zwMYTA5nlNjZxYrvBB2io" },
+      { id: "mm4", title: "Clair de Lune", artist: "Claude Debussy", videoId: "WNcsUNKlAKw", spotifyId: "6N7gZrmpV01q99v2BR9Cr6" }
+    ]
   }
 };
+
+// Load or initialize user library from localStorage
+function loadLibrary() {
+  try {
+    const saved = localStorage.getItem("moodtrace_user_library");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...DEFAULT_MOOD_LIBRARY, ...parsed };
+    }
+  } catch (e) {
+    console.error("Could not load library from storage", e);
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_MOOD_LIBRARY));
+}
+
+function saveLibrary() {
+  try {
+    localStorage.setItem("moodtrace_user_library", JSON.stringify(moodLibrary));
+  } catch (e) {}
+}
+
+let moodLibrary = loadLibrary();
+
+// Helper to get active song for a mood
+function getActiveSongForMood(moodKey) {
+  const group = moodLibrary[moodKey] || moodLibrary["calm_relaxed"];
+  const idx = Math.max(0, Math.min(group.activeIndex, group.songs.length - 1));
+  return group.songs[idx] || DEFAULT_MOOD_LIBRARY[moodKey].songs[0];
+}
 
 // ─── Real-time Browser Cursor Kinematics ──────────────────────────────────────
 window.addEventListener("mousemove", (e) => {
@@ -54,7 +92,7 @@ window.addEventListener("mousemove", (e) => {
       currentSpeed = instSpeed;
       recentSpeeds.push({ t: now, speed: instSpeed });
 
-      // Compute directional jerk (erratic movement vs smooth movement)
+      // Compute directional jerk
       const angleChange = Math.abs(Math.atan2(dy, dx) - Math.atan2(lastDy, lastDx));
       if (angleChange > 1.2 && instSpeed > 300) {
         jerkScore = Math.min(1.0, jerkScore + 0.15);
@@ -83,25 +121,20 @@ window.addEventListener("click", () => {
 setInterval(() => {
   const now = Date.now();
   
-  // Prune history
   while (recentSpeeds.length && now - recentSpeeds[0].t > 2500) {
     recentSpeeds.shift();
   }
 
-  // If under manual calibration lock, don't overwrite with mouse decay immediately
   if (now > manualCalibrationUntil) {
     if (recentSpeeds.length > 0) {
       const avgSpeed = recentSpeeds.reduce((acc, x) => acc + x.speed, 0) / recentSpeeds.length;
       
-      // Target Arousal: 0 px/s -> -0.9 (Very Calm), 1000+ px/s -> +0.95 (High Energy)
       const targetArousal = Math.min(1, Math.max(-1, (avgSpeed / 450) - 1));
       mockArousal = mockArousal * 0.88 + targetArousal * 0.12;
 
-      // Target Valence: Smooth movement -> positive (+0.7), erratic/jerky -> negative (-0.6)
       const targetValence = jerkScore > 0.45 ? -0.55 : (mockArousal > 0.6 ? 0.35 : 0.65);
       mockValence = mockValence * 0.90 + targetValence * 0.10;
     } else {
-      // Idle decay toward restful calm state
       mockArousal = mockArousal * 0.97 + (-0.75) * 0.03;
       mockValence = mockValence * 0.98 + (0.5) * 0.02;
       currentSpeed = currentSpeed * 0.8;
@@ -138,7 +171,7 @@ const { invoke } = window.__TAURI__?.core || {
   invoke: async (cmd, args) => {
     if (cmd === "get_current_state") {
       const moodKey = getMoodCategory(mockArousal, mockValence);
-      const track = MOOD_TRACKS[moodKey];
+      const track = getActiveSongForMood(moodKey);
       return {
         valence: mockValence,
         arousal: mockArousal,
@@ -154,7 +187,7 @@ const { invoke } = window.__TAURI__?.core || {
     if (cmd === "submit_label" && args) {
       mockValence = args.valence;
       mockArousal = args.arousal;
-      manualCalibrationUntil = Date.now() + 8000; // Hold for 8 seconds
+      manualCalibrationUntil = Date.now() + 8000;
       return { ok: true };
     }
     if (cmd === "set_provider" && args) {
@@ -172,14 +205,14 @@ function renderPlayer(trackInfo) {
   if (!ytContainer || !spotContainer) return;
 
   const moodKey = getMoodCategory(mockArousal, mockValence);
-  const track = MOOD_TRACKS[moodKey] || trackInfo;
+  const track = trackInfo || getActiveSongForMood(moodKey);
   
   if (currentProvider === "youtube") {
     ytContainer.style.display = "block";
     spotContainer.style.display = "none";
     
-    if (track.videoId && track.videoId !== activeVideoId) {
-      const autoplayParam = audioUnlocked ? 1 : 0;
+    if (track.videoId && (track.videoId !== activeVideoId || !isPlaying)) {
+      const autoplayParam = audioUnlocked && isPlaying ? 1 : 0;
       ytContainer.innerHTML = `
         <iframe width="100%" height="160"
           src="https://www.youtube.com/embed/${track.videoId}?autoplay=${autoplayParam}&mute=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
@@ -215,7 +248,7 @@ function renderPlayer(trackInfo) {
 async function pollState() {
   try {
     const s = await invoke("get_current_state");
-    const { valence, arousal, track_title, track_artist, provider } = s;
+    const { valence, arousal, provider } = s;
 
     // ── 1. Update Coordinates Readout ──
     const coordElem = document.getElementById("mood-coordinates");
@@ -244,7 +277,7 @@ async function pollState() {
 
     // ── 4. Dynamic Track Selection & Auto-Play ──
     const moodKey = getMoodCategory(arousal, valence);
-    const track = MOOD_TRACKS[moodKey];
+    const track = getActiveSongForMood(moodKey);
     
     if (track.title !== lastTitle) {
       lastTitle = track.title;
@@ -254,7 +287,10 @@ async function pollState() {
 
       if (titleElem) titleElem.innerText = track.title;
       if (artistElem) artistElem.innerText = track.artist || "—";
-      if (artGlow) artGlow.classList.add("playing");
+      if (artGlow) {
+        if (isPlaying) artGlow.classList.add("playing");
+        else artGlow.classList.remove("playing");
+      }
 
       renderPlayer(track);
     }
@@ -302,10 +338,61 @@ function unlockAudio() {
   if (hint) hint.innerText = "🔊 Audio Active • Auto-matching to mouse speed";
 
   const moodKey = getMoodCategory(mockArousal, mockValence);
-  renderPlayer(MOOD_TRACKS[moodKey]);
+  renderPlayer(getActiveSongForMood(moodKey));
 }
 
-// ─── Modal Affect Grid Manager ────────────────────────────────────────────────
+// ─── Playback Controls: Next, Prev, Play/Pause ────────────────────────────────
+function cycleTrack(direction) {
+  unlockAudio();
+  const moodKey = getMoodCategory(mockArousal, mockValence);
+  const group = moodLibrary[moodKey];
+  if (!group || !group.songs.length) return;
+
+  if (direction === "next") {
+    group.activeIndex = (group.activeIndex + 1) % group.songs.length;
+  } else {
+    group.activeIndex = (group.activeIndex - 1 + group.songs.length) % group.songs.length;
+  }
+  saveLibrary();
+  
+  const track = getActiveSongForMood(moodKey);
+  lastTitle = ""; // Force re-render
+  activeVideoId = null;
+  activeSpotifyId = null;
+  pollState();
+  showToast(`Switched track to "${track.title}" (${track.artist})`);
+}
+
+function togglePlayPause() {
+  unlockAudio();
+  isPlaying = !isPlaying;
+  const playBtn = document.getElementById("btn-play-pause");
+  const artGlow = document.getElementById("track-art-glow");
+  
+  if (playBtn) playBtn.innerText = isPlaying ? "⏸" : "▶";
+  if (artGlow) {
+    if (isPlaying) artGlow.classList.add("playing");
+    else artGlow.classList.remove("playing");
+  }
+
+  const moodKey = getMoodCategory(mockArousal, mockValence);
+  const track = getActiveSongForMood(moodKey);
+
+  if (isPlaying) {
+    activeVideoId = null; // Re-trigger autoplay
+    renderPlayer(track);
+    showToast("▶ Music Resumed");
+  } else {
+    const ytContainer = document.getElementById("yt-player-container");
+    if (ytContainer && currentProvider === "youtube") {
+      ytContainer.innerHTML = "";
+      activeVideoId = null;
+    }
+    showToast("⏸ Music Paused");
+  }
+}
+
+// ─── Modal: Affect Grid Manager ───────────────────────────────────────────────
 function setupAffectGridModal() {
   const modal = document.getElementById("affect-grid-modal");
   const openBtn = document.getElementById("btn-open-grid");
@@ -316,29 +403,19 @@ function setupAffectGridModal() {
 
   if (!modal || !openBtn || !grid) return;
 
-  function openModal() {
-    modal.style.display = "flex";
-  }
-
-  function closeModal() {
-    modal.style.display = "none";
-  }
+  function openModal() { modal.style.display = "flex"; }
+  function closeModal() { modal.style.display = "none"; }
 
   openBtn.addEventListener("click", openModal);
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal.style.display === "flex") closeModal();
   });
 
-  // Grid Hover Tracking
-  grid.addEventListener("mouseenter", () => {
-    if (marker) marker.style.display = "block";
-  });
+  grid.addEventListener("mouseenter", () => { if (marker) marker.style.display = "block"; });
   grid.addEventListener("mouseleave", () => {
     if (marker) marker.style.display = "none";
     if (readout) readout.innerText = "Hover over the grid to choose coordinates";
@@ -368,7 +445,6 @@ function setupAffectGridModal() {
     }
   });
 
-  // Grid Click Calibration
   grid.addEventListener("click", async (e) => {
     const rect = grid.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -379,7 +455,7 @@ function setupAffectGridModal() {
 
     mockValence = clickedValence;
     mockArousal = clickedArousal;
-    manualCalibrationUntil = Date.now() + 10000; // Hold user calibration for 10s
+    manualCalibrationUntil = Date.now() + 10000;
 
     try {
       await invoke("submit_label", { valence: clickedValence, arousal: clickedArousal });
@@ -396,6 +472,175 @@ function setupAffectGridModal() {
     else moodName = "Mellow & Reflective";
 
     showToast(`✨ Calibrated to [${moodName}] — Valence: ${clickedValence.toFixed(2)}, Arousal: ${clickedArousal.toFixed(2)}`);
+  });
+}
+
+// ─── Modal: Mood Songs & Favorites Library Manager ────────────────────────────
+let selectedLibTabMood = "excited_happy";
+
+function setupLibraryModal() {
+  const modal = document.getElementById("library-modal");
+  const openBtn = document.getElementById("btn-open-library");
+  const openBtn2 = document.getElementById("btn-open-library-action");
+  const closeBtn = document.getElementById("btn-close-library");
+  const tabs = document.querySelectorAll(".lib-tab-btn");
+  const saveNewSongBtn = document.getElementById("btn-save-new-song");
+
+  if (!modal) return;
+
+  function openLibrary() {
+    renderLibrarySongsList();
+    modal.style.display = "flex";
+  }
+
+  function closeLibrary() {
+    modal.style.display = "none";
+  }
+
+  if (openBtn) openBtn.addEventListener("click", openLibrary);
+  if (openBtn2) openBtn2.addEventListener("click", openLibrary);
+  if (closeBtn) closeBtn.addEventListener("click", closeLibrary);
+
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeLibrary(); });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "flex") closeLibrary();
+  });
+
+  // Tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      selectedLibTabMood = tab.getAttribute("data-mood");
+      renderLibrarySongsList();
+    });
+  });
+
+  // Add new song submit handler
+  if (saveNewSongBtn) {
+    saveNewSongBtn.addEventListener("click", () => {
+      const titleInput = document.getElementById("new-song-title");
+      const artistInput = document.getElementById("new-song-artist");
+      const ytInput = document.getElementById("new-song-yt");
+      const spotInput = document.getElementById("new-song-spotify");
+      const moodSelect = document.getElementById("new-song-mood");
+
+      const title = titleInput.value.trim();
+      const artist = artistInput.value.trim() || "Unknown Artist";
+      let videoId = ytInput.value.trim();
+      let spotifyId = spotInput.value.trim();
+      const targetMood = moodSelect.value;
+
+      if (!title || !videoId) {
+        showToast("⚠️ Please provide at least Song Title and YouTube Video ID/Link");
+        return;
+      }
+
+      // Extract YouTube Video ID if a full URL was provided
+      const ytMatch = videoId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+      if (ytMatch) videoId = ytMatch[1];
+
+      // Extract Spotify Track ID if full URL provided
+      const spotMatch = spotifyId.match(/track\/([a-zA-Z0-9]+)/);
+      if (spotMatch) spotifyId = spotMatch[1];
+
+      const newSong = {
+        id: "custom_" + Date.now(),
+        title,
+        artist,
+        videoId,
+        spotifyId: spotifyId || "0DiWol3AO6WpXZgp0EGl82",
+        isCustom: true
+      };
+
+      if (!moodLibrary[targetMood]) {
+        moodLibrary[targetMood] = { activeIndex: 0, songs: [] };
+      }
+
+      moodLibrary[targetMood].songs.push(newSong);
+      moodLibrary[targetMood].activeIndex = moodLibrary[targetMood].songs.length - 1; // Auto select
+      saveLibrary();
+
+      // Clear inputs
+      titleInput.value = "";
+      artistInput.value = "";
+      ytInput.value = "";
+      spotInput.value = "";
+
+      selectedLibTabMood = targetMood;
+      tabs.forEach(t => {
+        t.classList.toggle("active", t.getAttribute("data-mood") === targetMood);
+      });
+
+      renderLibrarySongsList();
+      lastTitle = ""; // Trigger update if current mood
+      pollState();
+      showToast(`⭐ Added "${title}" to your ${targetMood.replace('_', ' ')} library!`);
+    });
+  }
+}
+
+function renderLibrarySongsList() {
+  const container = document.getElementById("library-song-list");
+  if (!container) return;
+
+  const group = moodLibrary[selectedLibTabMood] || { activeIndex: 0, songs: [] };
+  container.innerHTML = "";
+
+  if (group.songs.length === 0) {
+    container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:12px;">No songs in this playlist yet.</p>`;
+    return;
+  }
+
+  group.songs.forEach((song, idx) => {
+    const isActive = idx === group.activeIndex;
+    const card = document.createElement("div");
+    card.className = `song-item-card ${isActive ? "is-active" : ""}`;
+    
+    card.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:2px; max-width:65%;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:700; font-size:0.88rem; color:#fff;">${song.title}</span>
+          ${isActive ? `<span class="song-active-badge">Active</span>` : ""}
+        </div>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">${song.artist}</span>
+      </div>
+      <div class="song-actions">
+        <button class="btn-select-song" data-index="${idx}">${isActive ? "Selected" : "Set Active"}</button>
+        ${song.isCustom ? `<button class="btn-delete-song" data-index="${idx}" title="Delete Custom Song">🗑</button>` : ""}
+      </div>
+    `;
+
+    // Click handler to set active song
+    const selectBtn = card.querySelector(".btn-select-song");
+    selectBtn.addEventListener("click", () => {
+      group.activeIndex = idx;
+      saveLibrary();
+      renderLibrarySongsList();
+      lastTitle = "";
+      activeVideoId = null;
+      activeSpotifyId = null;
+      pollState();
+      showToast(`⭐ Active song for ${selectedLibTabMood.replace('_', ' ')} set to "${song.title}"`);
+    });
+
+    // Delete custom song handler
+    const delBtn = card.querySelector(".btn-delete-song");
+    if (delBtn) {
+      delBtn.addEventListener("click", () => {
+        group.songs.splice(idx, 1);
+        if (group.activeIndex >= group.songs.length) {
+          group.activeIndex = Math.max(0, group.songs.length - 1);
+        }
+        saveLibrary();
+        renderLibrarySongsList();
+        pollState();
+        showToast("Deleted custom song.");
+      });
+    }
+
+    container.appendChild(card);
   });
 }
 
@@ -441,8 +686,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const enableBtn = document.getElementById("btn-enable-audio");
   if (enableBtn) enableBtn.addEventListener("click", unlockAudio);
 
-  // Affect Grid Modal setup
+  // Affect Grid Modal & Library Modal setup
   setupAffectGridModal();
+  setupLibraryModal();
+
+  // Playback Control Buttons
+  const btnPrev = document.getElementById("btn-prev-track");
+  const btnPlay = document.getElementById("btn-play-pause");
+  const btnNext = document.getElementById("btn-next-track");
+
+  if (btnPrev) btnPrev.addEventListener("click", () => cycleTrack("prev"));
+  if (btnNext) btnNext.addEventListener("click", () => cycleTrack("next"));
+  if (btnPlay) btnPlay.addEventListener("click", togglePlayPause);
 
   // Provider toggle switches
   async function switchProvider(name) {
@@ -451,7 +706,7 @@ window.addEventListener("DOMContentLoaded", () => {
     activeVideoId = null;
     activeSpotifyId = null;
     const moodKey = getMoodCategory(mockArousal, mockValence);
-    renderPlayer(MOOD_TRACKS[moodKey]);
+    renderPlayer(getActiveSongForMood(moodKey));
     showToast(`Switched music platform to ${name === "spotify" ? "Spotify" : "YouTube"}`);
   }
 
@@ -465,8 +720,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (artGlow) {
     artGlow.addEventListener("click", () => {
       unlockAudio();
-      const moodKey = getMoodCategory(mockArousal, mockValence);
-      renderPlayer(MOOD_TRACKS[moodKey]);
+      togglePlayPause();
     });
   }
 
