@@ -6,27 +6,34 @@ use std::sync::Mutex;
 use std::time::Instant;
 use chrono::Utc;
 use tauri::Manager;
+use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 
 use input_capture::features::calculate_features;
 use input_capture::hook::Hook;
 use input_capture::inference::InferenceEngine;
-use music_providers::MusicProvider;
-use music_providers::spotify::SpotifyProvider;
-use music_providers::youtube::YouTubeProvider;
+
+#[derive(Default, Clone, Copy)]
+pub struct LatestMetrics {
+    pub mean_speed: f32,
+    pub mean_acceleration: f32,
+    pub click_rate: f32,
+    pub idle_ratio: f32,
+    pub event_count: usize,
+}
 
 pub struct AppState {
     pub db_path: String,
     pub current_arousal: Mutex<f32>,
     pub current_valence: Mutex<f32>,
-    pub current_track: Mutex<Option<music_providers::Track>>,
-    pub active_provider: Mutex<String>, // "spotify" or "youtube"
-    pub spotify: SpotifyProvider,
-    pub youtube: YouTubeProvider,
+    pub tracking_enabled: Mutex<bool>,
+    pub inference_interval_sec: Mutex<u64>,
+    pub popup_interval_min: Mutex<u64>,
+    pub window_duration_sec: Mutex<i64>,
+    pub latest_metrics: Mutex<LatestMetrics>,
 }
 
 fn resolve_db_path() -> String {
-    // Resolve relative path to moodtrace.db in parent or workspace root
     let paths = ["../../moodtrace.db", "../moodtrace.db", "moodtrace.db"];
     for path in &paths {
         if std::path::Path::new(path).exists() {
@@ -53,26 +60,17 @@ fn resolve_model_paths() -> (String, String) {
 
 fn main() {
     let db_path = resolve_db_path();
-    println!("Tauri: Database path resolved to: {}", db_path);
-
-    // Initialize music providers and references
-    {
-        if let Ok(conn) = rusqlite::Connection::open(&db_path) {
-            let _ = music_providers::init_track_database(&conn);
-        }
-    }
-
-    let spotify = SpotifyProvider::new(&db_path, None);
-    let youtube = YouTubeProvider::new(&db_path, None);
+    println!("Moodtrace: Database path resolved to: {}", db_path);
 
     let state = AppState {
         db_path,
-        current_arousal: Mutex::new(-0.8), // starting calm
-        current_valence: Mutex::new(0.5),   // starting happy
-        current_track: Mutex::new(None),
-        active_provider: Mutex::new("youtube".to_string()), // default to YouTube
-        spotify,
-        youtube,
+        current_arousal: Mutex::new(-0.4),
+        current_valence: Mutex::new(0.6),
+        tracking_enabled: Mutex::new(true),
+        inference_interval_sec: Mutex::new(5),
+        popup_interval_min: Mutex::new(10),
+        window_duration_sec: Mutex::new(45),
+        latest_metrics: Mutex::new(LatestMetrics::default()),
     };
 
     tauri::Builder::default()
@@ -80,32 +78,80 @@ fn main() {
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             commands::get_current_state,
-            commands::set_provider,
+            commands::set_tracking,
+            commands::update_settings,
+            commands::get_telemetry_stats,
             commands::submit_label,
             commands::trigger_affect_grid,
-            commands::close_popup
+            commands::close_popup,
+            commands::hide_to_tray,
+            commands::quit_app
         ])
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                // When user closes the dashboard, minimize to system tray instead of exiting
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .setup(|app| {
             let app_handle = app.handle().clone();
 
-            // Load tray icon images from bytes (avoid CWD path dependencies)
+            // Load tray icons from compiled bytes
             let calm_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray_calm.png")).unwrap();
             let neutral_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray_neutral.png")).unwrap();
             let energized_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray_energized.png")).unwrap();
 
+            // Build Tray Context Menu
+            let show_i = MenuItem::with_id(app, "show_dashboard", "Open Dashboard", true, None::<&str>)?;
+            let report_i = MenuItem::with_id(app, "self_report", "Log Mood (Self-Report)", true, None::<&str>)?;
+            let toggle_i = MenuItem::with_id(app, "toggle_tracking", "Pause / Resume Tracking", true, None::<&str>)?;
+            let quit_i = MenuItem::with_id(app, "quit", "Quit Moodtrace", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_i, &report_i, &toggle_i, &quit_i])?;
+
             // Build system tray icon
             let _tray = TrayIconBuilder::with_id("main")
-                .tooltip("Moodtrace")
+                .tooltip("Moodtrace (Running in Background)")
                 .icon(neutral_icon.clone())
+                .menu(&menu)
+                .on_menu_event(move |app_h, event| {
+                    match event.id.as_ref() {
+                        "show_dashboard" => {
+                            if let Some(window) = app_h.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.unminimize();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        "self_report" => {
+                            if let Some(window) = app_h.get_webview_window("self_report") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        "toggle_tracking" => {
+                            let app_state = app_h.state::<AppState>();
+                            let mut tracking = app_state.tracking_enabled.lock().unwrap();
+                            *tracking = !*tracking;
+                            println!("Tray: Tracking toggled to {}", *tracking);
+                        }
+                        "quit" => {
+                            app_h.exit(0);
+                        }
+                        _ => {}
+                    }
+                })
                 .on_tray_icon_event(move |tray, event| {
                     if let TrayIconEvent::Click { .. } = event {
-                        // Toggle Dashboard main window visibility on tray click
                         if let Some(window) = tray.app_handle().get_webview_window("main") {
                             let is_visible = window.is_visible().unwrap_or(false);
                             if is_visible {
                                 let _ = window.hide();
                             } else {
                                 let _ = window.show();
+                                let _ = window.unminimize();
                                 let _ = window.set_focus();
                             }
                         }
@@ -113,129 +159,103 @@ fn main() {
                 })
                 .build(app)?;
 
-            // Explicitly ensure main window is visible, centered and focused on screen
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.unminimize();
-                let _ = window.set_focus();
-            }
-
-            // Spawn background OS thread for Hook, Inference, and Music selection to avoid future Send constraints
+            // Background Hook & Inference OS Thread
             std::thread::spawn(move || {
                 let (a_path, v_path) = resolve_model_paths();
-                println!("Tauri background: Loading model files:\n  Arousal: {}\n  Valence: {}", a_path, v_path);
+                println!("Moodtrace background: Loading ONNX models:\n  Arousal: {}\n  Valence: {}", a_path, v_path);
 
                 let mut engine = match InferenceEngine::load(&a_path, &v_path) {
-                    Ok(eng) => eng,
+                    Ok(eng) => Some(eng),
                     Err(e) => {
-                        eprintln!("Tauri background: Failed to load ONNX inference engine: {:?}", e);
-                        return;
+                        eprintln!("Moodtrace background: Warning: Could not load ONNX models: {:?}", e);
+                        None
                     }
                 };
 
-                // Initialize Windows low-level mouse hook
                 let hook = match Hook::start() {
-                    Ok(h) => h,
+                    Ok(h) => Some(h),
                     Err(e) => {
-                        eprintln!("Tauri background: Failed to start mouse hook: {:?}", e);
-                        return;
+                        eprintln!("Moodtrace background: Warning: Could not start mouse hook: {:?}", e);
+                        None
                     }
                 };
 
-                let rx = hook.receiver();
+                let rx = hook.as_ref().map(|h| h.receiver());
                 let mut buffer = Vec::new();
                 let mut last_predict = Instant::now();
                 let mut last_popup = Instant::now();
 
-                println!("Tauri coordinator loop started successfully.");
+                println!("Moodtrace background tracking loop running.");
 
                 loop {
-                    // Pull mouse events from hook
-                    while let Ok(event) = rx.try_recv() {
-                        buffer.push(event);
+                    let app_state = app_handle.state::<AppState>();
+                    let tracking_active = *app_state.tracking_enabled.lock().unwrap();
+
+                    // Pull events from hook
+                    if let Some(ref r) = rx {
+                        while let Ok(event) = r.try_recv() {
+                            if tracking_active {
+                                buffer.push(event);
+                            }
+                        }
                     }
 
-                    // Run inference prediction every 5 seconds
-                    if last_predict.elapsed() >= std::time::Duration::from_secs(5) {
+                    let interval_secs = *app_state.inference_interval_sec.lock().unwrap();
+                    let window_dur_secs = *app_state.window_duration_sec.lock().unwrap();
+                    let popup_mins = *app_state.popup_interval_min.lock().unwrap();
+
+                    if tracking_active && last_predict.elapsed() >= std::time::Duration::from_secs(interval_secs) {
                         last_predict = Instant::now();
 
                         let now = Utc::now();
-                        let window_start = now - chrono::Duration::seconds(45);
+                        let window_start = now - chrono::Duration::seconds(window_dur_secs);
                         buffer.retain(|e| e.ts_utc >= window_start);
 
                         let features = calculate_features(&buffer, window_start, now);
-                        
-                        if let Ok(state) = engine.predict(&features) {
-                            let app_state = app_handle.state::<AppState>();
-                            
-                            // Save prediction results
-                            {
-                                *app_state.current_arousal.lock().unwrap() = state.arousal;
-                                *app_state.current_valence.lock().unwrap() = state.valence;
-                            }
 
-                            // Dynamic tray icon swap
-                            let tray = app_handle.tray_by_id("main").unwrap();
-                            let icon = if state.arousal > 0.4 {
-                                energized_icon.clone()
-                            } else if state.arousal < -0.4 {
-                                calm_icon.clone()
-                            } else {
-                                neutral_icon.clone()
-                            };
-                            let _ = tray.set_icon(Some(icon));
+                        // Update latest metrics for UI
+                        {
+                            let mut m = app_state.latest_metrics.lock().unwrap();
+                            m.mean_speed = features.mean_speed;
+                            m.mean_acceleration = features.mean_acceleration;
+                            m.click_rate = features.click_rate;
+                            m.idle_ratio = features.idle_ratio;
+                            m.event_count = buffer.len();
+                        }
 
-                            // Find and update active track matching current emotion coordinates
-                            let provider_name = app_state.active_provider.lock().unwrap().clone();
-                            let target = (state.valence, state.arousal);
-
-                            // Block on the async find_track calls using Tauri async runtime helper
-                            let track_res = tauri::async_runtime::block_on(async {
-                                if provider_name == "spotify" {
-                                    app_state.spotify.find_track(target).await
-                                } else {
-                                    app_state.youtube.find_track(target).await
-                                }
-                            });
-
-                            if let Ok(track) = track_res {
-                                let mut track_changed = false;
+                        // Run ONNX inference if model is available
+                        if let Some(ref mut eng) = engine {
+                            if let Ok(state) = eng.predict(&features) {
                                 {
-                                    let mut current_track_guard = app_state.current_track.lock().unwrap();
-                                    if let Some(ref current) = *current_track_guard {
-                                        if current.provider_id != track.provider_id {
-                                            track_changed = true;
-                                        }
-                                    } else {
-                                        track_changed = true;
-                                    }
-                                    *current_track_guard = Some(track.clone());
+                                    *app_state.current_arousal.lock().unwrap() = state.arousal;
+                                    *app_state.current_valence.lock().unwrap() = state.valence;
                                 }
 
-                                if track_changed {
-                                    let _ = tauri::async_runtime::block_on(async {
-                                        if provider_name == "spotify" {
-                                            app_state.spotify.play(&track).await
-                                        } else {
-                                            app_state.youtube.play(&track).await
-                                        }
-                                    });
+                                // Update system tray icon based on arousal
+                                if let Some(tray) = app_handle.tray_by_id("main") {
+                                    let icon = if state.arousal > 0.3 {
+                                        energized_icon.clone()
+                                    } else if state.arousal < -0.3 {
+                                        calm_icon.clone()
+                                    } else {
+                                        neutral_icon.clone()
+                                    };
+                                    let _ = tray.set_icon(Some(icon));
                                 }
                             }
                         }
                     }
 
-                    // Periodically trigger the Affect Grid popup (every 10 minutes)
-                    if last_popup.elapsed() >= std::time::Duration::from_secs(600) {
+                    // Scheduled Self-Report popup
+                    if popup_mins > 0 && last_popup.elapsed() >= std::time::Duration::from_secs(popup_mins * 60) {
                         last_popup = Instant::now();
                         if let Some(window) = app_handle.get_webview_window("self_report") {
                             let _ = window.show();
                             let _ = window.set_focus();
-                            println!("Tauri background: Scheduled Affect Grid popup shown.");
+                            println!("Moodtrace: Scheduled Affect Grid popup shown.");
                         }
                     }
 
-                    // Loop pacing
                     std::thread::sleep(std::time::Duration::from_millis(100));
                 }
             });

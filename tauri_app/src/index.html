@@ -3,302 +3,347 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>Moodtrace Dashboard</title>
-    <!-- Import Premium Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=7" />
-    <script type="module" src="main.js?v=7" defer></script>
+    <title>Moodtrace — Background Affect Monitor</title>
+    <!-- Modern Outfit typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="main.js" defer></script>
   </head>
 
   <body>
-    <div class="background-radial-glow"></div>
-    
-    <main class="dashboard-container">
-      <!-- Live Audio Activation Banner -->
-      <div id="audio-activation-banner" class="audio-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(154, 77, 255, 0.25), rgba(0, 191, 255, 0.25)); border: 1px solid rgba(154, 77, 255, 0.4); border-radius: 12px; padding: 10px 16px; cursor: pointer; transition: all 0.3s ease;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.2rem;">🎵</span>
-          <span id="audio-banner-text" style="font-size: 0.85rem; font-weight: 600; color: #fff;">Click ▶ to start playing real Telugu & Hindi song previews (30-sec via iTunes)</span>
-        </div>
-        <button id="btn-enable-audio" style="background: var(--accent-purple); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">Enable Audio</button>
-      </div>
+    <div class="bg-glow"></div>
 
-      <!-- Title Header -->
+    <div class="app-window">
+      <!-- Top Title & Navigation Bar -->
       <header class="app-header">
-        <div class="logo-area">
-          <span class="pulse-dot"></span>
-          <h1>MOODTRACE</h1>
+        <div class="brand">
+          <div class="status-indicator active" id="header-status-dot"></div>
+          <div class="brand-text">
+            <h1>MOODTRACE</h1>
+            <span class="version-tag">v1.0 • Windows Background App</span>
+          </div>
         </div>
-        <p class="tagline">Real-time Human Affect & Music Generation Pipeline</p>
+
+        <nav class="nav-tabs">
+          <button class="nav-tab active" data-tab="tab-monitor" id="tab-btn-monitor">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Live Monitor
+          </button>
+          <button class="nav-tab" data-tab="tab-ambient" id="tab-btn-ambient">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            Ambient Mood Music
+          </button>
+          <button class="nav-tab" data-tab="tab-settings" id="tab-btn-settings">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Settings
+          </button>
+        </nav>
+
+        <div class="window-actions">
+          <button class="btn-icon" id="btn-hide-tray" title="Minimize to System Tray">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
+          </button>
+        </div>
       </header>
 
-      <!-- Grid Layout -->
-      <div class="dashboard-grid">
+      <!-- Main Tab Content Area -->
+      <main class="content-container">
         
-        <!-- Panel 1: Emotion Coordinates -->
-        <section class="glass-panel main-mood-card">
-          <h2 class="section-title">Inferred Emotion State</h2>
-          
-          <div class="mood-plot-container">
-            <!-- 2D Emotion Plane Visualizer -->
-            <div class="emotion-plane" id="emotion-plane-visualizer">
-              <span class="axis-label top">Excited</span>
-              <span class="axis-label bottom">Calm</span>
-              <span class="axis-label left">Negative</span>
-              <span class="axis-label right">Positive</span>
-              
-              <div class="plane-crosshair-h"></div>
-              <div class="plane-crosshair-v"></div>
-              
-              <!-- Inferred dot -->
-              <div class="inferred-dot" id="inferred-dot"></div>
-            </div>
-          </div>
+        <!-- TAB 1: LIVE MONITOR -->
+        <section class="tab-pane active" id="tab-monitor">
+          <div class="monitor-grid">
+            
+            <!-- Left: Affect Grid 2D Visualizer -->
+            <div class="glass-card affect-card">
+              <div class="card-header">
+                <h3>Inferred Emotion State</h3>
+                <span class="badge" id="tracking-badge">Active</span>
+              </div>
 
-          <div class="mood-readout">
-            <span class="mood-label" id="mood-label">Calm & Happy</span>
-            <span class="mood-coordinates" id="mood-coordinates">Valence: 0.50  Arousal: -0.80</span>
-          </div>
+              <div class="affect-plot-wrapper">
+                <div class="affect-plot" id="affect-plane">
+                  <!-- Quadrant Labels -->
+                  <div class="quad-label quad-tl">Intense / Focus</div>
+                  <div class="quad-label quad-tr">Upbeat / Energetic</div>
+                  <div class="quad-label quad-bl">Calm / Melancholy</div>
+                  <div class="quad-label quad-br">Relaxed / Content</div>
 
-          <div class="dynamics-bar-wrapper" style="margin-top: 10px; width: 100%; display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-secondary);">
-              <span>Mouse Speed Dynamics</span>
-              <span id="speed-indicator">0 px/s</span>
+                  <!-- Axes -->
+                  <div class="axis-line axis-x"></div>
+                  <div class="axis-line axis-y"></div>
+
+                  <!-- Axis Names -->
+                  <span class="axis-tag tag-top">High Arousal (+1)</span>
+                  <span class="axis-tag tag-bottom">Low Arousal (-1)</span>
+                  <span class="axis-tag tag-left">Unpleasant (-1)</span>
+                  <span class="axis-tag tag-right">Pleasant (+1)</span>
+
+                  <!-- Coordinates Dot -->
+                  <div class="affect-dot" id="affect-dot">
+                    <div class="dot-ripple"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="affect-summary">
+                <div class="primary-mood" id="primary-mood-text">Calm & Content</div>
+                <div class="coordinates-readout" id="coordinates-readout">Valence: +0.60 • Arousal: -0.40</div>
+              </div>
             </div>
-            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-              <div id="speed-meter-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-pink)); transition: width 0.15s ease;"></div>
+
+            <!-- Right: Live Dynamics & Controls -->
+            <div class="monitor-sidebar">
+              <!-- Kinematics Card -->
+              <div class="glass-card telemetry-card">
+                <div class="card-header">
+                  <h3>Real-time Input Dynamics</h3>
+                  <span class="sub-badge">45s Window</span>
+                </div>
+
+                <div class="metrics-list">
+                  <div class="metric-row">
+                    <div class="metric-info">
+                      <span class="metric-label">Mean Mouse Speed</span>
+                      <span class="metric-val" id="metric-speed">0 px/s</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" id="meter-speed" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div class="metric-row">
+                    <div class="metric-info">
+                      <span class="metric-label">Acceleration</span>
+                      <span class="metric-val" id="metric-accel">0 px/s²</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill accel" id="meter-accel" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div class="metric-row">
+                    <div class="metric-info">
+                      <span class="metric-label">Click Frequency</span>
+                      <span class="metric-val" id="metric-clicks">0.0 /s</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill clicks" id="meter-clicks" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div class="metric-row">
+                    <div class="metric-info">
+                      <span class="metric-label">Active / Idle Ratio</span>
+                      <span class="metric-val" id="metric-idle">0% idle</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill idle" id="meter-idle" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Action Card -->
+              <div class="glass-card actions-card">
+                <button class="btn-primary" id="btn-trigger-self-report">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                  Log Emotional State (Self-Report)
+                </button>
+                <div class="button-subgroup">
+                  <button class="btn-secondary" id="btn-toggle-tracking">
+                    <span id="btn-tracking-icon">⏸</span>
+                    <span id="btn-tracking-text">Pause Tracking</span>
+                  </button>
+                  <button class="btn-secondary" id="btn-minimize-tray">
+                    <span>🗕</span>
+                    <span>Send to Tray</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- TAB 2: AMBIENT MOOD AUDIO -->
+        <section class="tab-pane" id="tab-ambient">
+          <div class="ambient-container">
+            <div class="glass-card ambient-main-card">
+              <div class="ambient-header">
+                <div>
+                  <h3 id="ambient-station-title">🌿 Calm & Peaceful Ambient</h3>
+                  <p id="ambient-station-desc">Soothing soundscape calibrated to low arousal and high valence</p>
+                </div>
+                <div class="ambient-mode-toggle">
+                  <label class="switch-label">
+                    <input type="checkbox" id="chk-auto-mood-sync" checked />
+                    <span class="switch-slider"></span>
+                    <span class="switch-text">Auto-Sync with Inferred Mood</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Station Selection Quadrants -->
+              <div class="ambient-stations-grid">
+                <div class="station-card active" data-station="calm" id="station-calm">
+                  <div class="station-icon">🌿</div>
+                  <div class="station-details">
+                    <h4>Calm & Relaxed</h4>
+                    <span>High Valence • Low Arousal</span>
+                  </div>
+                </div>
+
+                <div class="station-card" data-station="upbeat" id="station-upbeat">
+                  <div class="station-icon">⚡</div>
+                  <div class="station-details">
+                    <h4>Upbeat & Energized</h4>
+                    <span>High Valence • High Arousal</span>
+                  </div>
+                </div>
+
+                <div class="station-card" data-station="focus" id="station-focus">
+                  <div class="station-icon">🎧</div>
+                  <div class="station-details">
+                    <h4>Deep Focus & Rhythm</h4>
+                    <span>Low Valence • High Arousal</span>
+                  </div>
+                </div>
+
+                <div class="station-card" data-station="melancholy" id="station-melancholy">
+                  <div class="station-icon">🌧️</div>
+                  <div class="station-details">
+                    <h4>Rain & Ambient Drone</h4>
+                    <span>Low Valence • Low Arousal</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Audio Player Controls -->
+              <div class="player-controls-bar">
+                <button class="btn-play-pause" id="btn-ambient-play">
+                  <svg id="icon-play" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="icon-pause" style="display: none;" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+
+                <div class="audio-track-info">
+                  <div class="now-playing-label" id="audio-status-label">Ready to play ambient soundscape</div>
+                  <div class="audio-equalizer" id="audio-equalizer">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                  </div>
+                </div>
+
+                <div class="volume-control">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  <input type="range" id="ambient-volume" min="0" max="100" value="70" />
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Panel 2: Music Recommendation -->
-        <section class="glass-panel music-recommendation-card">
-          <h2 class="section-title">Acoustic Affect Generation</h2>
-          
-          <div class="track-info-wrapper">
-            <div class="track-art-glow" id="track-art-glow" style="cursor: pointer;">
-              <div class="track-art-inner">
-                <svg viewBox="0 0 24 24" class="music-icon" id="music-art-icon">
-                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                </svg>
+        <!-- TAB 3: SETTINGS & CONTROLS -->
+        <section class="tab-pane" id="tab-settings">
+          <div class="settings-grid">
+            
+            <div class="glass-card settings-card">
+              <div class="card-header">
+                <h3>Background Tracking & Model Controls</h3>
               </div>
-            </div>
 
-            <div class="track-metadata">
-              <h3 class="track-title" id="track-title">Loading Track...</h3>
-              <p class="track-artist" id="track-artist">Move mouse fast or slow to shift mood</p>
-              <p class="click-play-hint" id="player-status-hint" style="font-size: 0.7rem; color: var(--accent-blue); opacity: 0.9; margin-top: 4px;">▶ Move cursor to shift mood & music</p>
-            </div>
-          </div>
-
-          <!-- Provider Switch Selector & Library Button -->
-          <div class="provider-selector" style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="btn-yt" data-provider="youtube">YouTube</button>
-              <button class="toggle-btn" id="btn-spot" data-provider="spotify">Spotify</button>
-            </div>
-            <button id="btn-open-library" class="library-btn" style="background: rgba(154, 77, 255, 0.2); border: 1px solid rgba(154, 77, 255, 0.4); color: #fff; border-radius: 8px; padding: 6px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-              <span>⭐</span> Mood Library
-            </button>
-          </div>
-
-          <!-- Direct Playback Controls Bar (Play, Pause, Stop, Prev, Next, Select, Volume) -->
-          <div class="player-controls-bar" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px 14px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button id="btn-prev-track" class="ctrl-btn" title="Previous Track" style="background: rgba(255,255,255,0.06); border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.95rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">⏮</button>
-                <button id="btn-play-pause" class="ctrl-btn main-play-btn" title="Play / Pause" style="background: var(--accent-purple); border: none; color: #fff; cursor: pointer; font-size: 1.1rem; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(154, 77, 255, 0.45);">▶</button>
-                <button id="btn-stop-track" class="ctrl-btn" title="Stop Audio" style="background: rgba(255,255,255,0.06); border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.95rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">⏹</button>
-                <button id="btn-next-track" class="ctrl-btn" title="Next Track" style="background: rgba(255,255,255,0.06); border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.95rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">⏭</button>
-              </div>
-              <select id="quick-mood-select" style="background: rgba(154,77,255,0.15); border: 1px solid rgba(154,77,255,0.35); color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; cursor: pointer; outline: none; font-family: inherit;">
-                <option value="excited_happy">⚡ 1. Excited (Naatu Naatu / Tauba)</option>
-                <option value="stressed_anxious">⚡ 2. Intense (Arjan Vailly / Hukum)</option>
-                <option value="calm_relaxed">🌿 3. Calm (Samajavaragamana / Kesariya)</option>
-                <option value="mellow_melancholy">🌿 4. Mellow (O Maahi / Adiga Adiga)</option>
-              </select>
-            </div>
-
-            <!-- Volume & Live Sound Status -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.05);">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.75rem; color: var(--text-secondary);">🔊 Volume:</span>
-                <input type="range" id="volume-slider" min="0" max="100" value="80" style="width: 90px; cursor: pointer; accent-color: var(--accent-purple);" />
-                <span id="volume-readout" style="font-size: 0.72rem; color: var(--text-secondary);">80%</span>
-              </div>
-              <span id="sound-engine-status" style="font-size: 0.72rem; color: #00ffaa; font-weight: 600;">● Live Audio Ready</span>
-            </div>
-          </div>
-
-          <!-- Pure Audio Music Player Deck (No Video Iframes, 100% Error-Free Audio) -->
-          <div class="player-embed-wrapper" style="margin-top: 12px;">
-            <div id="pure-audio-deck" style="background: linear-gradient(135deg, rgba(154, 77, 255, 0.15), rgba(10, 8, 20, 0.85)); border: 1.5px solid rgba(154, 77, 255, 0.35); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.5);">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.2rem;">🎶</span>
-                  <span id="deck-platform-label" style="font-weight: 800; font-size: 0.85rem; color: var(--accent-purple); letter-spacing: 1px;">iTunes Preview • Real Audio</span>
+              <div class="settings-form">
+                <div class="form-group">
+                  <label for="setting-inference-interval">Inference Frequency (Prediction Rate)</label>
+                  <select id="setting-inference-interval" class="form-control">
+                    <option value="1">Every 1 Second (High Responsiveness)</option>
+                    <option value="3">Every 3 Seconds</option>
+                    <option value="5" selected>Every 5 Seconds (Recommended)</option>
+                    <option value="10">Every 10 Seconds (Power Saving)</option>
+                    <option value="30">Every 30 Seconds</option>
+                  </select>
+                  <span class="form-hint">How often the ONNX ML model evaluates mouse dynamics.</span>
                 </div>
-                <span id="deck-live-badge" style="font-size: 0.72rem; font-weight: 700; color: #00ffaa; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 8px; border: 1px solid rgba(0,255,170,0.3);">
-                  ● AUDIO ACTIVE
-                </span>
+
+                <div class="form-group">
+                  <label for="setting-window-size">Kinematic Rolling Feature Window</label>
+                  <select id="setting-window-size" class="form-control">
+                    <option value="15">15 Seconds (Rapid changes)</option>
+                    <option value="30">30 Seconds</option>
+                    <option value="45" selected>45 Seconds (Balanced baseline)</option>
+                    <option value="60">60 Seconds (Smooth average)</option>
+                  </select>
+                  <span class="form-hint">Duration of recent cursor and click history evaluated in each sample.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="setting-popup-interval">Self-Report Reminder Popup Interval</label>
+                  <select id="setting-popup-interval" class="form-control">
+                    <option value="0">Disabled (Manual Only)</option>
+                    <option value="5">Every 5 Minutes</option>
+                    <option value="10" selected>Every 10 Minutes</option>
+                    <option value="15">Every 15 Minutes</option>
+                    <option value="30">Every 30 Minutes</option>
+                    <option value="60">Every 60 Minutes</option>
+                  </select>
+                  <span class="form-hint">Triggers the 9x9 Affect Grid to calibrate and improve local accuracy.</span>
+                </div>
+
+                <button class="btn-primary" id="btn-save-settings" style="margin-top: 12px;">Save Preferences</button>
+              </div>
+            </div>
+
+            <!-- Diagnostics & Privacy Guarantee Card -->
+            <div class="glass-card privacy-card">
+              <div class="card-header">
+                <h3>Local Privacy & Telemetry</h3>
               </div>
 
-              <!-- Animated Equalizer Waveform Bars -->
-              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.35); padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
-                  <span id="deck-song-title" style="font-size: 1rem; font-weight: 800; color: #fff;">Naatu Naatu</span>
-                  <span id="deck-song-artist" style="font-size: 0.78rem; color: var(--text-secondary);">Rahul Sipligunj, Kaala Bhairava (RRR)</span>
-                </div>
-                
-                <div id="deck-waveform" style="display: flex; align-items: flex-end; gap: 4px; height: 28px;">
-                  <div class="deck-wave-bar" style="width: 5px; height: 18px; background: var(--accent-purple); border-radius: 3px;"></div>
-                  <div class="deck-wave-bar" style="width: 5px; height: 26px; background: var(--accent-purple); border-radius: 3px;"></div>
-                  <div class="deck-wave-bar" style="width: 5px; height: 12px; background: var(--accent-purple); border-radius: 3px;"></div>
-                  <div class="deck-wave-bar" style="width: 5px; height: 22px; background: var(--accent-purple); border-radius: 3px;"></div>
-                  <div class="deck-wave-bar" style="width: 5px; height: 16px; background: var(--accent-purple); border-radius: 3px;"></div>
+              <div class="privacy-badge-box">
+                <div class="privacy-icon">🛡️</div>
+                <div class="privacy-text">
+                  <strong>100% On-Device Privacy Guaranteed</strong>
+                  <p>Zero keystroke characters or screen content are ever monitored or captured. Only mouse trajectory kinematics, acceleration, and click timestamps are processed locally.</p>
                 </div>
               </div>
 
-              <!-- Quick Link Launchers -->
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
-                <span id="deck-mood-badge" style="font-size: 0.74rem; color: var(--text-secondary);">Mood: <b style="color: #fff;">EXCITED & HAPPY</b></span>
-                <div style="display: flex; gap: 8px;">
-                  <a id="deck-spotify-link" href="https://open.spotify.com/search/Naatu%20Naatu" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #1db954; background: rgba(29, 185, 84, 0.15); border: 1px solid rgba(29, 185, 84, 0.35); padding: 4px 10px; border-radius: 15px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
-                    <span>Spotify ↗</span>
-                  </a>
-                  <a id="deck-yt-link" href="https://www.youtube.com/results?search_query=Naatu+Naatu+RRR" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #ff3355; background: rgba(255, 0, 51, 0.15); border: 1px solid rgba(255, 0, 51, 0.35); padding: 4px 10px; border-radius: 15px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px;">
-                    <span>YouTube ↗</span>
-                  </a>
+              <div class="telemetry-stats-grid">
+                <div class="telemetry-item">
+                  <span class="telemetry-number" id="stats-raw-events">...</span>
+                  <span class="telemetry-label">Raw Movement Events</span>
+                </div>
+                <div class="telemetry-item">
+                  <span class="telemetry-number" id="stats-labels">...</span>
+                  <span class="telemetry-label">Self-Report Samples</span>
                 </div>
               </div>
+
+              <div class="danger-zone">
+                <button class="btn-danger" id="btn-quit-app">Quit Moodtrace Completely</button>
+              </div>
             </div>
+
           </div>
         </section>
 
-        <!-- Panel 3: Action Center -->
-        <section class="glass-panel actions-card">
-          <h2 class="section-title">Command Center</h2>
-          <p class="description">Interactive mouse kinematics affect inference & self-report logger.</p>
-          
-          <div class="button-container" style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="action-btn glow-btn" id="btn-open-grid">
-              <svg viewBox="0 0 24 24" class="btn-icon">
-                <path d="M4 3h16c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm0 4v12h16V7H4zm12 10H8v-2h8v2zm2-4H6V9h12v4z" />
-              </svg>
-              Summon Affect Grid
-            </button>
-            <button class="action-btn" id="btn-open-library-action" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff;">
-              <span style="font-size: 1rem;">🎵</span> Customise Favorite Songs
-            </button>
-          </div>
+      </main>
 
-          <div class="stats-footer">
-            <div class="stat-item">
-              <span class="stat-value" id="events-count">0</span>
-              <span class="stat-label">Velocity Samples</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-value" id="status-label" style="color: #00ffaa;">Live Inferred</span>
-              <span class="stat-label">Pipeline Status</span>
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </main>
-
-    <!-- Modal: Affect Self-Report Grid -->
-    <div id="affect-grid-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-card">
-        <div class="modal-header">
-          <div class="modal-title-wrap">
-            <span class="modal-badge">Manual Affect Override</span>
-            <h3 class="modal-title">Summon Affect Grid</h3>
-          </div>
-          <button id="btn-close-modal" class="modal-close-btn">&times;</button>
+      <!-- Bottom Status Strip -->
+      <footer class="app-footer">
+        <div class="footer-item">
+          <span class="footer-dot active"></span>
+          <span>Hook: WH_MOUSE_LL Active</span>
         </div>
-        <p class="modal-subtitle">Click anywhere inside the 2D plane to calibrate your emotional state and auto-switch music.</p>
-        
-        <div class="modal-grid-wrapper" id="modal-affect-grid">
-          <!-- Quadrant Highlights -->
-          <div class="quad-bg quad-tl"></div>
-          <div class="quad-bg quad-tr"></div>
-          <div class="quad-bg quad-bl"></div>
-          <div class="quad-bg quad-br"></div>
-          
-          <!-- Crosshairs -->
-          <div class="grid-crosshair-h"></div>
-          <div class="grid-crosshair-v"></div>
-          
-          <!-- Labels -->
-          <span class="grid-label gl-top">Excited (High Arousal)</span>
-          <span class="grid-label gl-bottom">Calm (Low Arousal)</span>
-          <span class="grid-label gl-left">Negative</span>
-          <span class="grid-label gl-right">Positive</span>
-          
-          <!-- Cursor dot -->
-          <div class="grid-marker" id="modal-grid-marker"></div>
+        <div class="footer-item">
+          <span>Engine: Local ONNX Runtime</span>
         </div>
-
-        <div class="modal-footer">
-          <span id="modal-coords-readout">Hover over the grid to choose coordinates</span>
+        <div class="footer-item" id="footer-db-status">
+          <span>Storage: Local SQLite</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Modal: Mood Songs & Favorites Library -->
-    <div id="library-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-card library-modal-card" style="max-width: 540px; max-height: 85vh; overflow-y: auto;">
-        <div class="modal-header">
-          <div class="modal-title-wrap">
-            <span class="modal-badge">Music Library</span>
-            <h3 class="modal-title">Choose & Add Favorite Songs</h3>
-          </div>
-          <button id="btn-close-library" class="modal-close-btn">&times;</button>
-        </div>
-        <p class="modal-subtitle">Select which song plays when your mouse detects each emotional state, or add your own custom songs.</p>
-        
-        <!-- Mood Tabs -->
-        <div class="library-tabs" style="display: flex; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 10px; margin-top: 6px; overflow-x: auto;">
-          <button class="lib-tab-btn active" data-mood="excited_happy">⚡ Excited</button>
-          <button class="lib-tab-btn" data-mood="stressed_anxious">⚡ Intense</button>
-          <button class="lib-tab-btn" data-mood="calm_relaxed">🌿 Calm</button>
-          <button class="lib-tab-btn" data-mood="mellow_melancholy">🌿 Mellow</button>
-        </div>
-
-        <!-- Songs List for Selected Mood Tab -->
-        <div id="library-song-list" class="library-song-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
-          <!-- Dynamically populated by JS -->
-        </div>
-
-        <!-- Add Custom Song Section -->
-        <div class="add-song-section" style="margin-top: 14px; padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">
-          <h4 style="font-size: 0.88rem; font-weight: 700; color: #fff;">➕ Add Custom Favorite Song</h4>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input type="text" id="new-song-title" placeholder="Song Title (e.g. Kesariya)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
-            <input type="text" id="new-song-artist" placeholder="Artist (e.g. Arijit Singh)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;" />
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <select id="new-song-mood" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem; font-family: inherit;">
-              <option value="excited_happy">⚡ Excited & Happy</option>
-              <option value="stressed_anxious">⚡ Stressed & Intense</option>
-              <option value="calm_relaxed">🌿 Calm & Relaxed</option>
-              <option value="mellow_melancholy">🌿 Mellow & Reflective</option>
-            </select>
-            <button id="btn-save-new-song" style="background: var(--accent-purple); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: background 0.2s;">Add to Library</button>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-          <button id="btn-reset-library" style="background: transparent; border: none; color: var(--text-secondary); font-size: 0.75rem; text-decoration: underline; cursor: pointer;">↺ Reset Library to Verified Defaults</button>
-        </div>
-
-      </div>
+      </footer>
     </div>
   </body>
 </html>

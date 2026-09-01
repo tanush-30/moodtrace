@@ -5,55 +5,91 @@ use tauri::Manager;
 pub struct CurrentStateResponse {
     pub arousal: f32,
     pub valence: f32,
-    pub track_title: String,
-    pub track_artist: String,
-    pub track_provider_id: String,
-    pub provider: String,
+    pub tracking_enabled: bool,
+    pub inference_interval_sec: u64,
+    pub popup_interval_min: u64,
+    pub window_duration_sec: i64,
+    pub mean_speed: f32,
+    pub mean_acceleration: f32,
+    pub click_rate: f32,
+    pub idle_ratio: f32,
+    pub event_count: usize,
+}
+
+#[derive(serde::Serialize)]
+pub struct TelemetryStats {
+    pub raw_events_count: i64,
+    pub labels_count: i64,
 }
 
 #[tauri::command]
 pub fn get_current_state(state: tauri::State<'_, AppState>) -> CurrentStateResponse {
     let arousal = *state.current_arousal.lock().unwrap();
     let valence = *state.current_valence.lock().unwrap();
-    let provider = state.active_provider.lock().unwrap().clone();
+    let tracking_enabled = *state.tracking_enabled.lock().unwrap();
+    let inference_interval_sec = *state.inference_interval_sec.lock().unwrap();
+    let popup_interval_min = *state.popup_interval_min.lock().unwrap();
+    let window_duration_sec = *state.window_duration_sec.lock().unwrap();
     
-    let track_guard = state.current_track.lock().unwrap();
-    if let Some(ref track) = *track_guard {
-        CurrentStateResponse {
-            arousal,
-            valence,
-            track_title: track.title.clone(),
-            track_artist: track.artist.clone(),
-            track_provider_id: track.provider_id.clone(),
-            provider,
-        }
-    } else {
-        CurrentStateResponse {
-            arousal,
-            valence,
-            track_title: "No Track Active".to_string(),
-            track_artist: "".to_string(),
-            track_provider_id: "".to_string(),
-            provider,
-        }
+    let metrics = state.latest_metrics.lock().unwrap();
+
+    CurrentStateResponse {
+        arousal,
+        valence,
+        tracking_enabled,
+        inference_interval_sec,
+        popup_interval_min,
+        window_duration_sec,
+        mean_speed: metrics.mean_speed,
+        mean_acceleration: metrics.mean_acceleration,
+        click_rate: metrics.click_rate,
+        idle_ratio: metrics.idle_ratio,
+        event_count: metrics.event_count,
     }
 }
 
 #[tauri::command]
-pub fn set_provider(state: tauri::State<'_, AppState>, provider: String) -> Result<(), String> {
-    if provider == "spotify" || provider == "youtube" {
-        let mut guard = state.active_provider.lock().unwrap();
-        *guard = provider.clone();
-        println!("Tauri CMD: Active music provider switched to '{}'", provider);
+pub fn set_tracking(state: tauri::State<'_, AppState>, enabled: bool) -> Result<bool, String> {
+    let mut guard = state.tracking_enabled.lock().unwrap();
+    *guard = enabled;
+    println!("Tauri CMD: Tracking state set to {}", enabled);
+    Ok(enabled)
+}
+
+#[tauri::command]
+pub fn update_settings(
+    state: tauri::State<'_, AppState>,
+    inference_sec: u64,
+    popup_min: u64,
+    window_sec: i64,
+) -> Result<(), String> {
+    *state.inference_interval_sec.lock().unwrap() = inference_sec.clamp(1, 60);
+    *state.popup_interval_min.lock().unwrap() = popup_min;
+    *state.window_duration_sec.lock().unwrap() = window_sec.clamp(10, 300);
+    
+    println!(
+        "Tauri CMD: Settings updated (Inference: {}s, Popup: {}m, Window: {}s)",
+        inference_sec, popup_min, window_sec
+    );
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_telemetry_stats(state: tauri::State<'_, AppState>) -> Result<TelemetryStats, String> {
+    let conn = rusqlite::Connection::open(&state.db_path).map_err(|e| e.to_string())?;
+    
+    let raw_events_count: i64 = conn
+        .query_row("SELECT COUNT(*) FROM raw_events", [], |r| r.get(0))
+        .unwrap_or(0);
         
-        // Reset current track so the coordinator loop immediately re-matches under the new provider
-        let mut track_guard = state.current_track.lock().unwrap();
-        *track_guard = None;
-        
-        Ok(())
-    } else {
-        Err("Invalid provider name".to_string())
-    }
+    let labels_count: i64 = conn
+        .query_row("SELECT COUNT(*) FROM labels", [], |r| r.get(0))
+        .unwrap_or(0);
+
+    Ok(TelemetryStats {
+        raw_events_count,
+        labels_count,
+    })
 }
 
 #[tauri::command]
@@ -71,7 +107,7 @@ pub fn submit_label(
         rusqlite::params![ts_now, valence, arousal, "manual"],
     ).map_err(|e| e.to_string())?;
 
-    println!("Tauri CMD: Manual self-label submitted: valence={:.2}, arousal={:.2}", valence, arousal);
+    println!("Tauri CMD: Self-label submitted: valence={:.2}, arousal={:.2}", valence, arousal);
     Ok(())
 }
 
@@ -92,4 +128,18 @@ pub fn close_popup(app_handle: tauri::AppHandle) -> Result<(), String> {
         println!("Tauri CMD: Self-report Affect Grid popup closed.");
     }
     Ok(())
+}
+
+#[tauri::command]
+pub fn hide_to_tray(app_handle: tauri::AppHandle) -> Result<(), String> {
+    if let Some(window) = app_handle.get_webview_window("main") {
+        window.hide().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn quit_app(app_handle: tauri::AppHandle) {
+    println!("Tauri CMD: Clean shutdown requested.");
+    app_handle.exit(0);
 }
