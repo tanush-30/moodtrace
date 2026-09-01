@@ -1,4 +1,4 @@
-// Moodtrace — Windows Background Dashboard & Ambient Audio Engine
+// Moodtrace — Acoustic Affect & Biometric Soundscape Studio Engine
 
 let invoke = null;
 if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
@@ -7,23 +7,23 @@ if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
   invoke = window.__TAURI_INTERNALS__.invoke;
 }
 
-// Fallback mock invoke for pure browser preview
+// Browser Preview Mock Fallback
 if (!invoke) {
-  console.warn("Tauri invoke not detected. Initializing browser emulation mode.");
+  console.warn("Tauri IPC not detected. Running in browser simulation mode.");
   invoke = async (cmd, args = {}) => {
     if (cmd === 'get_current_state') {
       return {
-        arousal: -0.45,
+        arousal: -0.42,
         valence: 0.65,
         tracking_enabled: true,
         inference_interval_sec: 5,
         popup_interval_min: 10,
         window_duration_sec: 45,
-        mean_speed: 342.5,
-        mean_acceleration: 120.0,
-        click_rate: 0.4,
-        idle_ratio: 0.15,
-        event_count: 850
+        mean_speed: 380.0,
+        mean_acceleration: 145.0,
+        click_rate: 0.5,
+        idle_ratio: 0.12,
+        event_count: 920
       };
     }
     if (cmd === 'get_telemetry_stats') {
@@ -34,32 +34,47 @@ if (!invoke) {
 }
 
 // -----------------------------------------------------------------------------
-// Ambient Sound Engine (Public streams & generative ambient fallback)
+// Soundscape Stations Dataset (Royalty-Free Ambient Mood Streams)
 // -----------------------------------------------------------------------------
 const STATIONS = {
   calm: {
     id: 'calm',
-    name: '🌿 Calm & Peaceful Ambient',
-    desc: 'Soothing acoustic & nature soundscape calibrated to low arousal and high valence',
-    // Public Creative Commons ambient audio stream / direct MP3
+    badge: 'CALM & RELAXED',
+    name: 'Zen Ambient Solitude',
+    artist: 'Acoustic Piano & Nature Drone',
+    emoji: '🌿',
+    accentColor: '#10b981',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.35) 0%, rgba(16, 185, 129, 0.2) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3'
   },
   upbeat: {
     id: 'upbeat',
-    name: '⚡ Upbeat & Energized Chillhop',
-    desc: 'Lively uplifting beats calibrated to high arousal and high valence',
+    badge: 'HIGH ENERGY & HAPPY',
+    name: 'Sunshine Chillhop Beats',
+    artist: 'Vibrant Lo-Fi & Melodic Synth',
+    emoji: '⚡',
+    accentColor: '#f59e0b',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.35) 0%, rgba(244, 63, 94, 0.25) 35%, rgba(139, 92, 246, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3'
   },
   focus: {
     id: 'focus',
-    name: '🎧 Deep Focus & Rhythm',
-    desc: 'Driving steady pulse calibrated to high arousal and lower valence',
+    badge: 'INTENSE FOCUS & FLOW',
+    name: 'Cyber Synthwave Pulse',
+    artist: 'Deep Driving Bassline & Beats',
+    emoji: '🎧',
+    accentColor: '#8b5cf6',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.25) 35%, rgba(6, 182, 212, 0.15) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3'
   },
   melancholy: {
     id: 'melancholy',
-    name: '🌧️ Rain & Ambient Drone',
-    desc: 'Gentle rain and soft drone calibrated to low arousal and low valence',
+    badge: 'CALM & REFLECTIVE',
+    name: 'Binaural Rain & Space Drone',
+    artist: 'Soft Rainfall & Atmospheric Drone',
+    emoji: '🌧️',
+    accentColor: '#06b6d4',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.45) 0%, rgba(49, 46, 129, 0.3) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=soft-rain-ambient-111154.mp3'
   }
 };
@@ -67,118 +82,278 @@ const STATIONS = {
 let currentStation = 'calm';
 let isAudioPlaying = false;
 let autoMoodSync = true;
-let audioPlayer = new Audio();
+let isTrackingActive = true;
+
+const audioPlayer = new Audio();
 audioPlayer.loop = true;
 audioPlayer.volume = 0.7;
 
 // -----------------------------------------------------------------------------
-// UI State & DOM References
+// DOM References
 // -----------------------------------------------------------------------------
-let isTrackingActive = true;
-let currentArousal = -0.4;
-let currentValence = 0.6;
+const dynamicAura = document.getElementById('dynamic-aura');
+const harmonicOrb = document.getElementById('harmonic-orb');
+const valValence = document.getElementById('val-valence');
+const valArousal = document.getElementById('val-arousal');
+const vibeBadgeTitle = document.getElementById('vibe-badge-title');
+const vibeBadgeIcon = document.getElementById('vibe-badge-icon');
 
-// Elements
-const affectDot = document.getElementById('affect-dot');
-const primaryMoodText = document.getElementById('primary-mood-text');
-const coordinatesReadout = document.getElementById('coordinates-readout');
-const trackingBadge = document.getElementById('tracking-badge');
-const headerStatusDot = document.getElementById('header-status-dot');
+const vinylDisc = document.getElementById('vinyl-disc');
+const nowPlayingGenre = document.getElementById('now-playing-genre');
+const nowPlayingTitle = document.getElementById('now-playing-title');
+const nowPlayingArtist = document.getElementById('now-playing-artist');
+const svgPlayIcon = document.getElementById('svg-play-icon');
+const svgPauseIcon = document.getElementById('svg-pause-icon');
+const sliderVolume = document.getElementById('slider-volume');
+const chkStudioSync = document.getElementById('chk-studio-sync');
 
-const metricSpeed = document.getElementById('metric-speed');
-const meterSpeed = document.getElementById('meter-speed');
-const metricAccel = document.getElementById('metric-accel');
-const meterAccel = document.getElementById('meter-accel');
-const metricClicks = document.getElementById('metric-clicks');
-const meterClicks = document.getElementById('meter-clicks');
-const metricIdle = document.getElementById('metric-idle');
-const meterIdle = document.getElementById('meter-idle');
+const barFillSpeed = document.getElementById('bar-fill-speed');
+const meterValSpeed = document.getElementById('meter-val-speed');
+const barFillAccel = document.getElementById('bar-fill-accel');
+const meterValAccel = document.getElementById('meter-val-accel');
+const barFillClicks = document.getElementById('bar-fill-clicks');
+const meterValClicks = document.getElementById('meter-val-clicks');
 
-const btnToggleTracking = document.getElementById('btn-toggle-tracking');
-const btnTrackingIcon = document.getElementById('btn-tracking-icon');
-const btnTrackingText = document.getElementById('btn-tracking-text');
-
-const btnPlayPause = document.getElementById('btn-ambient-play');
-const iconPlay = document.getElementById('icon-play');
-const iconPause = document.getElementById('icon-pause');
-const audioStatusLabel = document.getElementById('audio-status-label');
-const audioEqualizer = document.getElementById('audio-equalizer');
-const ambientVolume = document.getElementById('ambient-volume');
-const chkAutoMoodSync = document.getElementById('chk-auto-mood-sync');
-const ambientStationTitle = document.getElementById('ambient-station-title');
-const ambientStationDesc = document.getElementById('ambient-station-desc');
+const statusLivePill = document.getElementById('status-live-pill');
+const statusLiveText = document.getElementById('status-live-text');
+const btnPauseTracking = document.getElementById('btn-pause-tracking');
+const btnTrackIcon = document.getElementById('btn-track-icon');
+const btnTrackText = document.getElementById('btn-track-text');
 
 // -----------------------------------------------------------------------------
 // Navigation Tabs
 // -----------------------------------------------------------------------------
-document.querySelectorAll('.nav-tab').forEach((tabBtn) => {
-  tabBtn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach((b) => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach((p) => p.classList.remove('active'));
+document.querySelectorAll('.dock-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.dock-btn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.tab-view').forEach((v) => v.classList.remove('active'));
 
-    tabBtn.classList.add('active');
-    const targetPane = document.getElementById(tabBtn.dataset.tab);
-    if (targetPane) targetPane.classList.add('active');
+    btn.classList.add('active');
+    const targetView = document.getElementById(btn.dataset.tab);
+    if (targetView) targetView.classList.add('active');
 
-    if (tabBtn.dataset.tab === 'tab-settings') {
-      loadTelemetryStats();
+    if (btn.dataset.tab === 'tab-config') {
+      loadTelemetryCounters();
     }
   });
 });
 
 // -----------------------------------------------------------------------------
-// Window Actions (Tray & Quit)
+// Window Actions (Tray & Terminate)
 // -----------------------------------------------------------------------------
-document.getElementById('btn-hide-tray')?.addEventListener('click', () => {
+document.getElementById('btn-minimize-to-tray')?.addEventListener('click', () => {
   invoke('hide_to_tray').catch(console.error);
 });
-document.getElementById('btn-minimize-tray')?.addEventListener('click', () => {
+document.getElementById('btn-dock-to-tray')?.addEventListener('click', () => {
   invoke('hide_to_tray').catch(console.error);
 });
-document.getElementById('btn-quit-app')?.addEventListener('click', () => {
-  invoke('quit_app').catch(console.error);
-});
-document.getElementById('btn-trigger-self-report')?.addEventListener('click', () => {
+document.getElementById('btn-open-self-report')?.addEventListener('click', () => {
   invoke('trigger_affect_grid').catch(console.error);
+});
+document.getElementById('btn-terminate-app')?.addEventListener('click', () => {
+  invoke('quit_app').catch(console.error);
 });
 
 // -----------------------------------------------------------------------------
 // Tracking Toggle
 // -----------------------------------------------------------------------------
-btnToggleTracking?.addEventListener('click', async () => {
+btnPauseTracking?.addEventListener('click', async () => {
   try {
     const newState = !isTrackingActive;
     await invoke('set_tracking', { enabled: newState });
     isTrackingActive = newState;
-    updateTrackingUI(newState);
+    applyTrackingState(newState);
   } catch (err) {
-    console.error('Failed to toggle tracking:', err);
+    console.error('Failed to set tracking state:', err);
   }
 });
 
-function updateTrackingUI(active) {
+function applyTrackingState(active) {
   if (active) {
-    trackingBadge.textContent = 'Active';
-    trackingBadge.className = 'badge';
-    headerStatusDot.className = 'status-indicator active';
-    btnTrackingIcon.textContent = '⏸';
-    btnTrackingText.textContent = 'Pause Tracking';
+    statusLivePill.className = 'live-pill active';
+    statusLiveText.textContent = 'MONITORING';
+    btnTrackIcon.textContent = '⏸';
+    btnTrackText.textContent = 'Pause Sensor';
   } else {
-    trackingBadge.textContent = 'Paused';
-    trackingBadge.className = 'badge paused';
-    headerStatusDot.className = 'status-indicator paused';
-    btnTrackingIcon.textContent = '▶';
-    btnTrackingText.textContent = 'Resume Tracking';
+    statusLivePill.className = 'live-pill paused';
+    statusLiveText.textContent = 'PAUSED';
+    btnTrackIcon.textContent = '▶';
+    btnTrackText.textContent = 'Resume Sensor';
   }
 }
 
 // -----------------------------------------------------------------------------
-// Settings Form
+// Music & Ambient Audio Player Controls
 // -----------------------------------------------------------------------------
-document.getElementById('btn-save-settings')?.addEventListener('click', async () => {
-  const inferenceSec = parseInt(document.getElementById('setting-inference-interval').value, 10);
-  const windowSec = parseInt(document.getElementById('setting-window-size').value, 10);
-  const popupMin = parseInt(document.getElementById('setting-popup-interval').value, 10);
+function activateStation(stationKey, startPlaying = false) {
+  const st = STATIONS[stationKey];
+  if (!st) return;
+
+  currentStation = stationKey;
+
+  // Update theme colors & background aura
+  document.documentElement.style.setProperty('--current-accent', st.accentColor);
+  document.documentElement.style.setProperty('--current-glow', `${st.accentColor}44`);
+  if (dynamicAura) {
+    dynamicAura.style.background = st.aura;
+  }
+
+  // Update hero vinyl meta
+  nowPlayingGenre.textContent = st.badge;
+  nowPlayingTitle.textContent = st.name;
+  nowPlayingArtist.textContent = st.artist;
+  vibeBadgeIcon.textContent = st.emoji;
+  vibeBadgeTitle.textContent = st.badge.replace('&', '•');
+
+  // Highlight album catalog card
+  document.querySelectorAll('.album-station-card').forEach((card) => {
+    card.classList.toggle('active', card.dataset.station === stationKey);
+  });
+
+  if (startPlaying || isAudioPlaying) {
+    audioPlayer.src = st.url;
+    audioPlayer.play().then(() => {
+      setPlaybackState(true);
+    }).catch((err) => {
+      console.warn('Audio stream fallback triggered:', err);
+      startProceduralSynthTone(st.accentColor);
+    });
+  }
+}
+
+function setPlaybackState(playing) {
+  isAudioPlaying = playing;
+  if (playing) {
+    svgPlayIcon.style.display = 'none';
+    svgPauseIcon.style.display = 'block';
+    vinylDisc.classList.add('spinning');
+  } else {
+    svgPlayIcon.style.display = 'block';
+    svgPauseIcon.style.display = 'none';
+    vinylDisc.classList.remove('spinning');
+  }
+}
+
+document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
+  if (isAudioPlaying) {
+    audioPlayer.pause();
+    setPlaybackState(false);
+  } else {
+    activateStation(currentStation, true);
+  }
+});
+
+sliderVolume?.addEventListener('input', (e) => {
+  audioPlayer.volume = parseFloat(e.target.value) / 100;
+});
+
+chkStudioSync?.addEventListener('change', (e) => {
+  autoMoodSync = e.target.checked;
+});
+
+// Stations Catalog Play Buttons
+document.querySelectorAll('.btn-play-station').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const target = btn.dataset.station;
+    activateStation(target, true);
+  });
+});
+
+document.querySelectorAll('.album-station-card').forEach((card) => {
+  card.addEventListener('click', () => {
+    activateStation(card.dataset.station, true);
+  });
+});
+
+// Procedural Synth Soundscape Fallback
+let webAudioCtx = null;
+function startProceduralSynthTone() {
+  try {
+    if (!webAudioCtx) {
+      webAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const osc = webAudioCtx.createOscillator();
+    const gain = webAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, webAudioCtx.currentTime);
+    gain.gain.setValueAtTime(0.04, webAudioCtx.currentTime);
+    osc.connect(gain);
+    gain.connect(webAudioCtx.destination);
+    osc.start();
+    setPlaybackState(true);
+  } catch (e) {
+    console.error('Web Audio Synth error:', e);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Live Affect & Kinematics Coordinate Loop
+// -----------------------------------------------------------------------------
+function mapMoodToStation(valence, arousal) {
+  if (arousal >= 0 && valence >= 0) return 'upbeat';
+  if (arousal >= 0 && valence < 0) return 'focus';
+  if (arousal < 0 && valence >= 0) return 'calm';
+  return 'melancholy';
+}
+
+async function syncLiveStudioState() {
+  try {
+    const state = await invoke('get_current_state');
+    if (!state) return;
+
+    const { valence, arousal, tracking_enabled, mean_speed, mean_acceleration, click_rate } = state;
+
+    isTrackingActive = tracking_enabled;
+    applyTrackingState(tracking_enabled);
+
+    // Update 2D Plane Coordinate Orb (Valence: X, Arousal: Y)
+    const xPct = ((valence + 1.0) / 2.0) * 100;
+    const yPct = ((1.0 - (arousal + 1.0) / 2.0)) * 100;
+
+    if (harmonicOrb) {
+      harmonicOrb.style.left = `${Math.max(6, Math.min(94, xPct))}%`;
+      harmonicOrb.style.top = `${Math.max(6, Math.min(94, yPct))}%`;
+    }
+
+    // Telemetry display values
+    valValence.textContent = (valence >= 0 ? '+' : '') + valence.toFixed(2);
+    valArousal.textContent = (arousal >= 0 ? '+' : '') + arousal.toFixed(2);
+
+    // Dynamic auto-sync with station vibes
+    if (autoMoodSync) {
+      const targetKey = mapMoodToStation(valence, arousal);
+      if (targetKey !== currentStation) {
+        activateStation(targetKey, isAudioPlaying);
+      }
+    }
+
+    // Update DJ Mixer dynamic meters
+    const speed = mean_speed || 0;
+    const accel = mean_acceleration || 0;
+    const clicks = click_rate || 0;
+
+    meterValSpeed.textContent = `${Math.round(speed)} px/s`;
+    barFillSpeed.style.width = `${Math.min(100, (speed / 1400) * 100)}%`;
+
+    meterValAccel.textContent = `${Math.round(accel)} px/s²`;
+    barFillAccel.style.width = `${Math.min(100, (accel / 2800) * 100)}%`;
+
+    meterValClicks.textContent = `${clicks.toFixed(1)} /s`;
+    barFillClicks.style.width = `${Math.min(100, (clicks / 2.0) * 100)}%`;
+
+  } catch (err) {
+    console.error('Studio sync error:', err);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Engine Settings Form
+// -----------------------------------------------------------------------------
+document.getElementById('btn-save-config')?.addEventListener('click', async () => {
+  const inferenceSec = parseInt(document.getElementById('cfg-inference-rate').value, 10);
+  const windowSec = parseInt(document.getElementById('cfg-feature-window').value, 10);
+  const popupMin = parseInt(document.getElementById('cfg-popup-interval').value, 10);
 
   try {
     await invoke('update_settings', {
@@ -186,25 +361,26 @@ document.getElementById('btn-save-settings')?.addEventListener('click', async ()
       popupMin,
       windowSec
     });
-    const saveBtn = document.getElementById('btn-save-settings');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = '✓ Preferences Saved';
-    saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+    const btn = document.getElementById('btn-save-config');
+    const oldLabel = btn.textContent;
+    btn.textContent = '✓ Engine Preferences Saved';
+    btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
     setTimeout(() => {
-      saveBtn.textContent = originalText;
-      saveBtn.style.background = '';
+      btn.textContent = oldLabel;
+      btn.style.background = '';
     }, 2000);
   } catch (err) {
-    console.error('Failed to update settings:', err);
+    console.error('Failed to save preferences:', err);
   }
 });
 
-async function loadTelemetryStats() {
+async function loadTelemetryCounters() {
   try {
-    const stats = await invoke('get_telemetry_stats');
-    if (stats) {
-      document.getElementById('stats-raw-events').textContent = (stats.raw_events_count || 0).toLocaleString();
-      document.getElementById('stats-labels').textContent = (stats.labels_count || 0).toLocaleString();
+    const data = await invoke('get_telemetry_stats');
+    if (data) {
+      document.getElementById('stat-count-events').textContent = (data.raw_events_count || 0).toLocaleString();
+      document.getElementById('stat-count-labels').textContent = (data.labels_count || 0).toLocaleString();
     }
   } catch (err) {
     console.error('Failed to load telemetry stats:', err);
@@ -212,171 +388,8 @@ async function loadTelemetryStats() {
 }
 
 // -----------------------------------------------------------------------------
-// Ambient Audio Player Logic
+// Initialization
 // -----------------------------------------------------------------------------
-function selectStation(stationKey, userInitiated = false) {
-  if (!STATIONS[stationKey]) return;
-  currentStation = stationKey;
-
-  // Update station card highlight
-  document.querySelectorAll('.station-card').forEach((card) => {
-    card.classList.toggle('active', card.dataset.station === stationKey);
-  });
-
-  const st = STATIONS[stationKey];
-  ambientStationTitle.textContent = st.name;
-  ambientStationDesc.textContent = st.desc;
-
-  if (isAudioPlaying) {
-    audioPlayer.src = st.url;
-    audioPlayer.play().catch((e) => console.warn('Autoplay prevented:', e));
-    audioStatusLabel.textContent = `Playing: ${st.name}`;
-  } else {
-    audioStatusLabel.textContent = `Selected: ${st.name}`;
-  }
-
-  if (userInitiated) {
-    // If user clicked manually, uncheck auto-sync temporarily or keep checked
-  }
-}
-
-document.querySelectorAll('.station-card').forEach((card) => {
-  card.addEventListener('click', () => {
-    selectStation(card.dataset.station, true);
-  });
-});
-
-chkAutoMoodSync?.addEventListener('change', (e) => {
-  autoMoodSync = e.target.checked;
-});
-
-btnPlayPause?.addEventListener('click', () => {
-  if (isAudioPlaying) {
-    audioPlayer.pause();
-    isAudioPlaying = false;
-    iconPlay.style.display = 'block';
-    iconPause.style.display = 'none';
-    audioEqualizer.classList.remove('playing');
-    audioStatusLabel.textContent = 'Paused';
-  } else {
-    audioPlayer.src = STATIONS[currentStation].url;
-    audioPlayer.play().then(() => {
-      isAudioPlaying = true;
-      iconPlay.style.display = 'none';
-      iconPause.style.display = 'block';
-      audioEqualizer.classList.add('playing');
-      audioStatusLabel.textContent = `Playing: ${STATIONS[currentStation].name}`;
-    }).catch((err) => {
-      console.warn('Audio playback error:', err);
-      // Generate soothing synthesized procedural tone fallback if URL blocked
-      startProceduralAmbientSynth();
-    });
-  }
-});
-
-ambientVolume?.addEventListener('input', (e) => {
-  const vol = parseFloat(e.target.value) / 100;
-  audioPlayer.volume = vol;
-});
-
-// Fallback procedural Web Audio synthesizer
-let synthCtx = null;
-function startProceduralAmbientSynth() {
-  try {
-    if (!synthCtx) {
-      synthCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    const osc = synthCtx.createOscillator();
-    const gain = synthCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(220, synthCtx.currentTime); // A3
-    gain.gain.setValueAtTime(0.05, synthCtx.currentTime);
-    osc.connect(gain);
-    gain.connect(synthCtx.destination);
-    osc.start();
-    isAudioPlaying = true;
-    iconPlay.style.display = 'none';
-    iconPause.style.display = 'block';
-    audioEqualizer.classList.add('playing');
-    audioStatusLabel.textContent = 'Procedural Ambient Generator Active';
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-// -----------------------------------------------------------------------------
-// Live Monitoring Polling Loop
-// -----------------------------------------------------------------------------
-function determineMoodTitle(valence, arousal) {
-  if (arousal >= 0 && valence >= 0) return '⚡ Upbeat & Energetic';
-  if (arousal >= 0 && valence < 0) return '🎧 High Focus & Intense';
-  if (arousal < 0 && valence >= 0) return '🌿 Calm & Relaxed';
-  return '🌧️ Melancholy & Low Energy';
-}
-
-function determineTargetStation(valence, arousal) {
-  if (arousal >= 0 && valence >= 0) return 'upbeat';
-  if (arousal >= 0 && valence < 0) return 'focus';
-  if (arousal < 0 && valence >= 0) return 'calm';
-  return 'melancholy';
-}
-
-async function updateLiveState() {
-  try {
-    const data = await invoke('get_current_state');
-    if (!data) return;
-
-    currentArousal = data.arousal;
-    currentValence = data.valence;
-    isTrackingActive = data.tracking_enabled;
-
-    updateTrackingUI(isTrackingActive);
-
-    // Update 2D Plane Coordinate Dot (Valence = X [-1, 1], Arousal = Y [-1, 1])
-    const xPct = ((currentValence + 1.0) / 2.0) * 100;
-    const yPct = ((1.0 - (currentArousal + 1.0) / 2.0)) * 100;
-
-    affectDot.style.left = `${Math.max(5, Math.min(95, xPct))}%`;
-    affectDot.style.top = `${Math.max(5, Math.min(95, yPct))}%`;
-
-    // Coordinates text
-    const vStr = (currentValence >= 0 ? '+' : '') + currentValence.toFixed(2);
-    const aStr = (currentArousal >= 0 ? '+' : '') + currentArousal.toFixed(2);
-    coordinatesReadout.textContent = `Valence: ${vStr} • Arousal: ${aStr}`;
-    primaryMoodText.textContent = determineMoodTitle(currentValence, currentArousal);
-
-    // Auto-sync ambient music if enabled
-    if (autoMoodSync) {
-      const targetStation = determineTargetStation(currentValence, currentArousal);
-      if (targetStation !== currentStation) {
-        selectStation(targetStation, false);
-      }
-    }
-
-    // Kinematics metrics
-    const speed = data.mean_speed || 0;
-    const accel = data.mean_acceleration || 0;
-    const clicks = data.click_rate || 0;
-    const idle = data.idle_ratio || 0;
-
-    metricSpeed.textContent = `${Math.round(speed)} px/s`;
-    meterSpeed.style.width = `${Math.min(100, (speed / 1500) * 100)}%`;
-
-    metricAccel.textContent = `${Math.round(accel)} px/s²`;
-    meterAccel.style.width = `${Math.min(100, (accel / 3000) * 100)}%`;
-
-    metricClicks.textContent = `${clicks.toFixed(1)} /s`;
-    meterClicks.style.width = `${Math.min(100, (clicks / 2.0) * 100)}%`;
-
-    metricIdle.textContent = `${Math.round(idle * 100)}% idle`;
-    meterIdle.style.width = `${Math.min(100, idle * 100)}%`;
-
-  } catch (err) {
-    console.error('Error fetching live state:', err);
-  }
-}
-
-// Initial calls & interval loop
-selectStation('calm');
-setInterval(updateLiveState, 1000);
-updateLiveState();
+activateStation('calm', false);
+setInterval(syncLiveStudioState, 1000);
+syncLiveStudioState();

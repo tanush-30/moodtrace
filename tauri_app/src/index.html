@@ -3,326 +3,412 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moodtrace — Background Affect Monitor</title>
-    <!-- Modern Outfit typography -->
+    <title>Moodtrace — Affect & Acoustic Ambient Suite</title>
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="main.js" defer></script>
   </head>
 
   <body>
-    <div class="bg-glow"></div>
+    <!-- Dynamic Ambient Mood Aura Background -->
+    <div class="dynamic-aura" id="dynamic-aura"></div>
+    <div class="mesh-overlay"></div>
 
-    <div class="app-window">
-      <!-- Top Title & Navigation Bar -->
-      <header class="app-header">
-        <div class="brand">
-          <div class="status-indicator active" id="header-status-dot"></div>
-          <div class="brand-text">
+    <div class="app-shell">
+      
+      <!-- Top Bar: Brand, Mood Badge, Navigation & Window Actions -->
+      <header class="top-nav-bar">
+        <div class="brand-group">
+          <div class="vinyl-mini-logo">
+            <div class="vinyl-center-dot"></div>
+          </div>
+          <div class="brand-headings">
             <h1>MOODTRACE</h1>
-            <span class="version-tag">v1.0 • Windows Background App</span>
+            <span class="sub-label">Acoustic Affect & Biometric Soundscape</span>
           </div>
         </div>
 
-        <nav class="nav-tabs">
-          <button class="nav-tab active" data-tab="tab-monitor" id="tab-btn-monitor">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Live Monitor
-          </button>
-          <button class="nav-tab" data-tab="tab-ambient" id="tab-btn-ambient">
+        <nav class="nav-dock">
+          <button class="dock-btn active" data-tab="tab-studio" id="nav-btn-studio">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            Ambient Mood Music
+            Mood Studio
           </button>
-          <button class="nav-tab" data-tab="tab-settings" id="tab-btn-settings">
+          <button class="dock-btn" data-tab="tab-stations" id="nav-btn-stations">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            Soundscapes
+          </button>
+          <button class="dock-btn" data-tab="tab-config" id="nav-btn-config">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             Settings
           </button>
         </nav>
 
-        <div class="window-actions">
-          <button class="btn-icon" id="btn-hide-tray" title="Minimize to System Tray">
+        <div class="tray-action-group">
+          <div class="live-pill active" id="status-live-pill">
+            <span class="live-pulse"></span>
+            <span id="status-live-text">MONITORING</span>
+          </div>
+          <button class="icon-action-btn" id="btn-minimize-to-tray" title="Minimize to System Tray">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
           </button>
         </div>
       </header>
 
-      <!-- Main Tab Content Area -->
-      <main class="content-container">
+      <!-- Main Canvas / Tab Panes -->
+      <main class="main-stage">
         
-        <!-- TAB 1: LIVE MONITOR -->
-        <section class="tab-pane active" id="tab-monitor">
-          <div class="monitor-grid">
+        <!-- ============================================================ -->
+        <!-- TAB 1: MOOD STUDIO (Hero Affect Matrix & Live Music Vibe)     -->
+        <!-- ============================================================ -->
+        <section class="tab-view active" id="tab-studio">
+          <div class="studio-layout">
             
-            <!-- Left: Affect Grid 2D Visualizer -->
-            <div class="glass-card affect-card">
-              <div class="card-header">
-                <h3>Inferred Emotion State</h3>
-                <span class="badge" id="tracking-badge">Active</span>
+            <!-- Left Panel: The Harmonic Mood Matrix (2D Affect Grid) -->
+            <div class="frosted-glass-box mood-matrix-panel">
+              <div class="panel-headline">
+                <div>
+                  <span class="caption-tag">BIOMETRIC EMOTION SPACE</span>
+                  <h2>Harmonic Affect Matrix</h2>
+                </div>
+                <div class="mood-vibe-pill" id="current-vibe-pill">
+                  <span class="vibe-icon" id="vibe-badge-icon">🌿</span>
+                  <span class="vibe-name" id="vibe-badge-title">Calm & Content</span>
+                </div>
               </div>
 
-              <div class="affect-plot-wrapper">
-                <div class="affect-plot" id="affect-plane">
-                  <!-- Quadrant Labels -->
-                  <div class="quad-label quad-tl">Intense / Focus</div>
-                  <div class="quad-label quad-tr">Upbeat / Energetic</div>
-                  <div class="quad-label quad-bl">Calm / Melancholy</div>
-                  <div class="quad-label quad-br">Relaxed / Content</div>
+              <div class="matrix-canvas-container">
+                <div class="matrix-plane" id="matrix-plane">
+                  <!-- Quadrant Backdrops with Audio Glow -->
+                  <div class="matrix-quadrant quad-top-left" data-q="focus">
+                    <span class="quad-vibe-title">🔥 Intense Focus</span>
+                    <span class="quad-vibe-sub">Cyber Synth • Deep Rhythms</span>
+                  </div>
+                  <div class="matrix-quadrant quad-top-right" data-q="upbeat">
+                    <span class="quad-vibe-title">⚡ High Energy</span>
+                    <span class="quad-vibe-sub">Upbeat Chillhop • Sunshine</span>
+                  </div>
+                  <div class="matrix-quadrant quad-bottom-left" data-q="melancholy">
+                    <span class="quad-vibe-title">🌧️ Rain & Drone</span>
+                    <span class="quad-vibe-sub">Soft Melancholy • Ambient</span>
+                  </div>
+                  <div class="matrix-quadrant quad-bottom-right" data-q="calm">
+                    <span class="quad-vibe-title">🌿 Zen Peace</span>
+                    <span class="quad-vibe-sub">Gentle Rhodes • Relaxed</span>
+                  </div>
 
-                  <!-- Axes -->
-                  <div class="axis-line axis-x"></div>
-                  <div class="axis-line axis-y"></div>
+                  <!-- Musical Frequency Grid Lines -->
+                  <div class="plane-axis axis-horizontal"></div>
+                  <div class="plane-axis axis-vertical"></div>
+                  
+                  <div class="harmonic-circles">
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+                  </div>
 
-                  <!-- Axis Names -->
-                  <span class="axis-tag tag-top">High Arousal (+1)</span>
-                  <span class="axis-tag tag-bottom">Low Arousal (-1)</span>
-                  <span class="axis-tag tag-left">Unpleasant (-1)</span>
-                  <span class="axis-tag tag-right">Pleasant (+1)</span>
+                  <!-- Axis Coordinate Callouts -->
+                  <span class="axis-legend leg-top">+1.0 AROUSAL (ENERGY)</span>
+                  <span class="axis-legend leg-bottom">-1.0 AROUSAL (CALM)</span>
+                  <span class="axis-legend leg-left">-1.0 VALENCE (NEGATIVE)</span>
+                  <span class="axis-legend leg-right">+1.0 VALENCE (POSITIVE)</span>
 
-                  <!-- Coordinates Dot -->
-                  <div class="affect-dot" id="affect-dot">
-                    <div class="dot-ripple"></div>
+                  <!-- Inferred Mood Orb (Animated Pulsing Puck) -->
+                  <div class="harmonic-orb" id="harmonic-orb">
+                    <div class="orb-core"></div>
+                    <div class="orb-wave-1"></div>
+                    <div class="orb-wave-2"></div>
                   </div>
                 </div>
               </div>
 
-              <div class="affect-summary">
-                <div class="primary-mood" id="primary-mood-text">Calm & Content</div>
-                <div class="coordinates-readout" id="coordinates-readout">Valence: +0.60 • Arousal: -0.40</div>
+              <!-- Real-time Valence / Arousal Readout Footer -->
+              <div class="matrix-telemetry-strip">
+                <div class="coord-tag">
+                  <span class="coord-label">VALENCE (PLEASANTNESS)</span>
+                  <span class="coord-val" id="val-valence">+0.60</span>
+                </div>
+                <div class="coord-divider"></div>
+                <div class="coord-tag">
+                  <span class="coord-label">AROUSAL (ENERGY INTENSITY)</span>
+                  <span class="coord-val" id="val-arousal">-0.40</span>
+                </div>
+                <button class="btn-grid-report" id="btn-open-self-report">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  Self-Report Mood
+                </button>
               </div>
             </div>
 
-            <!-- Right: Live Dynamics & Controls -->
-            <div class="monitor-sidebar">
-              <!-- Kinematics Card -->
-              <div class="glass-card telemetry-card">
-                <div class="card-header">
-                  <h3>Real-time Input Dynamics</h3>
-                  <span class="sub-badge">45s Window</span>
+            <!-- Right Panel: Vinyl Turntable & Kinematics Audio Mixer -->
+            <div class="studio-sidebar">
+              
+              <!-- Spinning Vinyl Player Card -->
+              <div class="frosted-glass-box vinyl-player-card">
+                <div class="vinyl-stage">
+                  <div class="vinyl-disc" id="vinyl-disc">
+                    <div class="vinyl-groove groove-1"></div>
+                    <div class="vinyl-groove groove-2"></div>
+                    <div class="vinyl-groove groove-3"></div>
+                    <div class="vinyl-label" id="vinyl-label-art">
+                      <div class="vinyl-center-hole"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="now-playing-meta">
+                    <span class="station-badge" id="now-playing-genre">AMBIENT SOUNDSCAPE</span>
+                    <h3 id="now-playing-title">Calm & Peaceful Ambient</h3>
+                    <p id="now-playing-artist">Acoustic Piano & Soft Strings</p>
+
+                    <!-- Real-time Soundwave Visualizer -->
+                    <div class="soundwave-bar-visualizer" id="live-soundwave">
+                      <span class="wave-stem" style="--d: 0.1s"></span>
+                      <span class="wave-stem" style="--d: 0.3s"></span>
+                      <span class="wave-stem" style="--d: 0.5s"></span>
+                      <span class="wave-stem" style="--d: 0.2s"></span>
+                      <span class="wave-stem" style="--d: 0.4s"></span>
+                      <span class="wave-stem" style="--d: 0.6s"></span>
+                      <span class="wave-stem" style="--d: 0.2s"></span>
+                      <span class="wave-stem" style="--d: 0.5s"></span>
+                      <span class="wave-stem" style="--d: 0.1s"></span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="metrics-list">
-                  <div class="metric-row">
-                    <div class="metric-info">
-                      <span class="metric-label">Mean Mouse Speed</span>
-                      <span class="metric-val" id="metric-speed">0 px/s</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-fill" id="meter-speed" style="width: 0%"></div>
-                    </div>
+                <!-- Playback & Audio Controls -->
+                <div class="dock-player-controls">
+                  <button class="btn-turntable-play" id="btn-audio-toggle">
+                    <svg id="svg-play-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="svg-pause-icon" style="display: none;" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+
+                  <div class="vol-slider-wrap">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                    <input type="range" id="slider-volume" min="0" max="100" value="70" class="neon-range" />
                   </div>
 
-                  <div class="metric-row">
-                    <div class="metric-info">
-                      <span class="metric-label">Acceleration</span>
-                      <span class="metric-val" id="metric-accel">0 px/s²</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-fill accel" id="meter-accel" style="width: 0%"></div>
-                    </div>
-                  </div>
-
-                  <div class="metric-row">
-                    <div class="metric-info">
-                      <span class="metric-label">Click Frequency</span>
-                      <span class="metric-val" id="metric-clicks">0.0 /s</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-fill clicks" id="meter-clicks" style="width: 0%"></div>
-                    </div>
-                  </div>
-
-                  <div class="metric-row">
-                    <div class="metric-info">
-                      <span class="metric-label">Active / Idle Ratio</span>
-                      <span class="metric-val" id="metric-idle">0% idle</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-fill idle" id="meter-idle" style="width: 0%"></div>
-                    </div>
+                  <div class="auto-sync-toggle" title="Automatically queue matching soundscapes based on predicted mood">
+                    <label class="glow-toggle-label">
+                      <input type="checkbox" id="chk-studio-sync" checked />
+                      <span class="toggle-track"></span>
+                      <span class="toggle-text">Mood Sync</span>
+                    </label>
                   </div>
                 </div>
               </div>
 
-              <!-- Quick Action Card -->
-              <div class="glass-card actions-card">
-                <button class="btn-primary" id="btn-trigger-self-report">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                  Log Emotional State (Self-Report)
-                </button>
-                <div class="button-subgroup">
-                  <button class="btn-secondary" id="btn-toggle-tracking">
-                    <span id="btn-tracking-icon">⏸</span>
-                    <span id="btn-tracking-text">Pause Tracking</span>
+              <!-- Kinematic Dynamics Synthesizer / Mixer -->
+              <div class="frosted-glass-box mixer-dynamics-card">
+                <div class="card-title-row">
+                  <span class="caption-tag">BIOMETRIC RHYTHM METERS</span>
+                  <span class="sub-freq">45s Window</span>
+                </div>
+
+                <div class="eq-meters-group">
+                  <!-- Meter 1: Tempo / Mouse Velocity -->
+                  <div class="eq-meter">
+                    <div class="eq-meter-header">
+                      <span>Mouse Velocity (Tempo)</span>
+                      <span class="eq-val" id="meter-val-speed">0 px/s</span>
+                    </div>
+                    <div class="eq-track">
+                      <div class="eq-fill tempo-fill" id="bar-fill-speed" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Meter 2: Acceleration Dynamics -->
+                  <div class="eq-meter">
+                    <div class="eq-meter-header">
+                      <span>Acceleration Dynamic</span>
+                      <span class="eq-val" id="meter-val-accel">0 px/s²</span>
+                    </div>
+                    <div class="eq-track">
+                      <div class="eq-fill dynamic-fill" id="bar-fill-accel" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Meter 3: Click Beats -->
+                  <div class="eq-meter">
+                    <div class="eq-meter-header">
+                      <span>Click Cadence</span>
+                      <span class="eq-val" id="meter-val-clicks">0.0 /s</span>
+                    </div>
+                    <div class="eq-track">
+                      <div class="eq-fill beat-fill" id="bar-fill-clicks" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer Quick Controls -->
+                <div class="mixer-footer-actions">
+                  <button class="btn-glass-action" id="btn-pause-tracking">
+                    <span id="btn-track-icon">⏸</span>
+                    <span id="btn-track-text">Pause Sensor</span>
                   </button>
-                  <button class="btn-secondary" id="btn-minimize-tray">
+                  <button class="btn-glass-action" id="btn-dock-to-tray">
                     <span>🗕</span>
                     <span>Send to Tray</span>
                   </button>
                 </div>
               </div>
+
             </div>
 
           </div>
         </section>
 
-        <!-- TAB 2: AMBIENT MOOD AUDIO -->
-        <section class="tab-pane" id="tab-ambient">
-          <div class="ambient-container">
-            <div class="glass-card ambient-main-card">
-              <div class="ambient-header">
-                <div>
-                  <h3 id="ambient-station-title">🌿 Calm & Peaceful Ambient</h3>
-                  <p id="ambient-station-desc">Soothing soundscape calibrated to low arousal and high valence</p>
+        <!-- ============================================================ -->
+        <!-- TAB 2: SOUNDSCAPES CATALOGUE (Mood Albums & Stations)       -->
+        <!-- ============================================================ -->
+        <section class="tab-view" id="tab-stations">
+          <div class="soundscapes-catalog-wrap">
+            <div class="catalog-header-box">
+              <h2>Acoustic Affect Stations</h2>
+              <p>Curated royalty-free generative soundscapes and ambient frequencies aligned with psychological arousal & valence states.</p>
+            </div>
+
+            <div class="stations-album-grid">
+              <!-- Station 1 -->
+              <div class="album-station-card active" data-station="calm" id="card-station-calm">
+                <div class="album-art-box art-calm">
+                  <span class="album-emoji">🌿</span>
+                  <div class="album-vinyl-sleeve"></div>
                 </div>
-                <div class="ambient-mode-toggle">
-                  <label class="switch-label">
-                    <input type="checkbox" id="chk-auto-mood-sync" checked />
-                    <span class="switch-slider"></span>
-                    <span class="switch-text">Auto-Sync with Inferred Mood</span>
-                  </label>
+                <div class="album-info">
+                  <span class="album-badge">CALM & RELAXED</span>
+                  <h4>Zen Ambient Solitude</h4>
+                  <p>Acoustic melodies, gentle Rhodes, and nature drone (Low Energy • High Valence)</p>
                 </div>
+                <button class="btn-play-station" data-station="calm">▶ Play</button>
               </div>
 
-              <!-- Station Selection Quadrants -->
-              <div class="ambient-stations-grid">
-                <div class="station-card active" data-station="calm" id="station-calm">
-                  <div class="station-icon">🌿</div>
-                  <div class="station-details">
-                    <h4>Calm & Relaxed</h4>
-                    <span>High Valence • Low Arousal</span>
-                  </div>
+              <!-- Station 2 -->
+              <div class="album-station-card" data-station="upbeat" id="card-station-upbeat">
+                <div class="album-art-box art-upbeat">
+                  <span class="album-emoji">⚡</span>
+                  <div class="album-vinyl-sleeve"></div>
                 </div>
-
-                <div class="station-card" data-station="upbeat" id="station-upbeat">
-                  <div class="station-icon">⚡</div>
-                  <div class="station-details">
-                    <h4>Upbeat & Energized</h4>
-                    <span>High Valence • High Arousal</span>
-                  </div>
+                <div class="album-info">
+                  <span class="album-badge">HIGH ENERGY & HAPPY</span>
+                  <h4>Sunshine Chillhop Beats</h4>
+                  <p>Vibrant lo-fi beats, uplifting rhythm, and melodic energy (High Energy • High Valence)</p>
                 </div>
-
-                <div class="station-card" data-station="focus" id="station-focus">
-                  <div class="station-icon">🎧</div>
-                  <div class="station-details">
-                    <h4>Deep Focus & Rhythm</h4>
-                    <span>Low Valence • High Arousal</span>
-                  </div>
-                </div>
-
-                <div class="station-card" data-station="melancholy" id="station-melancholy">
-                  <div class="station-icon">🌧️</div>
-                  <div class="station-details">
-                    <h4>Rain & Ambient Drone</h4>
-                    <span>Low Valence • Low Arousal</span>
-                  </div>
-                </div>
+                <button class="btn-play-station" data-station="upbeat">▶ Play</button>
               </div>
 
-              <!-- Audio Player Controls -->
-              <div class="player-controls-bar">
-                <button class="btn-play-pause" id="btn-ambient-play">
-                  <svg id="icon-play" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                  <svg id="icon-pause" style="display: none;" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-
-                <div class="audio-track-info">
-                  <div class="now-playing-label" id="audio-status-label">Ready to play ambient soundscape</div>
-                  <div class="audio-equalizer" id="audio-equalizer">
-                    <span class="eq-bar"></span>
-                    <span class="eq-bar"></span>
-                    <span class="eq-bar"></span>
-                    <span class="eq-bar"></span>
-                  </div>
+              <!-- Station 3 -->
+              <div class="album-station-card" data-station="focus" id="card-station-focus">
+                <div class="album-art-box art-focus">
+                  <span class="album-emoji">🎧</span>
+                  <div class="album-vinyl-sleeve"></div>
                 </div>
-
-                <div class="volume-control">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-                  <input type="range" id="ambient-volume" min="0" max="100" value="70" />
+                <div class="album-info">
+                  <span class="album-badge">INTENSE FOCUS & FLOW</span>
+                  <h4>Cyber Synthwave Pulse</h4>
+                  <p>Deep electronic driving basslines for coding & gaming intensity (High Energy • Low Valence)</p>
                 </div>
+                <button class="btn-play-station" data-station="focus">▶ Play</button>
+              </div>
+
+              <!-- Station 4 -->
+              <div class="album-station-card" data-station="melancholy" id="card-station-melancholy">
+                <div class="album-art-box art-melancholy">
+                  <span class="album-emoji">🌧️</span>
+                  <div class="album-vinyl-sleeve"></div>
+                </div>
+                <div class="album-info">
+                  <span class="album-badge">CALM & REFLECTIVE</span>
+                  <h4>Binaural Rain & Space Drone</h4>
+                  <p>Soft rainfall and meditative low-frequency drones (Low Energy • Low Valence)</p>
+                </div>
+                <button class="btn-play-station" data-station="melancholy">▶ Play</button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- TAB 3: SETTINGS & CONTROLS -->
-        <section class="tab-pane" id="tab-settings">
-          <div class="settings-grid">
+        <!-- ============================================================ -->
+        <!-- TAB 3: SETTINGS & PRIVACY (Hardware & Frequency Controls)    -->
+        <!-- ============================================================ -->
+        <section class="tab-view" id="tab-config">
+          <div class="config-grid-layout">
             
-            <div class="glass-card settings-card">
-              <div class="card-header">
-                <h3>Background Tracking & Model Controls</h3>
+            <div class="frosted-glass-box config-card">
+              <div class="config-card-header">
+                <h3>Prediction & Sensor Frequency</h3>
+                <span class="sub-label">ONNX Engine Tuner</span>
               </div>
 
-              <div class="settings-form">
-                <div class="form-group">
-                  <label for="setting-inference-interval">Inference Frequency (Prediction Rate)</label>
-                  <select id="setting-inference-interval" class="form-control">
+              <div class="config-form">
+                <div class="field-item">
+                  <label for="cfg-inference-rate">Inference Sampling Rate</label>
+                  <select id="cfg-inference-rate" class="glass-select">
                     <option value="1">Every 1 Second (High Responsiveness)</option>
-                    <option value="3">Every 3 Seconds</option>
+                    <option value="3">Every 3 Seconds (Balanced)</option>
                     <option value="5" selected>Every 5 Seconds (Recommended)</option>
-                    <option value="10">Every 10 Seconds (Power Saving)</option>
+                    <option value="10">Every 10 Seconds (Power-Saving)</option>
                     <option value="30">Every 30 Seconds</option>
                   </select>
-                  <span class="form-hint">How often the ONNX ML model evaluates mouse dynamics.</span>
+                  <span class="field-hint">Frequency at which the classical ML models evaluate your cursor dynamics.</span>
                 </div>
 
-                <div class="form-group">
-                  <label for="setting-window-size">Kinematic Rolling Feature Window</label>
-                  <select id="setting-window-size" class="form-control">
+                <div class="field-item">
+                  <label for="cfg-feature-window">Kinematic Rolling Feature Window</label>
+                  <select id="cfg-feature-window" class="glass-select">
                     <option value="15">15 Seconds (Rapid changes)</option>
                     <option value="30">30 Seconds</option>
-                    <option value="45" selected>45 Seconds (Balanced baseline)</option>
-                    <option value="60">60 Seconds (Smooth average)</option>
+                    <option value="45" selected>45 Seconds (Recommended Baseline)</option>
+                    <option value="60">60 Seconds (Smooth Average)</option>
                   </select>
-                  <span class="form-hint">Duration of recent cursor and click history evaluated in each sample.</span>
+                  <span class="field-hint">Length of past mouse kinematics and click cadence evaluated in each prediction.</span>
                 </div>
 
-                <div class="form-group">
-                  <label for="setting-popup-interval">Self-Report Reminder Popup Interval</label>
-                  <select id="setting-popup-interval" class="form-control">
+                <div class="field-item">
+                  <label for="cfg-popup-interval">Self-Report Popup Frequency</label>
+                  <select id="cfg-popup-interval" class="glass-select">
                     <option value="0">Disabled (Manual Only)</option>
                     <option value="5">Every 5 Minutes</option>
                     <option value="10" selected>Every 10 Minutes</option>
                     <option value="15">Every 15 Minutes</option>
                     <option value="30">Every 30 Minutes</option>
-                    <option value="60">Every 60 Minutes</option>
                   </select>
-                  <span class="form-hint">Triggers the 9x9 Affect Grid to calibrate and improve local accuracy.</span>
+                  <span class="field-hint">Opens the 9x9 Affect Grid dialog to capture ground truth labels.</span>
                 </div>
 
-                <button class="btn-primary" id="btn-save-settings" style="margin-top: 12px;">Save Preferences</button>
+                <button class="btn-save-glow" id="btn-save-config">Save Engine Preferences</button>
               </div>
             </div>
 
-            <!-- Diagnostics & Privacy Guarantee Card -->
-            <div class="glass-card privacy-card">
-              <div class="card-header">
-                <h3>Local Privacy & Telemetry</h3>
+            <!-- Privacy Guarantee & Telemetry Box -->
+            <div class="frosted-glass-box telemetry-card">
+              <div class="config-card-header">
+                <h3>Privacy Shield & Data Counter</h3>
+                <span class="sub-label">On-Device Local Isolation</span>
               </div>
 
-              <div class="privacy-badge-box">
-                <div class="privacy-icon">🛡️</div>
-                <div class="privacy-text">
-                  <strong>100% On-Device Privacy Guaranteed</strong>
-                  <p>Zero keystroke characters or screen content are ever monitored or captured. Only mouse trajectory kinematics, acceleration, and click timestamps are processed locally.</p>
+              <div class="privacy-shield-container">
+                <div class="shield-badge">🛡️</div>
+                <div class="shield-description">
+                  <strong>Zero Keystroke / Zero Screen Capture</strong>
+                  <p>Moodtrace operates strictly on-device. No keystroke characters, camera feeds, or screen frames are ever monitored. Only anonymous mouse trajectory physics are computed locally.</p>
                 </div>
               </div>
 
-              <div class="telemetry-stats-grid">
-                <div class="telemetry-item">
-                  <span class="telemetry-number" id="stats-raw-events">...</span>
-                  <span class="telemetry-label">Raw Movement Events</span>
+              <div class="telemetry-counter-grid">
+                <div class="stat-pill">
+                  <span class="stat-digit" id="stat-count-events">...</span>
+                  <span class="stat-caption">Kinematic Trajectory Points</span>
                 </div>
-                <div class="telemetry-item">
-                  <span class="telemetry-number" id="stats-labels">...</span>
-                  <span class="telemetry-label">Self-Report Samples</span>
+                <div class="stat-pill">
+                  <span class="stat-digit" id="stat-count-labels">...</span>
+                  <span class="stat-caption">Self-Report Calibration Points</span>
                 </div>
               </div>
 
-              <div class="danger-zone">
-                <button class="btn-danger" id="btn-quit-app">Quit Moodtrace Completely</button>
+              <div class="exit-panel">
+                <button class="btn-quit-danger" id="btn-terminate-app">Quit Moodtrace Completely</button>
               </div>
             </div>
 
@@ -331,19 +417,20 @@
 
       </main>
 
-      <!-- Bottom Status Strip -->
-      <footer class="app-footer">
-        <div class="footer-item">
-          <span class="footer-dot active"></span>
+      <!-- Bottom Audio Frequency Bar / Status -->
+      <footer class="app-status-bar">
+        <div class="status-cell">
+          <span class="status-light-green"></span>
           <span>Hook: WH_MOUSE_LL Active</span>
         </div>
-        <div class="footer-item">
-          <span>Engine: Local ONNX Runtime</span>
+        <div class="status-cell">
+          <span>Engine: Local ONNX Runtime (CPU)</span>
         </div>
-        <div class="footer-item" id="footer-db-status">
-          <span>Storage: Local SQLite</span>
+        <div class="status-cell">
+          <span id="ambient-stream-status">Audio: Public Ambient Stream Online</span>
         </div>
       </footer>
+
     </div>
   </body>
 </html>
