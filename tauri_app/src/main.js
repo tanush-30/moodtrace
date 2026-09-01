@@ -45,7 +45,8 @@ const STATIONS = {
     emoji: '🌿',
     accentColor: '#10b981',
     aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.38) 0%, rgba(16, 185, 129, 0.22) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3'
+    url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3',
+    synthType: 'calm_chords'
   },
   upbeat: {
     id: 'upbeat',
@@ -55,7 +56,8 @@ const STATIONS = {
     emoji: '⚡',
     accentColor: '#f59e0b',
     aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.38) 0%, rgba(244, 63, 94, 0.28) 35%, rgba(139, 92, 246, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3'
+    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3',
+    synthType: 'upbeat_pulse'
   },
   focus: {
     id: 'focus',
@@ -65,17 +67,19 @@ const STATIONS = {
     emoji: '🎧',
     accentColor: '#8b5cf6',
     aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3'
+    url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3',
+    synthType: 'focus_bass'
   },
   melancholy: {
     id: 'melancholy',
     badge: 'CALM & REFLECTIVE',
-    name: 'Binaural Rain & Space Drone',
-    artist: 'Soft Rainfall & Atmospheric Drone',
+    name: 'Midnight Rain & Reflective Piano',
+    artist: 'Contemplative Piano & Soft Rainfall',
     emoji: '🌧️',
     accentColor: '#06b6d4',
     aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.48) 0%, rgba(49, 46, 129, 0.32) 35%, rgba(6, 182, 212, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=soft-rain-ambient-111154.mp3'
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=piano-moment-11035.mp3',
+    synthType: 'rain_piano'
   }
 };
 
@@ -99,9 +103,10 @@ let displaySpeed = 0.0;
 let displayAccel = 0.0;
 let displayClicks = 0.0;
 
+let masterVolume = 0.7;
 const audioPlayer = new Audio();
 audioPlayer.loop = true;
-audioPlayer.volume = 0.7;
+audioPlayer.volume = masterVolume;
 
 // -----------------------------------------------------------------------------
 // DOM References
@@ -198,7 +203,179 @@ function applyTrackingState(active) {
 }
 
 // -----------------------------------------------------------------------------
-// Music & Ambient Audio Player Controls
+// Web Audio Ambient Multi-Layer Soundscape Synthesizer
+// -----------------------------------------------------------------------------
+let audioCtx = null;
+let activeNodes = [];
+let rainBufferNode = null;
+let synthGainNode = null;
+let chordIntervalTimer = null;
+
+function initAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function stopProceduralSoundscape() {
+  if (chordIntervalTimer) {
+    clearInterval(chordIntervalTimer);
+    chordIntervalTimer = null;
+  }
+  activeNodes.forEach((node) => {
+    try {
+      if (node.stop) node.stop();
+      if (node.disconnect) node.disconnect();
+    } catch (_) {}
+  });
+  activeNodes = [];
+}
+
+// Generates an authentic, soft, pink-noise nocturnal rain soundscape
+function createRainNoiseNode(ctx, masterGain) {
+  const bufferSize = ctx.sampleRate * 2;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+    b6 = white * 0.115926;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+  noise.loop = true;
+
+  // Rain lowpass filter (soothing mellow patter)
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1400, ctx.currentTime);
+
+  const rainGain = ctx.createGain();
+  rainGain.gain.setValueAtTime(0.18, ctx.currentTime);
+
+  noise.connect(filter);
+  filter.connect(rainGain);
+  rainGain.connect(masterGain);
+
+  noise.start();
+  activeNodes.push(noise, filter, rainGain);
+}
+
+// Plays a gentle, reflective piano / acoustic harmonic chord progression
+function playHarmonicPad(ctx, freqs, duration, masterGain, waveType = 'sine', gainLevel = 0.06) {
+  freqs.forEach((freq) => {
+    const osc = ctx.createOscillator();
+    const noteGain = ctx.createGain();
+    
+    osc.type = waveType;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    // Soft attack and lingering release
+    noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
+    noteGain.gain.linearRampToValueAtTime(gainLevel, ctx.currentTime + 1.2);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+    osc.connect(noteGain);
+    noteGain.connect(masterGain);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+    activeNodes.push(osc, noteGain);
+  });
+}
+
+function startProceduralStation(stationType) {
+  initAudioContext();
+  stopProceduralSoundscape();
+
+  synthGainNode = audioCtx.createGain();
+  synthGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
+  synthGainNode.connect(audioCtx.destination);
+
+  if (stationType === 'rain_piano') {
+    // 1. Soft nocturnal rainfall
+    createRainNoiseNode(audioCtx, synthGainNode);
+
+    // 2. Contemplative Reflective Piano Chord Progressions (D min 9, Bb maj 7, G min 9, F maj 7)
+    const reflectiveChords = [
+      [146.83, 220.00, 261.63, 329.63, 440.00], // D3, A3, C4, E4, A4 (Dmin9)
+      [116.54, 174.61, 233.08, 293.66, 349.23], // Bb2, F3, Bb3, D4, F4 (Bbmaj7)
+      [98.00, 146.83, 196.00, 261.63, 349.23],  // G2, D3, G3, C4, F4 (Gmin11)
+      [130.81, 196.00, 261.63, 329.63, 392.00]  // C3, G3, C4, E4, G4 (Cadd9)
+    ];
+
+    let chordIdx = 0;
+    const triggerChord = () => {
+      if (!isAudioPlaying) return;
+      playHarmonicPad(audioCtx, reflectiveChords[chordIdx], 5.5, synthGainNode, 'sine', 0.05);
+      chordIdx = (chordIdx + 1) % reflectiveChords.length;
+    };
+
+    triggerChord();
+    chordIntervalTimer = setInterval(triggerChord, 4800);
+
+  } else if (stationType === 'calm_chords') {
+    // Warm Rhodes Zen Progressions (Cmaj9, Am9, Fmaj9, G6)
+    const zenChords = [
+      [130.81, 196.00, 246.94, 293.66, 392.00], // Cmaj9
+      [110.00, 164.81, 220.00, 261.63, 329.63], // Am9
+      [87.31, 130.81, 174.61, 220.00, 261.63],  // Fmaj9
+      [98.00, 146.83, 196.00, 246.94, 293.66]   // G6
+    ];
+    let chordIdx = 0;
+    const triggerZen = () => {
+      if (!isAudioPlaying) return;
+      playHarmonicPad(audioCtx, zenChords[chordIdx], 6.0, synthGainNode, 'triangle', 0.045);
+      chordIdx = (chordIdx + 1) % zenChords.length;
+    };
+    triggerZen();
+    chordIntervalTimer = setInterval(triggerZen, 5200);
+
+  } else if (stationType === 'upbeat_pulse') {
+    // Upbeat Lo-Fi Chillhop Chords (Ebmaj9, Cm7, Abmaj7, Bb9)
+    const upbeatChords = [
+      [155.56, 233.08, 293.66, 349.23, 440.00],
+      [130.81, 196.00, 233.08, 293.66, 392.00],
+      [103.83, 155.56, 207.65, 261.63, 311.13],
+      [116.54, 174.61, 233.08, 293.66, 349.23]
+    ];
+    let chordIdx = 0;
+    const triggerUpbeat = () => {
+      if (!isAudioPlaying) return;
+      playHarmonicPad(audioCtx, upbeatChords[chordIdx], 3.5, synthGainNode, 'triangle', 0.05);
+      chordIdx = (chordIdx + 1) % upbeatChords.length;
+    };
+    triggerUpbeat();
+    chordIntervalTimer = setInterval(triggerUpbeat, 3200);
+
+  } else {
+    // Focus Bassline & Sweep
+    const bassline = [110.0, 110.0, 130.81, 146.83, 98.0, 110.0];
+    let noteIdx = 0;
+    const triggerFocus = () => {
+      if (!isAudioPlaying) return;
+      playHarmonicPad(audioCtx, [bassline[noteIdx], bassline[noteIdx] * 2], 2.0, synthGainNode, 'sawtooth', 0.035);
+      noteIdx = (noteIdx + 1) % bassline.length;
+    };
+    triggerFocus();
+    chordIntervalTimer = setInterval(triggerFocus, 1800);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Music Station Switcher & Playback Handler
 // -----------------------------------------------------------------------------
 function activateStation(stationKey, startPlaying = false) {
   const st = STATIONS[stationKey];
@@ -226,12 +403,16 @@ function activateStation(stationKey, startPlaying = false) {
   });
 
   if (startPlaying || isAudioPlaying) {
+    isAudioPlaying = true;
+    setPlaybackState(true);
+
+    // Try HTML5 streaming first, seamlessly launch procedural soundscape if stream blocked
     audioPlayer.src = st.url;
     audioPlayer.play().then(() => {
-      setPlaybackState(true);
+      stopProceduralSoundscape();
     }).catch((err) => {
-      console.warn('Audio stream fallback triggered:', err);
-      startProceduralSynthTone();
+      console.log(`Launching dedicated procedural ambient soundscape for ${st.name}:`, err.message || err);
+      startProceduralStation(st.synthType);
     });
   }
 }
@@ -246,12 +427,14 @@ function setPlaybackState(playing) {
     svgPlayIcon.style.display = 'block';
     svgPauseIcon.style.display = 'none';
     vinylDisc.classList.remove('spinning');
+    stopProceduralSoundscape();
   }
 }
 
 document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
   if (isAudioPlaying) {
     audioPlayer.pause();
+    stopProceduralSoundscape();
     setPlaybackState(false);
   } else {
     activateStation(currentStation, true);
@@ -259,7 +442,11 @@ document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
 });
 
 sliderVolume?.addEventListener('input', (e) => {
-  audioPlayer.volume = parseFloat(e.target.value) / 100;
+  masterVolume = parseFloat(e.target.value) / 100;
+  audioPlayer.volume = masterVolume;
+  if (synthGainNode && audioCtx) {
+    synthGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
+  }
 });
 
 chkStudioSync?.addEventListener('change', (e) => {
@@ -280,27 +467,6 @@ document.querySelectorAll('.album-station-card').forEach((card) => {
     activateStation(card.dataset.station, true);
   });
 });
-
-// Procedural Synth Soundscape Fallback
-let webAudioCtx = null;
-function startProceduralSynthTone() {
-  try {
-    if (!webAudioCtx) {
-      webAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    const osc = webAudioCtx.createOscillator();
-    const gain = webAudioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(220, webAudioCtx.currentTime);
-    gain.gain.setValueAtTime(0.04, webAudioCtx.currentTime);
-    osc.connect(gain);
-    gain.connect(webAudioCtx.destination);
-    osc.start();
-    setPlaybackState(true);
-  } catch (e) {
-    console.error('Web Audio Synth error:', e);
-  }
-}
 
 // -----------------------------------------------------------------------------
 // Live Affect & Kinematics Sync Loop
