@@ -34,7 +34,7 @@ if (!invoke) {
 }
 
 // =============================================================================
-// Comprehensive Soundscape Library (12 Unique Moods & Distinct Instruments)
+// Comprehensive Soundscape Library (12 Unique Pre-Rendered Audio Tracks)
 // =============================================================================
 const MOOD_LIBRARY = {
   // --- CALM & PEACEFUL (High Valence, Low Arousal) ---
@@ -47,18 +47,18 @@ const MOOD_LIBRARY = {
     emoji: '🌿',
     accentColor: '#10b981',
     aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.38) 0%, rgba(16, 185, 129, 0.22) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'zen'
+    audioFile: './assets/audio/zen.wav'
   },
   ocean: {
     id: 'ocean',
     category: 'calm',
     badge: 'CALM & TRANQUIL',
     name: 'Ocean Waves & Ethereal Harp',
-    artist: 'Rhythmic Coastal Surf & Plucked Harp',
+    artist: 'Coastal Ocean Surf & Plucked Harp',
     emoji: '🌊',
     accentColor: '#0ea5e9',
     aura: 'radial-gradient(circle at 40% 30%, rgba(14, 165, 233, 0.38) 0%, rgba(6, 182, 212, 0.24) 35%, rgba(16, 185, 129, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'ocean'
+    audioFile: './assets/audio/ocean.wav'
   },
   meditation: {
     id: 'meditation',
@@ -69,7 +69,7 @@ const MOOD_LIBRARY = {
     emoji: '🧘',
     accentColor: '#14b8a6',
     aura: 'radial-gradient(circle at 40% 30%, rgba(20, 184, 166, 0.38) 0%, rgba(6, 95, 70, 0.25) 35%, rgba(99, 102, 241, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'meditation'
+    audioFile: './assets/audio/meditation.wav'
   },
 
   // --- UPBEAT & ENERGIZED (High Valence, High Arousal) ---
@@ -82,29 +82,29 @@ const MOOD_LIBRARY = {
     emoji: '⚡',
     accentColor: '#f59e0b',
     aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.38) 0%, rgba(244, 63, 94, 0.28) 35%, rgba(139, 92, 246, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'chillhop'
+    audioFile: './assets/audio/chillhop.wav'
   },
   sunrise: {
     id: 'sunrise',
     category: 'upbeat',
     badge: 'OPTIMISM & SUNSHINE',
     name: 'Golden Sunrise Acoustic',
-    artist: 'Plucked Acoustic Guitar & Bright Melody',
+    artist: 'Plucked Folk Guitar & Bright Melody',
     emoji: '🌅',
     accentColor: '#f97316',
     aura: 'radial-gradient(circle at 40% 30%, rgba(249, 115, 22, 0.38) 0%, rgba(245, 158, 11, 0.28) 35%, rgba(236, 72, 153, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'sunrise'
+    audioFile: './assets/audio/sunrise.wav'
   },
   chiptune: {
     id: 'chiptune',
     category: 'upbeat',
     badge: 'RETRO ARCADE & ADRENALINE',
     name: '8-Bit Retro Neon Pulse',
-    artist: 'Pixel Synth Lead & Arcade Pulse',
+    artist: 'Arcade Pixel Lead & Chiptune Beats',
     emoji: '🎮',
     accentColor: '#ec4899',
     aura: 'radial-gradient(circle at 40% 30%, rgba(236, 72, 153, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'chiptune'
+    audioFile: './assets/audio/chiptune.wav'
   },
 
   // --- INTENSE FOCUS & FLOW (Low Valence, High Arousal) ---
@@ -113,33 +113,33 @@ const MOOD_LIBRARY = {
     category: 'focus',
     badge: 'INTENSE FOCUS & FLOW',
     name: 'Cyber Synthwave Pulse',
-    artist: 'Heavy Analog Synthwave Bass & Drive',
+    artist: 'Analog Outrun Synthwave Bass & Drive',
     emoji: '🎧',
     accentColor: '#8b5cf6',
     aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'cyber'
+    audioFile: './assets/audio/cyber.wav'
   },
   codeflow: {
     id: 'codeflow',
     category: 'focus',
     badge: 'HYPERFOCUS & MINIMAL TECHNO',
     name: 'Dark Code Flow Velocity',
-    artist: 'Driving Sub-Kick & Rapid Hi-Hats',
+    artist: '909 Sub-Kick & Driving Hi-Hats',
     emoji: '🔥',
     accentColor: '#6366f1',
     aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.42) 0%, rgba(79, 70, 229, 0.3) 35%, rgba(244, 63, 94, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'codeflow'
+    audioFile: './assets/audio/codeflow.wav'
   },
   space: {
     id: 'space',
     category: 'focus',
     badge: 'DEEP SPACE ASTRAL SYNTH',
     name: 'Cosmic Nebula Horizon',
-    artist: 'Zero-G Harmonic Ambient Space Drone',
+    artist: 'Zero-G Harmonic Ambient Space Pads',
     emoji: '🌌',
     accentColor: '#3b82f6',
     aura: 'radial-gradient(circle at 40% 30%, rgba(59, 130, 246, 0.42) 0%, rgba(99, 102, 241, 0.28) 35%, rgba(139, 92, 246, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'space'
+    audioFile: './assets/audio/space.wav'
   },
 
   // --- CALM & REFLECTIVE (Low Valence, Low Arousal) ---
@@ -148,22 +148,22 @@ const MOOD_LIBRARY = {
     category: 'melancholy',
     badge: 'CALM & REFLECTIVE',
     name: 'Midnight Rain & Reflective Piano',
-    artist: 'Nocturnal Rainfall & Grand Piano',
+    artist: 'Rainfall Ambience & Minor Grand Piano',
     emoji: '🌧️',
     accentColor: '#06b6d4',
     aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.48) 0%, rgba(49, 46, 129, 0.32) 35%, rgba(6, 182, 212, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'rain_piano'
+    audioFile: './assets/audio/rain_piano.wav'
   },
   cello: {
     id: 'cello',
     category: 'melancholy',
     badge: 'DEEP STRINGS & RAIN',
     name: 'Nocturnal Cello Meditation',
-    artist: 'Formant Bowed Cello & Strings',
+    artist: 'Formant Bowed Wooden Cello & Strings',
     emoji: '🎻',
     accentColor: '#64748b',
     aura: 'radial-gradient(circle at 40% 30%, rgba(51, 65, 85, 0.48) 0%, rgba(30, 41, 59, 0.35) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'cello'
+    audioFile: './assets/audio/cello.wav'
   },
   campfire: {
     id: 'campfire',
@@ -174,7 +174,7 @@ const MOOD_LIBRARY = {
     emoji: '🌲',
     accentColor: '#d97706',
     aura: 'radial-gradient(circle at 40% 30%, rgba(180, 83, 9, 0.42) 0%, rgba(120, 53, 15, 0.3) 35%, rgba(30, 27, 75, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
-    synthType: 'campfire'
+    audioFile: './assets/audio/campfire.wav'
   }
 };
 
@@ -210,6 +210,14 @@ let autoMoodSync = true;
 let isTrackingActive = true;
 
 // -----------------------------------------------------------------------------
+// HTML5 Audio Engine (Instant, Offline, Seamless Looping)
+// -----------------------------------------------------------------------------
+let masterVolume = 0.8;
+const audioPlayer = new Audio();
+audioPlayer.loop = true;
+audioPlayer.volume = masterVolume;
+
+// -----------------------------------------------------------------------------
 // Smooth Physics Interpolation (Lerp Target & Display Variables)
 // -----------------------------------------------------------------------------
 let targetValence = 0.6;
@@ -223,8 +231,6 @@ let targetClicks = 0.0;
 let displaySpeed = 0.0;
 let displayAccel = 0.0;
 let displayClicks = 0.0;
-
-let masterVolume = 0.75;
 
 // -----------------------------------------------------------------------------
 // DOM References
@@ -334,7 +340,6 @@ btnCancelCustomizer?.addEventListener('click', () => {
   modalCustomizer.classList.remove('open');
 });
 
-// Apply Custom 4 Moods
 btnApplyCustomizer?.addEventListener('click', () => {
   userQuadrantAssignments = {
     tl: selQuadTl.value,
@@ -483,623 +488,21 @@ function applyTrackingState(active) {
   }
 }
 
-// =============================================================================
-// Physical Acoustic & Musical Modeling Engine
-// =============================================================================
-let audioCtx = null;
-let activeNodes = [];
-let synthGainNode = null;
-let playbackLoopTimer = null;
-
-async function ensureAudioContextRunning() {
-  if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioCtx = new AudioContextClass();
-  }
-  if (audioCtx.state === 'suspended') {
-    await audioCtx.resume();
-  }
-}
-
-['click', 'keydown', 'touchstart'].forEach((evt) => {
-  window.addEventListener(evt, () => {
-    ensureAudioContextRunning();
-  }, { once: false });
-});
-
-function stopAllProceduralAudio() {
-  if (playbackLoopTimer) {
-    clearInterval(playbackLoopTimer);
-    playbackLoopTimer = null;
-  }
-  activeNodes.forEach((node) => {
-    try {
-      if (node.stop) node.stop();
-      if (node.disconnect) node.disconnect();
-    } catch (_) {}
-  });
-  activeNodes = [];
-}
-
-// Noise Generator for Nature Ambience
-function createNoiseBuffer(ctx, type = 'pink') {
-  const bufferSize = ctx.sampleRate * 2;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    if (type === 'pink') {
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.96900 * b2 + white * 0.1538520;
-      b3 = 0.86650 * b3 + white * 0.3104856;
-      b4 = 0.55000 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.0168980;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.05;
-      b6 = white * 0.115926;
-    } else if (type === 'crackling') {
-      data[i] = (Math.random() > 0.995 ? (Math.random() * 0.7 - 0.35) : (white * 0.012));
-    } else {
-      data[i] = white * 0.04;
-    }
-  }
-
-  const src = ctx.createBufferSource();
-  src.buffer = buffer;
-  src.loop = true;
-  return src;
-}
-
 // -----------------------------------------------------------------------------
-// Realistic Physical Acoustic Instruments
-// -----------------------------------------------------------------------------
-
-// 1. Acoustic Grand Piano Note (Multi-Harmonic String Struck Physics)
-function playAcousticPianoNote(ctx, freq, duration, targetNode, velocity = 0.12) {
-  const harmonics = [1.0, 2.01, 3.02, 4.04];
-  const weights = [1.0, 0.45, 0.20, 0.08];
-
-  harmonics.forEach((h, idx) => {
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    const f = freq * h;
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(f, ctx.currentTime);
-
-    // Struck hammer strike + exponential string decay
-    const peakGain = velocity * weights[idx];
-    g.gain.setValueAtTime(0.0001, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(peakGain, ctx.currentTime + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-    osc.connect(g);
-    g.connect(targetNode);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + duration);
-    activeNodes.push(osc, g);
-  });
-}
-
-// 2. Plucked Acoustic Guitar / Harp Note (Karplus-Strong Pluck Resonance)
-function playPluckedGuitarNote(ctx, freq, duration, targetNode, gainLevel = 0.1) {
-  const osc = ctx.createOscillator();
-  const filter = ctx.createBiquadFilter();
-  const noteGain = ctx.createGain();
-
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-  // Dynamic lowpass string damping
-  filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(freq * 5.0, ctx.currentTime);
-  filter.frequency.exponentialRampToValueAtTime(freq * 0.8, ctx.currentTime + duration * 0.8);
-
-  noteGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  noteGain.gain.linearRampToValueAtTime(gainLevel, ctx.currentTime + 0.005);
-  noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-  osc.connect(filter);
-  filter.connect(noteGain);
-  noteGain.connect(targetNode);
-
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + duration);
-  activeNodes.push(osc, filter, noteGain);
-}
-
-// 3. Formant Bowed Cello Note (Multi-Formant Wooden Body Resonance)
-function playBowedCelloNote(ctx, freq, duration, targetNode, gainLevel = 0.09) {
-  const osc = ctx.createOscillator();
-  const bodyFilter = ctx.createBiquadFilter();
-  const noteGain = ctx.createGain();
-
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-  // Natural cello pitch vibrato
-  const vibrato = ctx.createOscillator();
-  const vibGain = ctx.createGain();
-  vibrato.frequency.setValueAtTime(5.2, ctx.currentTime);
-  vibGain.gain.setValueAtTime(freq * 0.015, ctx.currentTime);
-  vibrato.connect(vibGain);
-  vibGain.connect(osc.frequency);
-  vibrato.start();
-  activeNodes.push(vibrato, vibGain);
-
-  // Cello wooden body formant resonance
-  bodyFilter.type = 'bandpass';
-  bodyFilter.frequency.setValueAtTime(520, ctx.currentTime);
-  bodyFilter.Q.setValueAtTime(2.5, ctx.currentTime);
-
-  noteGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  noteGain.gain.linearRampToValueAtTime(gainLevel, ctx.currentTime + 0.8);
-  noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-  osc.connect(bodyFilter);
-  bodyFilter.connect(noteGain);
-  noteGain.connect(targetNode);
-
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + duration);
-  activeNodes.push(osc, bodyFilter, noteGain);
-}
-
-// 4. Lo-Fi Hip Hop Drum Beats (Sub-Kick & Snare)
-function playLofiDrumHit(ctx, isSnare, targetNode) {
-  if (isSnare) {
-    const noise = createNoiseBuffer(ctx, 'white');
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.setValueAtTime(1200, ctx.currentTime);
-
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.08, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
-
-    noise.connect(filter);
-    filter.connect(g);
-    g.connect(targetNode);
-    noise.start();
-    noise.stop(ctx.currentTime + 0.18);
-    activeNodes.push(noise, filter, g);
-  } else {
-    // Warm sub kick
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.frequency.setValueAtTime(110, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(42, ctx.currentTime + 0.15);
-
-    g.gain.setValueAtTime(0.18, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
-
-    osc.connect(g);
-    g.connect(targetNode);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.25);
-    activeNodes.push(osc, g);
-  }
-}
-
-// -----------------------------------------------------------------------------
-// Launch Dedicated Musical Soundscape
-// -----------------------------------------------------------------------------
-async function launchMoodSynthesizer(synthType) {
-  await ensureAudioContextRunning();
-  stopAllProceduralAudio();
-
-  synthGainNode = audioCtx.createGain();
-  synthGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
-  synthGainNode.connect(audioCtx.destination);
-
-  switch (synthType) {
-    // ---------------------------------------------------------
-    // 1. ZEN: Authentic Grand Piano & Nature Breeze
-    // ---------------------------------------------------------
-    case 'zen': {
-      const zenChords = [
-        [261.63, 329.63, 392.00, 493.88], // Cmaj7
-        [220.00, 261.63, 329.63, 440.00], // Am7
-        [174.61, 261.63, 329.63, 392.00], // Fmaj7
-        [196.00, 246.94, 293.66, 392.00]  // G6
-      ];
-      let step = 0;
-      const playZen = () => {
-        if (!isAudioPlaying) return;
-        zenChords[step].forEach((f, idx) => {
-          setTimeout(() => {
-            playAcousticPianoNote(audioCtx, f, 4.5, synthGainNode, 0.09);
-          }, idx * 140);
-        });
-        step = (step + 1) % zenChords.length;
-      };
-      playZen();
-      playbackLoopTimer = setInterval(playZen, 4200);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 2. OCEAN: Coastal Surf Wash & Plucked Harp
-    // ---------------------------------------------------------
-    case 'ocean': {
-      const noise = createNoiseBuffer(audioCtx, 'pink');
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(450, audioCtx.currentTime);
-
-      const surfGain = audioCtx.createGain();
-      surfGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-      noise.connect(filter);
-      filter.connect(surfGain);
-      surfGain.connect(synthGainNode);
-      noise.start();
-      activeNodes.push(noise, filter, surfGain);
-
-      const harpNotes = [293.66, 369.99, 440.00, 554.37, 587.33, 739.99];
-      let harpIdx = 0;
-      const playHarp = () => {
-        if (!isAudioPlaying) return;
-        filter.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 1.8);
-        filter.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 4.2);
-
-        for (let i = 0; i < 4; i++) {
-          setTimeout(() => {
-            const f = harpNotes[(harpIdx + i) % harpNotes.length];
-            playPluckedGuitarNote(audioCtx, f, 3.2, synthGainNode, 0.08);
-          }, i * 220);
-        }
-        harpIdx = (harpIdx + 2) % harpNotes.length;
-      };
-      playHarp();
-      playbackLoopTimer = setInterval(playHarp, 4400);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 3. MEDITATION: 432Hz Tibetan Singing Bowls & OM Drone
-    // ---------------------------------------------------------
-    case 'meditation': {
-      const freqs = [108.0, 216.0, 432.0, 864.0];
-      freqs.forEach((f, idx) => {
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-        g.gain.setValueAtTime(0.06 / (idx + 1), audioCtx.currentTime);
-
-        const lfo = audioCtx.createOscillator();
-        const lfoGain = audioCtx.createGain();
-        lfo.frequency.setValueAtTime(0.12 + idx * 0.04, audioCtx.currentTime);
-        lfoGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-        lfo.connect(lfoGain);
-        lfoGain.connect(g.gain);
-        lfo.start();
-        activeNodes.push(lfo, lfoGain);
-
-        osc.connect(g);
-        g.connect(synthGainNode);
-        osc.start();
-        activeNodes.push(osc, g);
-      });
-
-      const triggerBowl = () => {
-        if (!isAudioPlaying) return;
-        playAcousticPianoNote(audioCtx, 576.0, 7.0, synthGainNode, 0.08);
-      };
-      triggerBowl();
-      playbackLoopTimer = setInterval(triggerBowl, 7500);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 4. CHILLHOP: Genuine Lo-Fi Beats & Jazzy Rhodes Chords
-    // ---------------------------------------------------------
-    case 'chillhop': {
-      const chillChords = [
-        [311.13, 392.00, 466.16, 587.33], // Ebmaj9
-        [261.63, 311.13, 392.00, 466.16], // Cm7
-        [207.65, 261.63, 311.13, 392.00], // Abmaj7
-        [233.08, 293.66, 349.23, 440.00]  // Bb9
-      ];
-      let beat = 0;
-      const playChillhop = () => {
-        if (!isAudioPlaying) return;
-        const chordIdx = Math.floor(beat / 4) % chillChords.length;
-
-        // Rhodes chord on beat 0
-        if (beat % 4 === 0) {
-          chillChords[chordIdx].forEach((f) => {
-            playAcousticPianoNote(audioCtx, f, 2.2, synthGainNode, 0.07);
-          });
-        }
-
-        // Lo-fi Kick on beats 0 & 2, Snare on beats 1 & 3
-        if (beat % 2 === 0) {
-          playLofiDrumHit(audioCtx, false, synthGainNode);
-        } else {
-          playLofiDrumHit(audioCtx, true, synthGainNode);
-        }
-
-        beat = (beat + 1) % 16;
-      };
-      playChillhop();
-      playbackLoopTimer = setInterval(playChillhop, 620);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 5. SUNRISE: Plucked Acoustic Guitar Melodies
-    // ---------------------------------------------------------
-    case 'sunrise': {
-      const guitarProgression = [
-        [196.00, 246.94, 293.66, 392.00], // G
-        [185.00, 246.94, 293.66, 369.99], // D/F#
-        [164.81, 246.94, 329.63, 392.00], // Em7
-        [130.81, 261.63, 329.63, 392.00]  // Cadd9
-      ];
-      let bar = 0;
-      const playSunrise = () => {
-        if (!isAudioPlaying) return;
-        const chord = guitarProgression[bar];
-        chord.forEach((note, idx) => {
-          setTimeout(() => {
-            playPluckedGuitarNote(audioCtx, note, 1.8, synthGainNode, 0.09);
-          }, idx * 160);
-        });
-        bar = (bar + 1) % guitarProgression.length;
-      };
-      playSunrise();
-      playbackLoopTimer = setInterval(playSunrise, 2200);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 6. CHIPTUNE: 8-Bit Arcade Fast Pixel Lead
-    // ---------------------------------------------------------
-    case 'chiptune': {
-      const chipNotes = [
-        261.63, 329.63, 392.00, 523.25,
-        196.00, 246.94, 293.66, 392.00,
-        220.00, 261.63, 329.63, 440.00,
-        174.61, 220.00, 261.63, 349.23
-      ];
-      let step = 0;
-      const playChip = () => {
-        if (!isAudioPlaying) return;
-        const f = chipNotes[step];
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-        g.gain.setValueAtTime(0.04, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
-        osc.connect(g);
-        g.connect(synthGainNode);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-        activeNodes.push(osc, g);
-        step = (step + 1) % chipNotes.length;
-      };
-      playChip();
-      playbackLoopTimer = setInterval(playChip, 180);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 7. CYBER: Heavy Synthwave Analog Bassline
-    // ---------------------------------------------------------
-    case 'cyber': {
-      const cyberBass = [110.0, 110.0, 130.81, 146.83, 98.0, 110.0];
-      let step = 0;
-      const playCyber = () => {
-        if (!isAudioPlaying) return;
-        const f = cyberBass[step];
-        const osc1 = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        const filter = audioCtx.createBiquadFilter();
-        const g = audioCtx.createGain();
-
-        osc1.type = 'sawtooth';
-        osc2.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(f, audioCtx.currentTime);
-        osc2.frequency.setValueAtTime(f * 1.006, audioCtx.currentTime); // Analog detune
-
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1400, audioCtx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.6);
-        filter.Q.setValueAtTime(4.0, audioCtx.currentTime);
-
-        g.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.65);
-
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(g);
-        g.connect(synthGainNode);
-
-        osc1.start();
-        osc2.start();
-        osc1.stop(audioCtx.currentTime + 0.65);
-        osc2.stop(audioCtx.currentTime + 0.65);
-        activeNodes.push(osc1, osc2, filter, g);
-
-        step = (step + 1) % cyberBass.length;
-      };
-      playCyber();
-      playbackLoopTimer = setInterval(playCyber, 680);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 8. CODEFLOW: Hyperfocus Minimal Techno Cadence
-    // ---------------------------------------------------------
-    case 'codeflow': {
-      let beat = 0;
-      const playTechno = () => {
-        if (!isAudioPlaying) return;
-        // Deep sub kick on every quarter beat
-        playLofiDrumHit(audioCtx, false, synthGainNode);
-
-        // Crisp 16th-note closed hi-hat
-        setTimeout(() => {
-          playLofiDrumHit(audioCtx, true, synthGainNode);
-        }, 220);
-
-        beat++;
-      };
-      playTechno();
-      playbackLoopTimer = setInterval(playTechno, 440);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 9. SPACE: Zero-G Astral Atmospheric Synth Pads
-    // ---------------------------------------------------------
-    case 'space': {
-      const spaceChords = [
-        [130.81, 196.00, 277.18, 329.63, 493.88], // Cmaj7#11
-        [103.83, 155.56, 207.65, 311.13, 415.30], // Abmaj9
-        [155.56, 233.08, 311.13, 349.23, 466.16]  // Ebmaj7
-      ];
-      let step = 0;
-      const playSpace = () => {
-        if (!isAudioPlaying) return;
-        spaceChords[step].forEach((f) => {
-          const osc = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-          g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-          g.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 1.8);
-          g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
-          osc.connect(g);
-          g.connect(synthGainNode);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 6.0);
-          activeNodes.push(osc, g);
-        });
-        step = (step + 1) % spaceChords.length;
-      };
-      playSpace();
-      playbackLoopTimer = setInterval(playSpace, 5500);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 10. RAIN PIANO: Real Rainfall & Contemplative Grand Piano
-    // ---------------------------------------------------------
-    case 'rain_piano': {
-      const rain = createNoiseBuffer(audioCtx, 'pink');
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(1400, audioCtx.currentTime);
-
-      const rainG = audioCtx.createGain();
-      rainG.gain.setValueAtTime(0.18, audioCtx.currentTime);
-      rain.connect(filter);
-      filter.connect(rainG);
-      rainG.connect(synthGainNode);
-      rain.start();
-      activeNodes.push(rain, filter, rainG);
-
-      const minorPianoChords = [
-        [146.83, 220.00, 261.63, 329.63], // Dmin9
-        [116.54, 174.61, 233.08, 293.66], // Bbmaj7
-        [98.00, 146.83, 196.00, 261.63],  // Gmin11
-        [130.81, 196.00, 261.63, 329.63]  // Cadd9
-      ];
-      let step = 0;
-      const playRainPiano = () => {
-        if (!isAudioPlaying) return;
-        minorPianoChords[step].forEach((f, idx) => {
-          setTimeout(() => {
-            playAcousticPianoNote(audioCtx, f, 4.8, synthGainNode, 0.095);
-          }, idx * 120);
-        });
-        step = (step + 1) % minorPianoChords.length;
-      };
-      playRainPiano();
-      playbackLoopTimer = setInterval(playRainPiano, 4400);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 11. CELLO: Formant Bowed Strings & Rain Droplets
-    // ---------------------------------------------------------
-    case 'cello': {
-      const celloChords = [
-        [110.00, 164.81, 220.00], // Am
-        [87.31, 130.81, 174.61],  // F
-        [73.42, 110.00, 146.83],  // Dm
-        [82.41, 123.47, 164.81]   // E7
-      ];
-      let step = 0;
-      const playCello = () => {
-        if (!isAudioPlaying) return;
-        celloChords[step].forEach((f) => {
-          playBowedCelloNote(audioCtx, f, 4.2, synthGainNode, 0.085);
-        });
-        step = (step + 1) % celloChords.length;
-      };
-      playCello();
-      playbackLoopTimer = setInterval(playCello, 4200);
-      break;
-    }
-
-    // ---------------------------------------------------------
-    // 12. CAMPFIRE: Crackling Embers & Fingerpicked Guitar
-    // ---------------------------------------------------------
-    case 'campfire': {
-      const crackle = createNoiseBuffer(audioCtx, 'crackling');
-      const crackleG = audioCtx.createGain();
-      crackleG.gain.setValueAtTime(0.22, audioCtx.currentTime);
-      crackle.connect(crackleG);
-      crackleG.connect(synthGainNode);
-      crackle.start();
-      activeNodes.push(crackle, crackleG);
-
-      const campfireChords = [
-        [164.81, 246.94, 329.63, 392.00], // Em
-        [130.81, 261.63, 329.63, 392.00], // Cmaj7
-        [110.00, 220.00, 261.63, 329.63], // Am7
-        [123.47, 246.94, 293.66, 369.99]  // B7
-      ];
-      let bar = 0;
-      const playCampfire = () => {
-        if (!isAudioPlaying) return;
-        const notes = campfireChords[bar];
-        notes.forEach((f, idx) => {
-          setTimeout(() => {
-            playPluckedGuitarNote(audioCtx, f, 2.4, synthGainNode, 0.085);
-          }, idx * 150);
-        });
-        bar = (bar + 1) % campfireChords.length;
-      };
-      playCampfire();
-      playbackLoopTimer = setInterval(playCampfire, 3200);
-      break;
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
-// Playback & Track Switcher Handler
+// Track Switcher & HTML5 Playback Engine
 // -----------------------------------------------------------------------------
 function activateMoodTrack(trackId, startPlaying = false) {
   const m = MOOD_LIBRARY[trackId] || MOOD_LIBRARY.zen;
   currentActiveTrackId = trackId;
 
-  // Update theme colors & aura
+  // Update theme colors & background aura
   document.documentElement.style.setProperty('--current-accent', m.accentColor);
   document.documentElement.style.setProperty('--current-glow', `${m.accentColor}44`);
   if (dynamicAura) {
     dynamicAura.style.background = m.aura;
   }
 
-  // Update hero vinyl meta
+  // Update hero vinyl metadata
   nowPlayingGenre.textContent = m.badge;
   nowPlayingTitle.textContent = m.name;
   nowPlayingArtist.textContent = m.artist;
@@ -1111,10 +514,17 @@ function activateMoodTrack(trackId, startPlaying = false) {
     card.classList.toggle('active', card.dataset.station === trackId);
   });
 
+  // Load and play the distinct audio track
+  if (audioPlayer.src !== new URL(m.audioFile, window.location.href).href) {
+    audioPlayer.src = m.audioFile;
+  }
+
   if (startPlaying || isAudioPlaying) {
     isAudioPlaying = true;
     setPlaybackState(true);
-    launchMoodSynthesizer(m.synthType);
+    audioPlayer.play().catch((err) => {
+      console.warn("Audio autoplay waiting for user interaction:", err);
+    });
   }
 }
 
@@ -1128,12 +538,11 @@ function setPlaybackState(playing) {
     svgPlayIcon.style.display = 'block';
     svgPauseIcon.style.display = 'none';
     vinylDisc.classList.remove('spinning');
-    stopAllProceduralAudio();
+    audioPlayer.pause();
   }
 }
 
-document.getElementById('btn-audio-toggle')?.addEventListener('click', async () => {
-  await ensureAudioContextRunning();
+document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
   if (isAudioPlaying) {
     setPlaybackState(false);
   } else {
@@ -1143,9 +552,7 @@ document.getElementById('btn-audio-toggle')?.addEventListener('click', async () 
 
 sliderVolume?.addEventListener('input', (e) => {
   masterVolume = parseFloat(e.target.value) / 100;
-  if (synthGainNode && audioCtx) {
-    synthGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
-  }
+  audioPlayer.volume = masterVolume;
 });
 
 chkStudioSync?.addEventListener('change', (e) => {
@@ -1156,10 +563,10 @@ chkStudioSync?.addEventListener('change', (e) => {
 // Live Affect & 4-Quadrant Dynamic Routing
 // -----------------------------------------------------------------------------
 function determineTargetQuadrantKey(valence, arousal) {
-  if (arousal >= 0 && valence >= 0) return 'tr'; // Top-Right
-  if (arousal >= 0 && valence < 0) return 'tl'; // Top-Left
-  if (arousal < 0 && valence < 0) return 'bl';  // Bottom-Left
-  return 'br';                                  // Bottom-Right
+  if (arousal >= 0 && valence >= 0) return 'tr'; // Top-Right (Upbeat / Energized)
+  if (arousal >= 0 && valence < 0) return 'tl'; // Top-Left (Intense / Focus)
+  if (arousal < 0 && valence < 0) return 'bl';  // Bottom-Left (Calm / Reflective)
+  return 'br';                                  // Bottom-Right (Calm / Peaceful)
 }
 
 async function syncLiveStudioState() {
