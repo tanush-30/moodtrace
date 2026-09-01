@@ -208,6 +208,8 @@ let currentActiveTrackId = userQuadrantAssignments.br;
 let isAudioPlaying = false;
 let autoMoodSync = true;
 let isTrackingActive = true;
+let activeTabId = 'tab-studio';
+let manualOverrideActive = false; // Prevents auto-sync from hijacking manual playback in Sound Library
 
 // -----------------------------------------------------------------------------
 // HTML5 Audio Engine (Instant, Offline, Seamless Looping)
@@ -216,6 +218,10 @@ let masterVolume = 0.8;
 const audioPlayer = new Audio();
 audioPlayer.loop = true;
 audioPlayer.volume = masterVolume;
+
+audioPlayer.onerror = (e) => {
+  console.error("Audio playback error on source:", audioPlayer.src, e);
+};
 
 // -----------------------------------------------------------------------------
 // Smooth Physics Interpolation (Lerp Target & Display Variables)
@@ -355,6 +361,7 @@ btnApplyCustomizer?.addEventListener('click', () => {
   refreshMatrixQuadrantDisplays();
   modalCustomizer.classList.remove('open');
 
+  manualOverrideActive = false;
   const activeQuad = determineTargetQuadrantKey(targetValence, targetArousal);
   const targetTrackId = userQuadrantAssignments[activeQuad];
   activateMoodTrack(targetTrackId, isAudioPlaying);
@@ -402,12 +409,14 @@ function renderLibraryGrid(filter = 'all') {
     `;
 
     card.addEventListener('click', () => {
+      manualOverrideActive = true; // User manually chose this specific song!
       activateMoodTrack(m.id, true);
     });
 
     const playBtn = card.querySelector('.btn-play-station');
     playBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      manualOverrideActive = true;
       activateMoodTrack(m.id, true);
     });
 
@@ -432,11 +441,15 @@ document.querySelectorAll('.dock-btn').forEach((btn) => {
     document.querySelectorAll('.tab-view').forEach((v) => v.classList.remove('active'));
 
     btn.classList.add('active');
+    activeTabId = btn.dataset.tab;
     const targetView = document.getElementById(btn.dataset.tab);
     if (targetView) targetView.classList.add('active');
 
     if (btn.dataset.tab === 'tab-stations') {
       renderLibraryGrid();
+    }
+    if (btn.dataset.tab === 'tab-studio') {
+      manualOverrideActive = false; // Re-enable mood auto-sync on studio tab
     }
     if (btn.dataset.tab === 'tab-config') {
       loadTelemetryCounters();
@@ -515,9 +528,7 @@ function activateMoodTrack(trackId, startPlaying = false) {
   });
 
   // Load and play the distinct audio track
-  if (audioPlayer.src !== new URL(m.audioFile, window.location.href).href) {
-    audioPlayer.src = m.audioFile;
-  }
+  audioPlayer.src = m.audioFile;
 
   if (startPlaying || isAudioPlaying) {
     isAudioPlaying = true;
@@ -557,6 +568,9 @@ sliderVolume?.addEventListener('input', (e) => {
 
 chkStudioSync?.addEventListener('change', (e) => {
   autoMoodSync = e.target.checked;
+  if (autoMoodSync) {
+    manualOverrideActive = false;
+  }
 });
 
 // -----------------------------------------------------------------------------
@@ -586,8 +600,8 @@ async function syncLiveStudioState() {
     targetAccel = mean_acceleration || 0;
     targetClicks = click_rate || 0;
 
-    // Dynamic auto-sync with user's configured 4 quadrants
-    if (autoMoodSync) {
+    // Dynamic auto-sync with user's configured 4 quadrants ONLY when in Studio tab and not manually overridden
+    if (autoMoodSync && !manualOverrideActive && activeTabId === 'tab-studio') {
       const activeQuad = determineTargetQuadrantKey(targetValence, targetArousal);
       const targetTrackId = userQuadrantAssignments[activeQuad] || DEFAULT_ASSIGNMENTS[activeQuad];
       if (targetTrackId !== currentActiveTrackId) {
