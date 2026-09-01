@@ -67,9 +67,9 @@ fn main() {
         current_arousal: Mutex::new(-0.4),
         current_valence: Mutex::new(0.6),
         tracking_enabled: Mutex::new(true),
-        inference_interval_sec: Mutex::new(5),
+        inference_interval_sec: Mutex::new(1), // High-precision 1-second cadence
         popup_interval_min: Mutex::new(10),
-        window_duration_sec: Mutex::new(45),
+        window_duration_sec: Mutex::new(35),   // 35s balanced rolling window
         latest_metrics: Mutex::new(LatestMetrics::default()),
     };
 
@@ -193,13 +193,13 @@ fn main() {
                 let mut last_predict = Instant::now();
                 let mut last_popup = Instant::now();
 
-                println!("Moodtrace background tracking loop running.");
+                println!("Moodtrace high-precision background tracking loop running.");
 
                 loop {
                     let app_state = app_handle.state::<AppState>();
                     let tracking_active = *app_state.tracking_enabled.lock().unwrap();
 
-                    // Pull events from hook
+                    // Pull events from hook receiver into buffer
                     if let Some(ref r) = rx {
                         while let Ok(event) = r.try_recv() {
                             if tracking_active {
@@ -226,12 +226,12 @@ fn main() {
                             let mut m = app_state.latest_metrics.lock().unwrap();
                             m.mean_speed = features.mean_speed;
                             m.mean_acceleration = features.mean_acceleration;
-                            m.click_rate = features.click_rate;
+                            m.click_rate = features.click_rate / 60.0; // Normalized to clicks per second for UI
                             m.idle_ratio = features.idle_ratio;
                             m.event_count = buffer.len();
                         }
 
-                        // Run ONNX inference if model is available
+                        // Run high-precision hybrid inference
                         if let Some(ref mut eng) = engine {
                             if let Ok(state) = eng.predict(&features) {
                                 {
@@ -241,9 +241,9 @@ fn main() {
 
                                 // Update system tray icon based on arousal
                                 if let Some(tray) = app_handle.tray_by_id("main") {
-                                    let icon = if state.arousal > 0.3 {
+                                    let icon = if state.arousal > 0.25 {
                                         energized_icon.clone()
-                                    } else if state.arousal < -0.3 {
+                                    } else if state.arousal < -0.25 {
                                         calm_icon.clone()
                                     } else {
                                         neutral_icon.clone()
@@ -264,7 +264,7 @@ fn main() {
                         }
                     }
 
-                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    std::thread::sleep(std::time::Duration::from_millis(50));
                 }
             });
 

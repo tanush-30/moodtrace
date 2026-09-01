@@ -16,9 +16,9 @@ if (!invoke) {
         arousal: -0.42,
         valence: 0.65,
         tracking_enabled: true,
-        inference_interval_sec: 5,
+        inference_interval_sec: 1,
         popup_interval_min: 10,
-        window_duration_sec: 45,
+        window_duration_sec: 35,
         mean_speed: 380.0,
         mean_acceleration: 145.0,
         click_rate: 0.5,
@@ -44,7 +44,7 @@ const STATIONS = {
     artist: 'Acoustic Piano & Nature Drone',
     emoji: '🌿',
     accentColor: '#10b981',
-    aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.35) 0%, rgba(16, 185, 129, 0.2) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.38) 0%, rgba(16, 185, 129, 0.22) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3'
   },
   upbeat: {
@@ -54,7 +54,7 @@ const STATIONS = {
     artist: 'Vibrant Lo-Fi & Melodic Synth',
     emoji: '⚡',
     accentColor: '#f59e0b',
-    aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.35) 0%, rgba(244, 63, 94, 0.25) 35%, rgba(139, 92, 246, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.38) 0%, rgba(244, 63, 94, 0.28) 35%, rgba(139, 92, 246, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3'
   },
   focus: {
@@ -64,7 +64,7 @@ const STATIONS = {
     artist: 'Deep Driving Bassline & Beats',
     emoji: '🎧',
     accentColor: '#8b5cf6',
-    aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.25) 35%, rgba(6, 182, 212, 0.15) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3'
   },
   melancholy: {
@@ -74,7 +74,7 @@ const STATIONS = {
     artist: 'Soft Rainfall & Atmospheric Drone',
     emoji: '🌧️',
     accentColor: '#06b6d4',
-    aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.45) 0%, rgba(49, 46, 129, 0.3) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.48) 0%, rgba(49, 46, 129, 0.32) 35%, rgba(6, 182, 212, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=soft-rain-ambient-111154.mp3'
   }
 };
@@ -83,6 +83,21 @@ let currentStation = 'calm';
 let isAudioPlaying = false;
 let autoMoodSync = true;
 let isTrackingActive = true;
+
+// -----------------------------------------------------------------------------
+// Smooth Physics Interpolation (Lerp Target & Display Variables)
+// -----------------------------------------------------------------------------
+let targetValence = 0.6;
+let targetArousal = -0.4;
+let displayValence = 0.6;
+let displayArousal = -0.4;
+
+let targetSpeed = 0.0;
+let targetAccel = 0.0;
+let targetClicks = 0.0;
+let displaySpeed = 0.0;
+let displayAccel = 0.0;
+let displayClicks = 0.0;
 
 const audioPlayer = new Audio();
 audioPlayer.loop = true;
@@ -216,7 +231,7 @@ function activateStation(stationKey, startPlaying = false) {
       setPlaybackState(true);
     }).catch((err) => {
       console.warn('Audio stream fallback triggered:', err);
-      startProceduralSynthTone(st.accentColor);
+      startProceduralSynthTone();
     });
   }
 }
@@ -288,7 +303,7 @@ function startProceduralSynthTone() {
 }
 
 // -----------------------------------------------------------------------------
-// Live Affect & Kinematics Coordinate Loop
+// Live Affect & Kinematics Sync Loop
 // -----------------------------------------------------------------------------
 function mapMoodToStation(valence, arousal) {
   if (arousal >= 0 && valence >= 0) return 'upbeat';
@@ -307,44 +322,61 @@ async function syncLiveStudioState() {
     isTrackingActive = tracking_enabled;
     applyTrackingState(tracking_enabled);
 
-    // Update 2D Plane Coordinate Orb (Valence: X, Arousal: Y)
-    const xPct = ((valence + 1.0) / 2.0) * 100;
-    const yPct = ((1.0 - (arousal + 1.0) / 2.0)) * 100;
-
-    if (harmonicOrb) {
-      harmonicOrb.style.left = `${Math.max(6, Math.min(94, xPct))}%`;
-      harmonicOrb.style.top = `${Math.max(6, Math.min(94, yPct))}%`;
-    }
-
-    // Telemetry display values
-    valValence.textContent = (valence >= 0 ? '+' : '') + valence.toFixed(2);
-    valArousal.textContent = (arousal >= 0 ? '+' : '') + arousal.toFixed(2);
+    // Set targets for 60fps smooth interpolation
+    targetValence = valence;
+    targetArousal = arousal;
+    targetSpeed = mean_speed || 0;
+    targetAccel = mean_acceleration || 0;
+    targetClicks = click_rate || 0;
 
     // Dynamic auto-sync with station vibes
     if (autoMoodSync) {
-      const targetKey = mapMoodToStation(valence, arousal);
+      const targetKey = mapMoodToStation(targetValence, targetArousal);
       if (targetKey !== currentStation) {
         activateStation(targetKey, isAudioPlaying);
       }
     }
 
-    // Update DJ Mixer dynamic meters
-    const speed = mean_speed || 0;
-    const accel = mean_acceleration || 0;
-    const clicks = click_rate || 0;
-
-    meterValSpeed.textContent = `${Math.round(speed)} px/s`;
-    barFillSpeed.style.width = `${Math.min(100, (speed / 1400) * 100)}%`;
-
-    meterValAccel.textContent = `${Math.round(accel)} px/s²`;
-    barFillAccel.style.width = `${Math.min(100, (accel / 2800) * 100)}%`;
-
-    meterValClicks.textContent = `${clicks.toFixed(1)} /s`;
-    barFillClicks.style.width = `${Math.min(100, (clicks / 2.0) * 100)}%`;
-
   } catch (err) {
     console.error('Studio sync error:', err);
   }
+}
+
+// -----------------------------------------------------------------------------
+// 60 FPS Fluid Linear Interpolation (Lerp) Render Loop
+// -----------------------------------------------------------------------------
+function renderFluidFrame() {
+  // Smoothly glide position: 14% delta per frame
+  displayValence += (targetValence - displayValence) * 0.14;
+  displayArousal += (targetArousal - displayArousal) * 0.14;
+  displaySpeed += (targetSpeed - displaySpeed) * 0.18;
+  displayAccel += (targetAccel - displayAccel) * 0.18;
+  displayClicks += (targetClicks - displayClicks) * 0.18;
+
+  // Update 2D Plane Coordinate Orb (Valence: X, Arousal: Y)
+  const xPct = ((displayValence + 1.0) / 2.0) * 100;
+  const yPct = ((1.0 - (displayArousal + 1.0) / 2.0)) * 100;
+
+  if (harmonicOrb) {
+    harmonicOrb.style.left = `${Math.max(6, Math.min(94, xPct))}%`;
+    harmonicOrb.style.top = `${Math.max(6, Math.min(94, yPct))}%`;
+  }
+
+  // Telemetry display values
+  if (valValence) valValence.textContent = (displayValence >= 0 ? '+' : '') + displayValence.toFixed(2);
+  if (valArousal) valArousal.textContent = (displayArousal >= 0 ? '+' : '') + displayArousal.toFixed(2);
+
+  // Update DJ Mixer dynamic meters
+  if (meterValSpeed) meterValSpeed.textContent = `${Math.round(displaySpeed)} px/s`;
+  if (barFillSpeed) barFillSpeed.style.width = `${Math.min(100, (displaySpeed / 1200) * 100)}%`;
+
+  if (meterValAccel) meterValAccel.textContent = `${Math.round(displayAccel)} px/s²`;
+  if (barFillAccel) barFillAccel.style.width = `${Math.min(100, (displayAccel / 2400) * 100)}%`;
+
+  if (meterValClicks) meterValClicks.textContent = `${displayClicks.toFixed(1)} /s`;
+  if (barFillClicks) barFillClicks.style.width = `${Math.min(100, (displayClicks / 2.0) * 100)}%`;
+
+  requestAnimationFrame(renderFluidFrame);
 }
 
 // -----------------------------------------------------------------------------
@@ -391,5 +423,6 @@ async function loadTelemetryCounters() {
 // Initialization
 // -----------------------------------------------------------------------------
 activateStation('calm', false);
-setInterval(syncLiveStudioState, 1000);
+setInterval(syncLiveStudioState, 500); // 500ms sync loop for high responsiveness
 syncLiveStudioState();
+requestAnimationFrame(renderFluidFrame); // 60 FPS fluid rendering loop
