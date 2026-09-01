@@ -33,23 +33,52 @@ if (!invoke) {
   };
 }
 
-// -----------------------------------------------------------------------------
-// Soundscape Stations Dataset (Royalty-Free Ambient Mood Streams)
-// -----------------------------------------------------------------------------
-const STATIONS = {
-  calm: {
-    id: 'calm',
-    badge: 'CALM & RELAXED',
+// =============================================================================
+// Comprehensive Soundscape Library (12 Diverse Moods & Themes)
+// =============================================================================
+const MOOD_LIBRARY = {
+  // --- CALM & PEACEFUL (High Valence, Low Arousal) ---
+  zen: {
+    id: 'zen',
+    category: 'calm',
+    badge: 'CALM & PEACEFUL',
     name: 'Zen Ambient Solitude',
     artist: 'Acoustic Piano & Nature Drone',
     emoji: '🌿',
     accentColor: '#10b981',
     aura: 'radial-gradient(circle at 40% 30%, rgba(6, 95, 70, 0.38) 0%, rgba(16, 185, 129, 0.22) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3',
-    synthType: 'calm_chords'
+    synthType: 'zen_rhodes'
   },
-  upbeat: {
-    id: 'upbeat',
+  ocean: {
+    id: 'ocean',
+    category: 'calm',
+    badge: 'CALM & TRANQUIL',
+    name: 'Ocean Waves & Ethereal Harp',
+    artist: 'Gentle Coastal Surf & Strings',
+    emoji: '🌊',
+    accentColor: '#0ea5e9',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(14, 165, 233, 0.38) 0%, rgba(6, 182, 212, 0.24) 35%, rgba(16, 185, 129, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3',
+    synthType: 'ocean_harp'
+  },
+  meditation: {
+    id: 'meditation',
+    category: 'calm',
+    badge: 'MEDITATION & TRANSCENDENCE',
+    name: 'Deep 432Hz Singing Bowls',
+    artist: 'Harmonic Tibetan Resonances',
+    emoji: '🧘',
+    accentColor: '#14b8a6',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(20, 184, 166, 0.38) 0%, rgba(6, 95, 70, 0.25) 35%, rgba(99, 102, 241, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=ambient-piano-amp-strings-10711.mp3',
+    synthType: 'bowl_drone'
+  },
+
+  // --- UPBEAT & ENERGIZED (High Valence, High Arousal) ---
+  chillhop: {
+    id: 'chillhop',
+    category: 'upbeat',
     badge: 'HIGH ENERGY & HAPPY',
     name: 'Sunshine Chillhop Beats',
     artist: 'Vibrant Lo-Fi & Melodic Synth',
@@ -57,10 +86,37 @@ const STATIONS = {
     accentColor: '#f59e0b',
     aura: 'radial-gradient(circle at 40% 30%, rgba(245, 158, 11, 0.38) 0%, rgba(244, 63, 94, 0.28) 35%, rgba(139, 92, 246, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3',
-    synthType: 'upbeat_pulse'
+    synthType: 'chillhop_pulse'
   },
-  focus: {
-    id: 'focus',
+  sunrise: {
+    id: 'sunrise',
+    category: 'upbeat',
+    badge: 'OPTIMISM & SUNSHINE',
+    name: 'Golden Sunrise Acoustic',
+    artist: 'Warm Fingerstyle & Bright Chords',
+    emoji: '🌅',
+    accentColor: '#f97316',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(249, 115, 22, 0.38) 0%, rgba(245, 158, 11, 0.28) 35%, rgba(236, 72, 153, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3',
+    synthType: 'sunrise_acoustic'
+  },
+  chiptune: {
+    id: 'chiptune',
+    category: 'upbeat',
+    badge: 'RETRO ARCADE & ADRENALINE',
+    name: '8-Bit Retro Neon Pulse',
+    artist: 'Pixel Synth & Bouncing Arpeggio',
+    emoji: '🎮',
+    accentColor: '#ec4899',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(236, 72, 153, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.18) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3',
+    synthType: 'chiptune_arp'
+  },
+
+  // --- INTENSE FOCUS & FLOW (Low Valence, High Arousal) ---
+  cyber: {
+    id: 'cyber',
+    category: 'focus',
     badge: 'INTENSE FOCUS & FLOW',
     name: 'Cyber Synthwave Pulse',
     artist: 'Deep Driving Bassline & Beats',
@@ -68,10 +124,37 @@ const STATIONS = {
     accentColor: '#8b5cf6',
     aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.38) 0%, rgba(139, 92, 246, 0.28) 35%, rgba(6, 182, 212, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3',
-    synthType: 'focus_bass'
+    synthType: 'cyber_bass'
   },
-  melancholy: {
-    id: 'melancholy',
+  codeflow: {
+    id: 'codeflow',
+    category: 'focus',
+    badge: 'HYPERFOCUS & MINIMAL TECHNO',
+    name: 'Dark Code Flow Velocity',
+    artist: 'Algorithmic Sub-Bass & Hi-Hats',
+    emoji: '🔥',
+    accentColor: '#6366f1',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.42) 0%, rgba(79, 70, 229, 0.3) 35%, rgba(244, 63, 94, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3',
+    synthType: 'codeflow_techno'
+  },
+  space: {
+    id: 'space',
+    category: 'focus',
+    badge: 'DEEP SPACE ASTRAL SYNTH',
+    name: 'Cosmic Nebula Horizon',
+    artist: 'Zero-G Atmospheric Soundscape',
+    emoji: '🌌',
+    accentColor: '#3b82f6',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(59, 130, 246, 0.42) 0%, rgba(99, 102, 241, 0.28) 35%, rgba(139, 92, 246, 0.16) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_7314a51e60.mp3?filename=chill-abstract-intention-12099.mp3',
+    synthType: 'space_drone'
+  },
+
+  // --- CALM & REFLECTIVE (Low Valence, Low Arousal) ---
+  rain_piano: {
+    id: 'rain_piano',
+    category: 'melancholy',
     badge: 'CALM & REFLECTIVE',
     name: 'Midnight Rain & Reflective Piano',
     artist: 'Contemplative Piano & Soft Rainfall',
@@ -80,10 +163,61 @@ const STATIONS = {
     aura: 'radial-gradient(circle at 40% 30%, rgba(30, 27, 75, 0.48) 0%, rgba(49, 46, 129, 0.32) 35%, rgba(6, 182, 212, 0.14) 60%, rgba(7, 9, 14, 0.98) 85%)',
     url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=piano-moment-11035.mp3',
     synthType: 'rain_piano'
+  },
+  cello: {
+    id: 'cello',
+    category: 'melancholy',
+    badge: 'DEEP STRINGS & RAIN',
+    name: 'Nocturnal Cello Meditation',
+    artist: 'Melancholic Strings & Droplets',
+    emoji: '🎻',
+    accentColor: '#64748b',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(51, 65, 85, 0.48) 0%, rgba(30, 41, 59, 0.35) 35%, rgba(6, 182, 212, 0.12) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=piano-moment-11035.mp3',
+    synthType: 'cello_strings'
+  },
+  campfire: {
+    id: 'campfire',
+    category: 'melancholy',
+    badge: 'CAMPFIRE & NOCTURNE',
+    name: 'Midnight Embers & Guitar',
+    artist: 'Crackling Fire & Mellow Fingerstyle',
+    emoji: '🌲',
+    accentColor: '#d97706',
+    aura: 'radial-gradient(circle at 40% 30%, rgba(180, 83, 9, 0.42) 0%, rgba(120, 53, 15, 0.3) 35%, rgba(30, 27, 75, 0.2) 60%, rgba(7, 9, 14, 0.98) 85%)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=piano-moment-11035.mp3',
+    synthType: 'campfire_guitar'
   }
 };
 
-let currentStation = 'calm';
+// =============================================================================
+// Custom 4-Quadrant Assignment System
+// =============================================================================
+const DEFAULT_ASSIGNMENTS = {
+  tl: 'cyber',       // Top-Left (High Arousal, Low Valence)
+  tr: 'chillhop',    // Top-Right (High Arousal, High Valence)
+  bl: 'rain_piano',  // Bottom-Left (Low Arousal, Low Valence)
+  br: 'zen'          // Bottom-Right (Low Arousal, High Valence)
+};
+
+const PRESETS = {
+  studio: { tl: 'cyber', tr: 'chillhop', bl: 'rain_piano', br: 'zen' },
+  lofi: { tl: 'codeflow', tr: 'sunrise', bl: 'campfire', br: 'ocean' },
+  nature: { tl: 'space', tr: 'sunrise', bl: 'rain_piano', br: 'meditation' },
+  cyber: { tl: 'cyber', tr: 'chiptune', bl: 'cello', br: 'zen' }
+};
+
+let userQuadrantAssignments = { ...DEFAULT_ASSIGNMENTS };
+
+// Load user saved quadrant assignments from localStorage
+try {
+  const saved = localStorage.getItem('moodtrace_user_quadrants');
+  if (saved) {
+    userQuadrantAssignments = { ...DEFAULT_ASSIGNMENTS, ...JSON.parse(saved) };
+  }
+} catch (_) {}
+
+let currentActiveTrackId = userQuadrantAssignments.br;
 let isAudioPlaying = false;
 let autoMoodSync = true;
 let isTrackingActive = true;
@@ -140,6 +274,168 @@ const btnPauseTracking = document.getElementById('btn-pause-tracking');
 const btnTrackIcon = document.getElementById('btn-track-icon');
 const btnTrackText = document.getElementById('btn-track-text');
 
+// Quadrant labels on Harmonic Matrix
+const lblTlTitle = document.getElementById('lbl-tl-title');
+const lblTlDesc = document.getElementById('lbl-tl-desc');
+const lblTrTitle = document.getElementById('lbl-tr-title');
+const lblTrDesc = document.getElementById('lbl-tr-desc');
+const lblBlTitle = document.getElementById('lbl-bl-title');
+const lblBlDesc = document.getElementById('lbl-bl-desc');
+const lblBrTitle = document.getElementById('lbl-br-title');
+const lblBrDesc = document.getElementById('lbl-br-desc');
+
+// Modal Elements
+const modalCustomizer = document.getElementById('modal-quadrant-customizer');
+const btnOpenCustomizer = document.getElementById('btn-open-quadrant-customizer');
+const btnCloseCustomizer = document.getElementById('btn-close-customizer');
+const btnCancelCustomizer = document.getElementById('btn-cancel-customizer');
+const btnApplyCustomizer = document.getElementById('btn-apply-custom-quadrants');
+const selQuadTl = document.getElementById('sel-quad-tl');
+const selQuadTr = document.getElementById('sel-quad-tr');
+const selQuadBl = document.getElementById('sel-quad-bl');
+const selQuadBr = document.getElementById('sel-quad-br');
+
+// -----------------------------------------------------------------------------
+// Update Quadrant Display Cards on Harmonic Matrix
+// -----------------------------------------------------------------------------
+function refreshMatrixQuadrantDisplays() {
+  const mTl = MOOD_LIBRARY[userQuadrantAssignments.tl] || MOOD_LIBRARY.cyber;
+  const mTr = MOOD_LIBRARY[userQuadrantAssignments.tr] || MOOD_LIBRARY.chillhop;
+  const mBl = MOOD_LIBRARY[userQuadrantAssignments.bl] || MOOD_LIBRARY.rain_piano;
+  const mBr = MOOD_LIBRARY[userQuadrantAssignments.br] || MOOD_LIBRARY.zen;
+
+  if (lblTlTitle) lblTlTitle.textContent = `${mTl.emoji} ${mTl.name}`;
+  if (lblTlDesc) lblTlDesc.textContent = `${mTl.badge} • ${mTl.artist}`;
+
+  if (lblTrTitle) lblTrTitle.textContent = `${mTr.emoji} ${mTr.name}`;
+  if (lblTrDesc) lblTrDesc.textContent = `${mTr.badge} • ${mTr.artist}`;
+
+  if (lblBlTitle) lblBlTitle.textContent = `${mBl.emoji} ${mBl.name}`;
+  if (lblBlDesc) lblBlDesc.textContent = `${mBl.badge} • ${mBl.artist}`;
+
+  if (lblBrTitle) lblBrTitle.textContent = `${mBr.emoji} ${mBr.name}`;
+  if (lblBrDesc) lblBrDesc.textContent = `${mBr.badge} • ${mBr.artist}`;
+}
+
+// -----------------------------------------------------------------------------
+// Modal & Customizer Logic
+// -----------------------------------------------------------------------------
+function populateCustomizerDropdowns() {
+  const populate = (selectElem, selectedKey) => {
+    selectElem.innerHTML = '';
+    Object.values(MOOD_LIBRARY).forEach((m) => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = `${m.emoji} ${m.name} (${m.badge})`;
+      if (m.id === selectedKey) opt.selected = true;
+      selectElem.appendChild(opt);
+    });
+  };
+
+  populate(selQuadTl, userQuadrantAssignments.tl);
+  populate(selQuadTr, userQuadrantAssignments.tr);
+  populate(selQuadBl, userQuadrantAssignments.bl);
+  populate(selQuadBr, userQuadrantAssignments.br);
+}
+
+btnOpenCustomizer?.addEventListener('click', () => {
+  populateCustomizerDropdowns();
+  modalCustomizer.classList.add('open');
+});
+
+btnCloseCustomizer?.addEventListener('click', () => {
+  modalCustomizer.classList.remove('open');
+});
+btnCancelCustomizer?.addEventListener('click', () => {
+  modalCustomizer.classList.remove('open');
+});
+
+// Apply Custom 4 Moods
+btnApplyCustomizer?.addEventListener('click', () => {
+  userQuadrantAssignments = {
+    tl: selQuadTl.value,
+    tr: selQuadTr.value,
+    bl: selQuadBl.value,
+    br: selQuadBr.value
+  };
+
+  try {
+    localStorage.setItem('moodtrace_user_quadrants', JSON.stringify(userQuadrantAssignments));
+  } catch (_) {}
+
+  refreshMatrixQuadrantDisplays();
+  modalCustomizer.classList.remove('open');
+
+  // Immediately transition audio to current quadrant track
+  const activeQuad = determineTargetQuadrantKey(targetValence, targetArousal);
+  const targetTrackId = userQuadrantAssignments[activeQuad];
+  activateMoodTrack(targetTrackId, isAudioPlaying);
+});
+
+// Preset Buttons inside Modal
+document.querySelectorAll('.btn-preset-pill').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const pKey = btn.dataset.preset;
+    if (PRESETS[pKey]) {
+      const p = PRESETS[pKey];
+      selQuadTl.value = p.tl;
+      selQuadTr.value = p.tr;
+      selQuadBl.value = p.bl;
+      selQuadBr.value = p.br;
+    }
+  });
+});
+
+// -----------------------------------------------------------------------------
+// Sound Library Grid Render & Filter (12 Albums)
+// -----------------------------------------------------------------------------
+function renderLibraryGrid(filter = 'all') {
+  const grid = document.getElementById('full-library-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  Object.values(MOOD_LIBRARY).forEach((m) => {
+    if (filter !== 'all' && m.category !== filter) return;
+
+    const card = document.createElement('div');
+    card.className = `album-station-card ${m.id === currentActiveTrackId ? 'active' : ''}`;
+    card.dataset.station = m.id;
+
+    card.innerHTML = `
+      <div class="album-art-box" style="background: ${m.accentColor}22; border: 1px solid ${m.accentColor}44;">
+        <span class="album-emoji">${m.emoji}</span>
+      </div>
+      <div class="album-info">
+        <span class="album-badge" style="color: ${m.accentColor};">${m.badge}</span>
+        <h4>${m.name}</h4>
+        <p>${m.artist}</p>
+      </div>
+      <button class="btn-play-station" data-track="${m.id}">▶ Play</button>
+    `;
+
+    card.addEventListener('click', () => {
+      activateMoodTrack(m.id, true);
+    });
+
+    const playBtn = card.querySelector('.btn-play-station');
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activateMoodTrack(m.id, true);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// Library Category Filter Pills
+document.querySelectorAll('.filter-pill').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibraryGrid(btn.dataset.filter);
+  });
+});
+
 // -----------------------------------------------------------------------------
 // Navigation Tabs
 // -----------------------------------------------------------------------------
@@ -152,6 +448,9 @@ document.querySelectorAll('.dock-btn').forEach((btn) => {
     const targetView = document.getElementById(btn.dataset.tab);
     if (targetView) targetView.classList.add('active');
 
+    if (btn.dataset.tab === 'tab-stations') {
+      renderLibraryGrid();
+    }
     if (btn.dataset.tab === 'tab-config') {
       loadTelemetryCounters();
     }
@@ -203,11 +502,10 @@ function applyTrackingState(active) {
 }
 
 // -----------------------------------------------------------------------------
-// Web Audio Ambient Multi-Layer Soundscape Synthesizer
+// Universal Web Audio Procedural Soundscape Synthesizer
 // -----------------------------------------------------------------------------
 let audioCtx = null;
 let activeNodes = [];
-let rainBufferNode = null;
 let synthGainNode = null;
 let chordIntervalTimer = null;
 
@@ -235,7 +533,7 @@ function stopProceduralSoundscape() {
   activeNodes = [];
 }
 
-// Generates an authentic, soft, pink-noise nocturnal rain soundscape
+// Soft pink noise nocturnal rain texture
 function createRainNoiseNode(ctx, masterGain) {
   const bufferSize = ctx.sampleRate * 2;
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -257,7 +555,6 @@ function createRainNoiseNode(ctx, masterGain) {
   noise.buffer = buffer;
   noise.loop = true;
 
-  // Rain lowpass filter (soothing mellow patter)
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(1400, ctx.currentTime);
@@ -273,7 +570,6 @@ function createRainNoiseNode(ctx, masterGain) {
   activeNodes.push(noise, filter, rainGain);
 }
 
-// Plays a gentle, reflective piano / acoustic harmonic chord progression
 function playHarmonicPad(ctx, freqs, duration, masterGain, waveType = 'sine', gainLevel = 0.06) {
   freqs.forEach((freq) => {
     const osc = ctx.createOscillator();
@@ -282,7 +578,6 @@ function playHarmonicPad(ctx, freqs, duration, masterGain, waveType = 'sine', ga
     osc.type = waveType;
     osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
-    // Soft attack and lingering release
     noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
     noteGain.gain.linearRampToValueAtTime(gainLevel, ctx.currentTime + 1.2);
     noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
@@ -296,7 +591,7 @@ function playHarmonicPad(ctx, freqs, duration, masterGain, waveType = 'sine', ga
   });
 }
 
-function startProceduralStation(stationType) {
+function startProceduralMood(synthType) {
   initAudioContext();
   stopProceduralSoundscape();
 
@@ -304,47 +599,45 @@ function startProceduralStation(stationType) {
   synthGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
   synthGainNode.connect(audioCtx.destination);
 
-  if (stationType === 'rain_piano') {
-    // 1. Soft nocturnal rainfall
+  if (synthType === 'rain_piano' || synthType === 'cello_strings' || synthType === 'campfire_guitar') {
+    // Soft rain / nature ambience
     createRainNoiseNode(audioCtx, synthGainNode);
 
-    // 2. Contemplative Reflective Piano Chord Progressions (D min 9, Bb maj 7, G min 9, F maj 7)
-    const reflectiveChords = [
-      [146.83, 220.00, 261.63, 329.63, 440.00], // D3, A3, C4, E4, A4 (Dmin9)
-      [116.54, 174.61, 233.08, 293.66, 349.23], // Bb2, F3, Bb3, D4, F4 (Bbmaj7)
-      [98.00, 146.83, 196.00, 261.63, 349.23],  // G2, D3, G3, C4, F4 (Gmin11)
-      [130.81, 196.00, 261.63, 329.63, 392.00]  // C3, G3, C4, E4, G4 (Cadd9)
+    // Contemplative minor piano progression (Dmin9 -> Bbmaj7 -> Gmin11 -> Cadd9)
+    const minorChords = [
+      [146.83, 220.00, 261.63, 329.63, 440.00],
+      [116.54, 174.61, 233.08, 293.66, 349.23],
+      [98.00, 146.83, 196.00, 261.63, 349.23],
+      [130.81, 196.00, 261.63, 329.63, 392.00]
     ];
-
     let chordIdx = 0;
-    const triggerChord = () => {
+    const trigger = () => {
       if (!isAudioPlaying) return;
-      playHarmonicPad(audioCtx, reflectiveChords[chordIdx], 5.5, synthGainNode, 'sine', 0.05);
-      chordIdx = (chordIdx + 1) % reflectiveChords.length;
+      playHarmonicPad(audioCtx, minorChords[chordIdx], 5.5, synthGainNode, 'sine', 0.05);
+      chordIdx = (chordIdx + 1) % minorChords.length;
     };
+    trigger();
+    chordIntervalTimer = setInterval(trigger, 4800);
 
-    triggerChord();
-    chordIntervalTimer = setInterval(triggerChord, 4800);
-
-  } else if (stationType === 'calm_chords') {
-    // Warm Rhodes Zen Progressions (Cmaj9, Am9, Fmaj9, G6)
+  } else if (synthType === 'zen_rhodes' || synthType === 'ocean_harp' || synthType === 'bowl_drone') {
+    // Zen major progression (Cmaj9 -> Am9 -> Fmaj9 -> G6)
     const zenChords = [
-      [130.81, 196.00, 246.94, 293.66, 392.00], // Cmaj9
-      [110.00, 164.81, 220.00, 261.63, 329.63], // Am9
-      [87.31, 130.81, 174.61, 220.00, 261.63],  // Fmaj9
-      [98.00, 146.83, 196.00, 246.94, 293.66]   // G6
+      [130.81, 196.00, 246.94, 293.66, 392.00],
+      [110.00, 164.81, 220.00, 261.63, 329.63],
+      [87.31, 130.81, 174.61, 220.00, 261.63],
+      [98.00, 146.83, 196.00, 246.94, 293.66]
     ];
     let chordIdx = 0;
-    const triggerZen = () => {
+    const trigger = () => {
       if (!isAudioPlaying) return;
       playHarmonicPad(audioCtx, zenChords[chordIdx], 6.0, synthGainNode, 'triangle', 0.045);
       chordIdx = (chordIdx + 1) % zenChords.length;
     };
-    triggerZen();
-    chordIntervalTimer = setInterval(triggerZen, 5200);
+    trigger();
+    chordIntervalTimer = setInterval(trigger, 5200);
 
-  } else if (stationType === 'upbeat_pulse') {
-    // Upbeat Lo-Fi Chillhop Chords (Ebmaj9, Cm7, Abmaj7, Bb9)
+  } else if (synthType === 'chillhop_pulse' || synthType === 'sunrise_acoustic' || synthType === 'chiptune_arp') {
+    // Upbeat progression (Ebmaj9 -> Cm7 -> Abmaj7 -> Bb9)
     const upbeatChords = [
       [155.56, 233.08, 293.66, 349.23, 440.00],
       [130.81, 196.00, 233.08, 293.66, 392.00],
@@ -352,67 +645,64 @@ function startProceduralStation(stationType) {
       [116.54, 174.61, 233.08, 293.66, 349.23]
     ];
     let chordIdx = 0;
-    const triggerUpbeat = () => {
+    const trigger = () => {
       if (!isAudioPlaying) return;
       playHarmonicPad(audioCtx, upbeatChords[chordIdx], 3.5, synthGainNode, 'triangle', 0.05);
       chordIdx = (chordIdx + 1) % upbeatChords.length;
     };
-    triggerUpbeat();
-    chordIntervalTimer = setInterval(triggerUpbeat, 3200);
+    trigger();
+    chordIntervalTimer = setInterval(trigger, 3200);
 
   } else {
-    // Focus Bassline & Sweep
+    // Focus Bassline & Sweep (cyber_bass, codeflow_techno, space_drone)
     const bassline = [110.0, 110.0, 130.81, 146.83, 98.0, 110.0];
     let noteIdx = 0;
-    const triggerFocus = () => {
+    const trigger = () => {
       if (!isAudioPlaying) return;
       playHarmonicPad(audioCtx, [bassline[noteIdx], bassline[noteIdx] * 2], 2.0, synthGainNode, 'sawtooth', 0.035);
       noteIdx = (noteIdx + 1) % bassline.length;
     };
-    triggerFocus();
-    chordIntervalTimer = setInterval(triggerFocus, 1800);
+    trigger();
+    chordIntervalTimer = setInterval(trigger, 1800);
   }
 }
 
 // -----------------------------------------------------------------------------
-// Music Station Switcher & Playback Handler
+// Playback & Track Switcher Handler
 // -----------------------------------------------------------------------------
-function activateStation(stationKey, startPlaying = false) {
-  const st = STATIONS[stationKey];
-  if (!st) return;
+function activateMoodTrack(trackId, startPlaying = false) {
+  const m = MOOD_LIBRARY[trackId] || MOOD_LIBRARY.zen;
+  currentActiveTrackId = trackId;
 
-  currentStation = stationKey;
-
-  // Update theme colors & background aura
-  document.documentElement.style.setProperty('--current-accent', st.accentColor);
-  document.documentElement.style.setProperty('--current-glow', `${st.accentColor}44`);
+  // Update theme colors & aura
+  document.documentElement.style.setProperty('--current-accent', m.accentColor);
+  document.documentElement.style.setProperty('--current-glow', `${m.accentColor}44`);
   if (dynamicAura) {
-    dynamicAura.style.background = st.aura;
+    dynamicAura.style.background = m.aura;
   }
 
   // Update hero vinyl meta
-  nowPlayingGenre.textContent = st.badge;
-  nowPlayingTitle.textContent = st.name;
-  nowPlayingArtist.textContent = st.artist;
-  vibeBadgeIcon.textContent = st.emoji;
-  vibeBadgeTitle.textContent = st.badge.replace('&', '•');
+  nowPlayingGenre.textContent = m.badge;
+  nowPlayingTitle.textContent = m.name;
+  nowPlayingArtist.textContent = m.artist;
+  vibeBadgeIcon.textContent = m.emoji;
+  vibeBadgeTitle.textContent = m.badge.replace('&', '•');
 
-  // Highlight album catalog card
+  // Highlight active cards in library grid
   document.querySelectorAll('.album-station-card').forEach((card) => {
-    card.classList.toggle('active', card.dataset.station === stationKey);
+    card.classList.toggle('active', card.dataset.station === trackId);
   });
 
   if (startPlaying || isAudioPlaying) {
     isAudioPlaying = true;
     setPlaybackState(true);
 
-    // Try HTML5 streaming first, seamlessly launch procedural soundscape if stream blocked
-    audioPlayer.src = st.url;
+    audioPlayer.src = m.url;
     audioPlayer.play().then(() => {
       stopProceduralSoundscape();
     }).catch((err) => {
-      console.log(`Launching dedicated procedural ambient soundscape for ${st.name}:`, err.message || err);
-      startProceduralStation(st.synthType);
+      console.log(`Launching dedicated procedural ambient soundscape for ${m.name}:`, err.message || err);
+      startProceduralMood(m.synthType);
     });
   }
 }
@@ -437,7 +727,7 @@ document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
     stopProceduralSoundscape();
     setPlaybackState(false);
   } else {
-    activateStation(currentStation, true);
+    activateMoodTrack(currentActiveTrackId, true);
   }
 });
 
@@ -453,29 +743,14 @@ chkStudioSync?.addEventListener('change', (e) => {
   autoMoodSync = e.target.checked;
 });
 
-// Stations Catalog Play Buttons
-document.querySelectorAll('.btn-play-station').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const target = btn.dataset.station;
-    activateStation(target, true);
-  });
-});
-
-document.querySelectorAll('.album-station-card').forEach((card) => {
-  card.addEventListener('click', () => {
-    activateStation(card.dataset.station, true);
-  });
-});
-
 // -----------------------------------------------------------------------------
-// Live Affect & Kinematics Sync Loop
+// Live Affect & 4-Quadrant Dynamic Routing
 // -----------------------------------------------------------------------------
-function mapMoodToStation(valence, arousal) {
-  if (arousal >= 0 && valence >= 0) return 'upbeat';
-  if (arousal >= 0 && valence < 0) return 'focus';
-  if (arousal < 0 && valence >= 0) return 'calm';
-  return 'melancholy';
+function determineTargetQuadrantKey(valence, arousal) {
+  if (arousal >= 0 && valence >= 0) return 'tr'; // Top-Right
+  if (arousal >= 0 && valence < 0) return 'tl'; // Top-Left
+  if (arousal < 0 && valence < 0) return 'bl';  // Bottom-Left
+  return 'br';                                  // Bottom-Right
 }
 
 async function syncLiveStudioState() {
@@ -495,11 +770,12 @@ async function syncLiveStudioState() {
     targetAccel = mean_acceleration || 0;
     targetClicks = click_rate || 0;
 
-    // Dynamic auto-sync with station vibes
+    // Dynamic auto-sync with user's configured 4 quadrants
     if (autoMoodSync) {
-      const targetKey = mapMoodToStation(targetValence, targetArousal);
-      if (targetKey !== currentStation) {
-        activateStation(targetKey, isAudioPlaying);
+      const activeQuad = determineTargetQuadrantKey(targetValence, targetArousal);
+      const targetTrackId = userQuadrantAssignments[activeQuad] || DEFAULT_ASSIGNMENTS[activeQuad];
+      if (targetTrackId !== currentActiveTrackId) {
+        activateMoodTrack(targetTrackId, isAudioPlaying);
       }
     }
 
@@ -512,7 +788,6 @@ async function syncLiveStudioState() {
 // 60 FPS Fluid Linear Interpolation (Lerp) Render Loop
 // -----------------------------------------------------------------------------
 function renderFluidFrame() {
-  // Smoothly glide position: 14% delta per frame
   displayValence += (targetValence - displayValence) * 0.14;
   displayArousal += (targetArousal - displayArousal) * 0.14;
   displaySpeed += (targetSpeed - displaySpeed) * 0.18;
@@ -588,7 +863,9 @@ async function loadTelemetryCounters() {
 // -----------------------------------------------------------------------------
 // Initialization
 // -----------------------------------------------------------------------------
-activateStation('calm', false);
-setInterval(syncLiveStudioState, 500); // 500ms sync loop for high responsiveness
+refreshMatrixQuadrantDisplays();
+renderLibraryGrid('all');
+activateMoodTrack(currentActiveTrackId, false);
+setInterval(syncLiveStudioState, 500); // 500ms high-precision sync
 syncLiveStudioState();
 requestAnimationFrame(renderFluidFrame); // 60 FPS fluid rendering loop

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moodtrace — Affect & Acoustic Ambient Suite</title>
+    <title>Moodtrace — Acoustic Affect & Biometric Soundscape Suite</title>
     <!-- Google Fonts: Plus Jakarta Sans & Outfit & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -38,7 +38,7 @@
           </button>
           <button class="dock-btn" data-tab="tab-stations" id="nav-btn-stations">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-            Soundscapes
+            Sound Library
           </button>
           <button class="dock-btn" data-tab="tab-config" id="nav-btn-config">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
@@ -61,7 +61,7 @@
       <main class="main-stage">
         
         <!-- ============================================================ -->
-        <!-- TAB 1: MOOD STUDIO (Hero Affect Matrix & Live Music Vibe)     -->
+        <!-- TAB 1: MOOD STUDIO (Harmonic Mood Matrix & Customizer)       -->
         <!-- ============================================================ -->
         <section class="tab-view active" id="tab-studio">
           <div class="studio-layout">
@@ -70,7 +70,13 @@
             <div class="frosted-glass-box mood-matrix-panel">
               <div class="panel-headline">
                 <div>
-                  <span class="caption-tag">BIOMETRIC EMOTION SPACE</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="caption-tag">BIOMETRIC EMOTION SPACE</span>
+                    <button class="btn-customize-quadrants" id="btn-open-quadrant-customizer">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                      Customize 4 Grid Moods
+                    </button>
+                  </div>
                   <h2>Harmonic Affect Matrix</h2>
                 </div>
                 <div class="mood-vibe-pill" id="current-vibe-pill">
@@ -81,22 +87,22 @@
 
               <div class="matrix-canvas-container">
                 <div class="matrix-plane" id="matrix-plane">
-                  <!-- Quadrant Backdrops with Audio Glow -->
-                  <div class="matrix-quadrant quad-top-left" data-q="focus">
-                    <span class="quad-vibe-title">🔥 Intense Focus</span>
-                    <span class="quad-vibe-sub">Cyber Synth • Deep Rhythms</span>
+                  <!-- Quadrant Backdrops (Dynamic Customized Moods) -->
+                  <div class="matrix-quadrant quad-top-left" id="quad-display-tl">
+                    <span class="quad-vibe-title" id="lbl-tl-title">🎧 Cyber Synth Pulse</span>
+                    <span class="quad-vibe-sub" id="lbl-tl-desc">Intense Flow • Electronic</span>
                   </div>
-                  <div class="matrix-quadrant quad-top-right" data-q="upbeat">
-                    <span class="quad-vibe-title">⚡ High Energy</span>
-                    <span class="quad-vibe-sub">Upbeat Chillhop • Sunshine</span>
+                  <div class="matrix-quadrant quad-top-right" id="quad-display-tr">
+                    <span class="quad-vibe-title" id="lbl-tr-title">⚡ Sunshine Chillhop</span>
+                    <span class="quad-vibe-sub" id="lbl-tr-desc">High Energy • Happy</span>
                   </div>
-                  <div class="matrix-quadrant quad-bottom-left" data-q="melancholy">
-                    <span class="quad-vibe-title">🌧️ Rain & Drone</span>
-                    <span class="quad-vibe-sub">Soft Melancholy • Ambient</span>
+                  <div class="matrix-quadrant quad-bottom-left" id="quad-display-bl">
+                    <span class="quad-vibe-title" id="lbl-bl-title">🌧️ Midnight Rain Piano</span>
+                    <span class="quad-vibe-sub" id="lbl-bl-desc">Reflective • Soft Rainfall</span>
                   </div>
-                  <div class="matrix-quadrant quad-bottom-right" data-q="calm">
-                    <span class="quad-vibe-title">🌿 Zen Peace</span>
-                    <span class="quad-vibe-sub">Gentle Rhodes • Relaxed</span>
+                  <div class="matrix-quadrant quad-bottom-right" id="quad-display-br">
+                    <span class="quad-vibe-title" id="lbl-br-title">🌿 Zen Solitude</span>
+                    <span class="quad-vibe-sub" id="lbl-br-desc">Calm • Nature Drone</span>
                   </div>
 
                   <!-- Musical Frequency Grid Lines -->
@@ -159,8 +165,8 @@
                   
                   <div class="now-playing-meta">
                     <span class="station-badge" id="now-playing-genre">AMBIENT SOUNDSCAPE</span>
-                    <h3 id="now-playing-title">Calm & Peaceful Ambient</h3>
-                    <p id="now-playing-artist">Acoustic Piano & Soft Strings</p>
+                    <h3 id="now-playing-title">Zen Ambient Solitude</h3>
+                    <p id="now-playing-artist">Acoustic Piano & Nature Drone</p>
 
                     <!-- Real-time Soundwave Visualizer -->
                     <div class="soundwave-bar-visualizer" id="live-soundwave">
@@ -203,7 +209,7 @@
               <div class="frosted-glass-box mixer-dynamics-card">
                 <div class="card-title-row">
                   <span class="caption-tag">BIOMETRIC RHYTHM METERS</span>
-                  <span class="sub-freq">45s Window</span>
+                  <span class="sub-freq">35s Rolling Window</span>
                 </div>
 
                 <div class="eq-meters-group">
@@ -260,77 +266,35 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB 2: SOUNDSCAPES CATALOGUE (Mood Albums & Stations)       -->
+        <!-- TAB 2: SOUND LIBRARY (12+ Diverse Moods & Soundscapes)        -->
         <!-- ============================================================ -->
         <section class="tab-view" id="tab-stations">
           <div class="soundscapes-catalog-wrap">
             <div class="catalog-header-box">
-              <h2>Acoustic Affect Stations</h2>
-              <p>Curated royalty-free generative soundscapes and ambient frequencies aligned with psychological arousal & valence states.</p>
+              <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                  <h2>Acoustic Soundscape Library</h2>
+                  <p>Explore all 12 mood soundscapes. Click to preview or assign them to your 4-quadrant Harmonic Matrix.</p>
+                </div>
+                <div class="library-filter-pills" id="library-filter-group">
+                  <button class="filter-pill active" data-filter="all">All (12)</button>
+                  <button class="filter-pill" data-filter="calm">Calm (3)</button>
+                  <button class="filter-pill" data-filter="upbeat">Energetic (3)</button>
+                  <button class="filter-pill" data-filter="focus">Focus (3)</button>
+                  <button class="filter-pill" data-filter="melancholy">Reflective (3)</button>
+                </div>
+              </div>
             </div>
 
-            <div class="stations-album-grid">
-              <!-- Station 1 -->
-              <div class="album-station-card active" data-station="calm" id="card-station-calm">
-                <div class="album-art-box art-calm">
-                  <span class="album-emoji">🌿</span>
-                  <div class="album-vinyl-sleeve"></div>
-                </div>
-                <div class="album-info">
-                  <span class="album-badge">CALM & RELAXED</span>
-                  <h4>Zen Ambient Solitude</h4>
-                  <p>Acoustic melodies, gentle Rhodes, and nature drone (Low Energy • High Valence)</p>
-                </div>
-                <button class="btn-play-station" data-station="calm">▶ Play</button>
-              </div>
-
-              <!-- Station 2 -->
-              <div class="album-station-card" data-station="upbeat" id="card-station-upbeat">
-                <div class="album-art-box art-upbeat">
-                  <span class="album-emoji">⚡</span>
-                  <div class="album-vinyl-sleeve"></div>
-                </div>
-                <div class="album-info">
-                  <span class="album-badge">HIGH ENERGY & HAPPY</span>
-                  <h4>Sunshine Chillhop Beats</h4>
-                  <p>Vibrant lo-fi beats, uplifting rhythm, and melodic energy (High Energy • High Valence)</p>
-                </div>
-                <button class="btn-play-station" data-station="upbeat">▶ Play</button>
-              </div>
-
-              <!-- Station 3 -->
-              <div class="album-station-card" data-station="focus" id="card-station-focus">
-                <div class="album-art-box art-focus">
-                  <span class="album-emoji">🎧</span>
-                  <div class="album-vinyl-sleeve"></div>
-                </div>
-                <div class="album-info">
-                  <span class="album-badge">INTENSE FOCUS & FLOW</span>
-                  <h4>Cyber Synthwave Pulse</h4>
-                  <p>Deep electronic driving basslines for coding & gaming intensity (High Energy • Low Valence)</p>
-                </div>
-                <button class="btn-play-station" data-station="focus">▶ Play</button>
-              </div>
-
-              <!-- Station 4 -->
-              <div class="album-station-card" data-station="melancholy" id="card-station-melancholy">
-                <div class="album-art-box art-melancholy">
-                  <span class="album-emoji">🌧️</span>
-                  <div class="album-vinyl-sleeve"></div>
-                </div>
-                <div class="album-info">
-                  <span class="album-badge">CALM & REFLECTIVE</span>
-                  <h4>Midnight Rain & Reflective Piano</h4>
-                  <p>Gentle nocturnal rain, warm piano chords, and contemplative ambient strings (Low Energy • Low Valence)</p>
-                </div>
-                <button class="btn-play-station" data-station="melancholy">▶ Play</button>
-              </div>
+            <!-- 12 Diverse Soundscape Albums Grid -->
+            <div class="stations-album-grid" id="full-library-grid">
+              <!-- Dynamically populated via JavaScript -->
             </div>
           </div>
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB 3: SETTINGS & PRIVACY (Hardware & Frequency Controls)    -->
+        <!-- TAB 3: SETTINGS & PRIVACY (Hardware & Custom Presets)        -->
         <!-- ============================================================ -->
         <section class="tab-view" id="tab-config">
           <div class="config-grid-layout">
@@ -345,11 +309,10 @@
                 <div class="field-item">
                   <label for="cfg-inference-rate">Inference Sampling Rate</label>
                   <select id="cfg-inference-rate" class="glass-select">
-                    <option value="1">Every 1 Second (High Responsiveness)</option>
+                    <option value="1" selected>Every 1 Second (High Responsiveness)</option>
                     <option value="3">Every 3 Seconds (Balanced)</option>
-                    <option value="5" selected>Every 5 Seconds (Recommended)</option>
+                    <option value="5">Every 5 Seconds (Low CPU)</option>
                     <option value="10">Every 10 Seconds (Power-Saving)</option>
-                    <option value="30">Every 30 Seconds</option>
                   </select>
                   <span class="field-hint">Frequency at which the classical ML models evaluate your cursor dynamics.</span>
                 </div>
@@ -359,8 +322,8 @@
                   <select id="cfg-feature-window" class="glass-select">
                     <option value="15">15 Seconds (Rapid changes)</option>
                     <option value="30">30 Seconds</option>
-                    <option value="45" selected>45 Seconds (Recommended Baseline)</option>
-                    <option value="60">60 Seconds (Smooth Average)</option>
+                    <option value="35" selected>35 Seconds (Balanced Baseline)</option>
+                    <option value="45">45 Seconds (Smooth Average)</option>
                   </select>
                   <span class="field-hint">Length of past mouse kinematics and click cadence evaluated in each prediction.</span>
                 </div>
@@ -374,7 +337,7 @@
                     <option value="15">Every 15 Minutes</option>
                     <option value="30">Every 30 Minutes</option>
                   </select>
-                  <span class="field-hint">Opens the 9x9 Affect Grid dialog to capture ground truth labels.</span>
+                  <span class="field-hint">Opens the 9x9 Affect Grid dialog to calibrate local ground truth.</span>
                 </div>
 
                 <button class="btn-save-glow" id="btn-save-config">Save Engine Preferences</button>
@@ -424,13 +387,84 @@
           <span>Hook: WH_MOUSE_LL Active</span>
         </div>
         <div class="status-cell">
-          <span>Engine: Local ONNX Runtime (CPU)</span>
+          <span>Engine: Local Hybrid ONNX Runtime</span>
         </div>
         <div class="status-cell">
-          <span id="ambient-stream-status">Audio: Public Ambient Stream Online</span>
+          <span id="ambient-stream-status">Soundscapes: 12 Mood Stations Active</span>
         </div>
       </footer>
 
     </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Custom 4-Quadrant Mood Assignment Selector            -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="modal-quadrant-customizer">
+      <div class="modal-content frosted-glass-box customizer-box">
+        <div class="modal-header">
+          <div>
+            <h3>Customize Your 4-Quadrant Mood Matrix</h3>
+            <p>Select which mood & soundscape represents each quadrant of your 2D Affect Space.</p>
+          </div>
+          <button class="btn-close-modal" id="btn-close-customizer">&times;</button>
+        </div>
+
+        <!-- Quick Preset Themes -->
+        <div class="preset-theme-bar">
+          <span class="preset-label">Quick Bundles:</span>
+          <button class="btn-preset-pill" data-preset="studio">Studio Classic</button>
+          <button class="btn-preset-pill" data-preset="lofi">Lo-Fi & Coffee</button>
+          <button class="btn-preset-pill" data-preset="nature">Zen Nature</button>
+          <button class="btn-preset-pill" data-preset="cyber">Cyberpunk & Coding</button>
+        </div>
+
+        <!-- 4 Quadrant Selector Cards -->
+        <div class="quadrant-selectors-grid">
+          
+          <!-- Quadrant Top-Left: High Arousal, Low Valence -->
+          <div class="quad-select-card" style="border-left: 4px solid var(--accent-rose);">
+            <div class="q-card-head">
+              <span class="q-badge">TOP-LEFT (HIGH ENERGY • INTENSE)</span>
+            </div>
+            <label for="sel-quad-tl">Assigned Mood Track:</label>
+            <select id="sel-quad-tl" class="glass-select q-select-input"></select>
+          </div>
+
+          <!-- Quadrant Top-Right: High Arousal, High Valence -->
+          <div class="quad-select-card" style="border-left: 4px solid var(--accent-amber);">
+            <div class="q-card-head">
+              <span class="q-badge">TOP-RIGHT (HIGH ENERGY • UPBEAT)</span>
+            </div>
+            <label for="sel-quad-tr">Assigned Mood Track:</label>
+            <select id="sel-quad-tr" class="glass-select q-select-input"></select>
+          </div>
+
+          <!-- Quadrant Bottom-Left: Low Arousal, Low Valence -->
+          <div class="quad-select-card" style="border-left: 4px solid var(--accent-cyan);">
+            <div class="q-card-head">
+              <span class="q-badge">BOTTOM-LEFT (CALM • REFLECTIVE)</span>
+            </div>
+            <label for="sel-quad-bl">Assigned Mood Track:</label>
+            <select id="sel-quad-bl" class="glass-select q-select-input"></select>
+          </div>
+
+          <!-- Quadrant Bottom-Right: Low Arousal, High Valence -->
+          <div class="quad-select-card" style="border-left: 4px solid var(--accent-emerald);">
+            <div class="q-card-head">
+              <span class="q-badge">BOTTOM-RIGHT (CALM • PEACEFUL)</span>
+            </div>
+            <label for="sel-quad-br">Assigned Mood Track:</label>
+            <select id="sel-quad-br" class="glass-select q-select-input"></select>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary-glass" id="btn-cancel-customizer">Cancel</button>
+          <button class="btn-save-glow" id="btn-apply-custom-quadrants" style="margin-top: 0; padding: 10px 24px;">Apply Custom 4 Moods</button>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>
