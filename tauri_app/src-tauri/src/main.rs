@@ -93,11 +93,19 @@ fn main() {
                 if window.label() == "main" {
                     api.prevent_close();
                     let _ = window.hide();
+                    println!("Moodtrace: Dashboard minimized to system tray.");
                 }
             }
         })
         .setup(|app| {
             let app_handle = app.handle().clone();
+
+            // Explicitly show, unminimize, and bring the main window to front on launch
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
 
             // Load tray icons from compiled bytes
             let calm_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray_calm.png")).unwrap();
